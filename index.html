@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karton — Bee Pee Packaging</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F8F7F4;--surface:#fff;--s2:#F4F2EE;--hover:#F0EEE8;
+  --line:#E8E5DE;--line2:#D4D0C6;
+  --ink:#1A1814;--ink2:#4D4A42;--ink3:#7A7669;--muted:#A39E91;
+  --green:#166534;--green-bg:#E8F0E9;
+  --amber:#92400E;--amber-bg:#F7EBD8;
+  --red:#991B1B;--red-bg:#F5E0E0;
+  --blue:#1E40AF;--blue-bg:#E2E8F5;
+  --r:8px;--r2:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Inter Tight',system-ui,sans-serif;font-size:13px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+
+/* SHELL */
+.app{display:grid;grid-template-columns:210px 1fr;min-height:100vh}
+@media(max-width:720px){
+  /* weight inner grids */
+  .wsec .cb[style*="grid-template-columns"]{grid-template-columns:1fr 1fr!important}
+  /* board size inputs */
+  #w-reel,#w-cut{width:90px!important}
+  .app{grid-template-columns:1fr}
+  .sb{display:none}
+  .mob-nav{display:flex!important}
+  .content{padding:12px}
+  .ph{flex-direction:column;gap:8px}
+  .ptitle{font-size:17px}
+  /* order list: stack on mobile */
+  .ovx{font-size:12px}
+  /* work order grid */
+  .wo-grid{grid-template-columns:repeat(2,1fr)!important}
+  .wo-status-sel{width:100%!important;min-width:unset!important}
+  .wo-bot{flex-direction:column;align-items:stretch}
+  /* weight page */
+  .w2{grid-template-columns:1fr!important}
+  /* kpi strip handled by auto-fill */
+  .kpi{padding:9px 10px}
+  /* addform wrap */
+  .addform{flex-direction:column;align-items:stretch}
+  .addform .sel,.addform .inp{width:100%!important}
+  .addform>div{width:100%}
+  /* pill filters scroll */
+  .fbar{flex-wrap:nowrap;overflow-x:auto}
+  /* wo filter pills */
+  #wo-filters{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+  /* product data filters */
+  .card .addform .sel{width:100%!important}
+}
+
+/* SIDEBAR */
+.sb{background:var(--bg);border-right:1px solid var(--line);padding:12px;height:100vh;position:sticky;top:0;display:flex;flex-direction:column;gap:1px}
+.brand{display:flex;align-items:center;gap:8px;padding:12px 8px 18px}
+.bmark{width:22px;height:22px;background:var(--ink);border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0}
+.btxt{font-weight:600;font-size:14px;letter-spacing:-.02em}
+.bsub{font-size:10px;color:var(--ink3);margin-top:1px}
+.ni{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:4px;color:var(--ink2);cursor:pointer;border:0;background:transparent;font-family:inherit;font-size:13px;width:100%;text-align:left}
+.ni:hover{background:var(--hover);color:var(--ink)}
+.ni.active{background:var(--ink);color:#fff;font-weight:500}
+.ni .c{margin-left:auto;font-size:11px;font-family:'JetBrains Mono',monospace;opacity:.55}
+
+/* MOBILE NAV */
+.mob-nav{display:none;overflow-x:auto;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;scrollbar-width:none}
+.mob-nav::-webkit-scrollbar{display:none}
+.mni{flex-shrink:0;padding:12px 16px;font-size:12px;font-weight:500;color:var(--ink3);border-bottom:2px solid transparent;cursor:pointer;background:transparent;border-top:0;border-left:0;border-right:0;font-family:inherit;white-space:nowrap}
+.mni.active{color:var(--ink);border-bottom-color:var(--ink)}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{height:52px;border-bottom:1px solid var(--line);padding:0 24px;display:flex;align-items:center;position:sticky;top:0;background:var(--bg);z-index:10}
+@media(max-width:680px){.topbar{display:none}}
+.crumb{font-size:12px;color:var(--ink3)}.crumb b{color:var(--ink);font-weight:500}
+.content{padding:20px 24px}
+@media(max-width:680px){.content{padding:14px}}
+.view{display:none}.view.active{display:block}
+
+/* PAGE */
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.ptitle{font-size:20px;font-weight:600;letter-spacing:-.02em;margin-bottom:3px}
+.psub{font-size:11px;color:var(--ink3);font-family:'JetBrains Mono',monospace}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.ch{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.ctitle{font-size:13px;font-weight:600}
+.cb{padding:14px 16px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:12px;font-weight:500;height:28px;padding:0 12px;border-radius:var(--r2);border:1px solid transparent;cursor:pointer;background:transparent;color:var(--ink);white-space:nowrap}
+.btn-p{background:var(--ink);color:#fff}.btn-p:hover{background:#000}
+.btn-g{border-color:var(--line);background:var(--surface);color:var(--ink2)}.btn-g:hover{border-color:var(--line2);color:var(--ink)}
+.btn-sm{height:24px;padding:0 8px;font-size:11px}
+.btn-del{height:22px;width:22px;padding:0;border-radius:3px;color:var(--muted);background:transparent;border:0;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center}
+.btn-del:hover{color:var(--red);background:var(--red-bg)}
+
+/* PILLS */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;height:24px;padding:0 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);cursor:pointer;flex-shrink:0;font-family:inherit}
+.pill:hover{border-color:var(--line2);color:var(--ink)}.pill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* BADGES */
+.bdg{display:inline-flex;align-items:center;font-size:10px;font-weight:600;height:19px;padding:0 7px;border-radius:9px;white-space:nowrap;letter-spacing:.01em}
+.bdg.pn{background:var(--s2);color:var(--ink3)}
+.bdg.ip{background:var(--amber-bg);color:var(--amber)}
+.bdg.pd{background:var(--blue-bg);color:var(--blue)}
+.bdg.rd{background:var(--green-bg);color:var(--green)}
+.bdg.ds{background:var(--s2);color:var(--ink3)}
+
+/* INPUTS */
+.inp{font-family:inherit;font-size:12px;height:28px;padding:0 8px;border-radius:var(--r2);border:1px solid var(--line);background:var(--surface);color:var(--ink);outline:0}
+.inp:focus{border-color:var(--ink);box-shadow:0 0 0 3px rgba(26,24,20,.07)}
+.sel{font-family:inherit;font-size:12px;height:28px;padding:0 8px;border-radius:var(--r2);border:1px solid var(--line);background:var(--surface);color:var(--ink);outline:0;cursor:pointer}
+
+/* INLINE TABLE CELLS */
+.cell{font-family:inherit;font-size:12px;height:26px;padding:0 5px;width:100%;border:1px solid transparent;background:transparent;border-radius:3px;color:var(--ink);outline:0}
+.cell:hover{background:var(--hover)}.cell:focus{background:#fff;border-color:var(--ink)}
+.csel{font-family:inherit;font-size:12px;height:26px;padding:0 4px;width:100%;border:1px solid transparent;background:transparent;border-radius:3px;color:var(--ink);outline:0;cursor:pointer}
+.csel:hover{background:var(--hover)}
+
+/* TABLE */
+table.t{width:100%;border-collapse:collapse}
+.t th{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);background:var(--s2);text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.t td{padding:2px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+.t tr:last-child td{border-bottom:0}
+.t tr:hover td{background:var(--hover)}
+.t .r{text-align:right}
+.ovx{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cell.err{border-color:var(--red)!important;background:var(--red-bg)!important}
+.warn-row td{background:#FFFBEB!important}
+.warn-cell{font-size:10px;color:var(--amber);font-family:"JetBrains Mono",monospace;white-space:nowrap}
+.tfoot{padding:8px 14px;border-top:1px solid var(--line);font-size:11px;color:var(--ink3);display:flex;justify-content:space-between}
+
+/* FILTER BAR */
+.fbar{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;overflow-x:auto;padding:10px 14px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.fbar::-webkit-scrollbar{display:none}
+
+/* ADD FORM */
+.addform{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--s2)}
+.flbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
+
+/* WORK ORDER CARDS */
+.wo-list{display:flex;flex-direction:column;gap:10px;padding:14px}
+.wo-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);display:flex;overflow:hidden;transition:border-color .12s}
+.wo-card:hover{border-color:var(--line2)}
+.wo-stripe{width:4px;flex-shrink:0}
+.wo-stripe.pn{background:var(--line2)}
+.wo-stripe.ip{background:var(--amber)}.wo-stripe.pd{background:var(--blue)}
+.wo-stripe.rd{background:var(--green)}.wo-stripe.ds{background:var(--muted)}
+.wo-body{flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.wo-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.wo-cust{font-size:14px;font-weight:600;word-break:break-word}
+.wo-no{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--ink3);margin-top:2px}
+.wo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 16px}
+
+.wo-flbl{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.wo-fval{font-size:13px;font-weight:500;font-family:'JetBrains Mono',monospace;color:var(--ink)}
+.wo-fval.t{font-family:'Inter Tight',sans-serif}
+.wo-bot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:8px;border-top:1px solid var(--line);flex-wrap:wrap;row-gap:6px}
+.wo-disp{font-size:11px;font-family:'JetBrains Mono',monospace}
+.wo-disp.overdue{color:var(--red);font-weight:600}
+.wo-disp.today{color:var(--amber);font-weight:600}
+.wo-disp.ok{color:var(--ink3)}
+.wo-disp.done{color:var(--muted)}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:11px 14px}
+.kpi-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+.kpi-val{font-size:20px;font-weight:600;letter-spacing:-.02em;font-family:'JetBrains Mono',monospace}
+.kpi-sub{font-size:10px;color:var(--ink3);margin-top:2px;font-family:'JetBrains Mono',monospace}
+
+/* WEIGHT PAGE */
+.w2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:680px){.w2{grid-template-columns:1fr}}
+.wlbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
+.wout{font-size:22px;font-weight:600;font-family:'JetBrains Mono',monospace;letter-spacing:-.02em;color:var(--ink);margin-top:4px}
+.wsec{display:flex;flex-direction:column;gap:12px}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<aside class="sb">
+  <div class="brand">
+    <div class="btxt" style="font-size:15px">Bee Pee Packaging</div>
+  </div>
+  <button class="ni active" data-v="orderlist" onclick="nav('orderlist')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+    Order List<span class="c" id="co">0</span>
+  </button>
+  <button class="ni" data-v="workstatus" onclick="nav('workstatus')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+    Work Status<span class="c" id="cw">0</span>
+  </button>
+  <button class="ni" data-v="tasks" onclick="nav('tasks')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Tasks<span class="c" id="ct">0</span>
+  </button>
+  <button class="ni" data-v="weight" onclick="nav('weight')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3a4 4 0 0 0-4 4h8a4 4 0 0 0-4-4z"/><path d="M6.5 7H17.5L19 21H5L6.5 7z"/></svg>
+    Weight
+  </button>
+  <button class="ni" data-v="productdata" onclick="nav('productdata')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.27 6.96 8.73 5.05 8.73-5.05M12 22.08V12"/></svg>
+    Product Data
+  </button>
+  <button class="ni" data-v="parties" onclick="nav('parties')">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Parties<span class="c" id="cp">0</span>
+  </button>
+</aside>
+
+<div class="main">
+  <!-- MOBILE NAV -->
+  <nav class="mob-nav">
+    <button class="mni active" data-v="orderlist" onclick="nav('orderlist')">Order List</button>
+    <button class="mni" data-v="workstatus" onclick="nav('workstatus')">Work Status</button>
+    <button class="mni" data-v="tasks" onclick="nav('tasks')">Tasks</button>
+    <button class="mni" data-v="weight" onclick="nav('weight')">Weight</button>
+    <button class="mni" data-v="productdata" onclick="nav('productdata')">Product Data</button>
+    <button class="mni" data-v="parties" onclick="nav('parties')">Parties</button>
+  </nav>
+
+  <div class="topbar"><div class="crumb" id="crumb">karton / <b>Order List</b></div></div>
+  <div id="mob-scroll-hint" style="display:none;font-size:11px;color:var(--ink3);padding:6px 14px;background:var(--s2);border-bottom:1px solid var(--line);text-align:center">← scroll table sideways →</div>
+
+  <div class="content">
+
+    <!-- ORDER LIST -->
+    <section id="view-orderlist" class="view active">
+      <div class="ph">
+        <div><div class="ptitle">Order List</div><div class="psub" id="ol-sub"></div></div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input class="inp" id="ol-search" placeholder="Search customer / order no…" style="width:220px" oninput="renderOrders()">
+          <button class="btn btn-p" onclick="addOrder()">+ New order</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="fbar" id="ol-filters"></div>
+        <div class="ovx">
+          <table class="t">
+            <thead><tr>
+              <th style="width:108px">Date</th>
+              <th style="width:108px">Order No</th>
+              <th style="min-width:130px">Customer</th>
+              <th style="min-width:120px">Product</th>
+              <th style="width:52px">Ply</th>
+              <th style="min-width:150px">Size L×W×H</th>
+              <th class="r" style="width:68px">Qty</th>
+              <th style="width:78px">Joint</th>
+              <th style="width:110px">Dispatch</th>
+              <th style="min-width:140px">Status</th>
+              <th style="width:28px"></th>
+            </tr></thead>
+            <tbody id="ol-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORK ORDER -->
+    <section id="view-workstatus" class="view">
+      <div class="ph">
+        <div><div class="ptitle">Work Status</div><div class="psub" id="wo-sub"></div></div>
+        <div style="display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;scrollbar-width:none" id="wo-filters"></div>
+      </div>
+      <div class="kpi-strip" id="wo-kpi"></div>
+      <div class="card">
+        <div class="wo-list" id="wo-list"></div>
+      </div>
+    </section>
+
+    <!-- TASKS -->
+    <section id="view-tasks" class="view">
+      <div class="ph">
+        <div><div class="ptitle">Tasks</div><div class="psub" id="t-sub"></div></div>
+        <button class="btn btn-p" onclick="addTask()">+ New task</button>
+      </div>
+      <div class="card">
+        <div class="fbar" id="t-filters"></div>
+        <div class="ovx">
+          <table class="t">
+            <thead><tr>
+              <th style="width:108px">Date</th>
+              <th>Task</th>
+              <th style="width:150px">Assigned</th>
+              <th style="width:135px">Status</th>
+              <th style="width:28px"></th>
+            </tr></thead>
+            <tbody id="t-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- WEIGHT -->
+    <section id="view-weight" class="view">
+      <div class="ph">
+        <div><div class="ptitle">Weight Calculator</div><div class="psub">Board size & weight per box · 3 decimal places</div></div>
+      </div>
+      <div class="w2">
+        <div class="wsec">
+          <div class="card">
+            <div class="ch"><span class="ctitle">Configuration</span></div>
+            <div class="cb" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+              <div><div class="wlbl">Ply</div><select class="sel" id="w-ply" onchange="wPlyChange()" style="width:100%"><option>3</option><option>5</option><option>7</option></select></div>
+              <div><div class="wlbl">Unit</div><select class="sel" id="w-unit" onchange="wCalc()" style="width:100%"><option value="in">Inches</option><option value="cm">CM</option></select></div>
+              <div><div class="wlbl">Joint</div><select class="sel" id="w-joint" onchange="wCalc()" style="width:100%"><option value="double">Double</option><option value="single">Single</option></select></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><span class="ctitle">Box Size</span><span class="psub" id="w-unit-lbl">inches</span></div>
+            <div class="cb" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+              <div><div class="wlbl">Length (L)</div><input class="inp" type="number" id="w-L" value="15" min="0" oninput="wCalc()" style="width:100%"></div>
+              <div><div class="wlbl">Width (W)</div><input class="inp" type="number" id="w-W" value="15" min="0" oninput="wCalc()" style="width:100%"></div>
+              <div><div class="wlbl">Height (H)</div><input class="inp" type="number" id="w-H" value="15" min="0" oninput="wCalc()" style="width:100%"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><span class="ctitle">Paper GSM</span><span class="psub">Flutes × 1.45 applied</span></div>
+            <div class="cb" style="display:flex;flex-direction:column;gap:10px" id="w-gsm-fields"></div>
+          </div>
+        </div>
+        <div class="wsec">
+          <div class="card">
+            <div class="ch"><span class="ctitle">Board Sizes</span><span class="psub">auto-calculated · editable</span></div>
+            <div class="cb" style="display:flex;flex-direction:column;gap:14px">
+              <div>
+                <div class="wlbl">Reel Size <span style="font-weight:400;color:var(--ink3)">(W + H + 1)</span></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+                  <input class="inp" type="number" id="w-reel" step="0.001" oninput="wReelEdited=true;wCalcFromBoard()" style="width:110px;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600">
+                  <span class="psub">in</span>
+                </div>
+                <div style="font-size:10px;color:var(--muted);margin-top:3px" id="w-reel-hint"></div>
+              </div>
+              <div style="height:1px;background:var(--line)"></div>
+              <div>
+                <div class="wlbl" id="w-cut-lbl">Cut Size <span style="font-weight:400;color:var(--ink3)">(L + W + 2)</span></div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+                  <input class="inp" type="number" id="w-cut" step="0.001" oninput="wCutEdited=true;wCalcFromBoard()" style="width:110px;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600">
+                  <span class="psub">in</span>
+                </div>
+                <div style="font-size:10px;color:var(--muted);margin-top:3px" id="w-cut-hint"></div>
+              </div>
+            </div>
+          </div>
+                    <div class="card">
+            <div class="ch"><span class="ctitle">Total Paper GSM</span><span class="psub">editable · used in weight calc</span></div>
+            <div class="cb" style="display:flex;align-items:center;gap:12px">
+              <input class="inp" type="number" id="w-total-gsm" step="1" min="0" oninput="wTotalGsmEdited=true;wCalcFromBoard()" style="width:120px;font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600">
+              <span class="psub">g/m²</span>
+            </div>
+          </div>
+          <div class="card" style="border-color:var(--ink)">
+            <div class="ch" style="background:var(--ink);border-radius:7px 7px 0 0"><span class="ctitle" style="color:#fff">Weight per Box</span></div>
+            <div style="text-align:center;padding:28px 16px">
+              <div style="font-size:42px;font-weight:700;letter-spacing:-.03em;font-family:'JetBrains Mono',monospace;line-height:1" id="w-result">—</div>
+              <div style="font-size:13px;color:var(--ink3);margin-top:8px">kg</div>
+            </div>
+            <div style="border-top:1px solid var(--line);padding:10px 16px;font-size:11px;color:var(--ink3);font-family:'JetBrains Mono',monospace" id="w-formula">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRODUCT DATA -->
+    <section id="view-productdata" class="view">
+      <div class="ph">
+        <div><div class="ptitle">Product Data</div><div class="psub" id="pd-sub"></div></div>
+      </div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="addform">
+          <div><div class="flbl">Customer</div><select class="sel" id="pdf-cust" onchange="renderProductData()" style="width:180px"><option value="">All customers</option></select></div>
+          <div><div class="flbl">Reel Size</div><select class="sel" id="pdf-reel" onchange="renderProductData()" style="width:130px"><option value="">All sizes</option></select></div>
+          <button class="btn btn-g btn-sm" onclick="pdClear()">↺ Clear</button>
+          <span class="psub" id="pd-note" style="align-self:flex-end"></span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ovx">
+          <table class="t">
+            <thead><tr>
+              <th style="min-width:160px">Customer</th>
+              <th style="min-width:120px">Product</th>
+              <th style="width:60px">Ply</th>
+              <th style="width:100px">Reel Size</th>
+              <th style="width:100px">Cut Size</th>
+              <th class="r" style="width:90px">Quantity</th>
+            </tr></thead>
+            <tbody id="pd-body"></tbody>
+          </table>
+        </div>
+        <div class="tfoot"><span id="pd-foot-l"></span><span id="pd-foot-r"></span></div>
+      </div>
+    </section>
+
+    <!-- PARTIES -->
+    <section id="view-parties" class="view">
+      <div class="ph">
+        <div><div class="ptitle">Parties</div><div class="psub" id="p-sub"></div></div>
+      </div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="addform">
+          <div><div class="flbl">Name</div><input class="inp" id="p-name" placeholder="Party name" style="width:220px"></div>
+          <div><div class="flbl">Type</div><select class="sel" id="p-type"><option>Customer</option><option>Supplier</option></select></div>
+          <button class="btn btn-p btn-sm" onclick="addParty()">+ Add</button>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="pill active" id="pf-all" onclick="pFilter('all')">All</button>
+            <button class="pill" id="pf-c" onclick="pFilter('Customer')">Customers</button>
+            <button class="pill" id="pf-s" onclick="pFilter('Supplier')">Suppliers</button>
+          </div>
+        </div>
+        <table class="t">
+          <thead><tr><th>Name</th><th style="width:130px">Type</th><th style="width:28px"></th></tr></thead>
+          <tbody id="p-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<datalist id="custList"></datalist>
+
+<script>
+// ── SUPABASE ─────────────────────────────────────────────
+const SB_URL = 'https://cdkxvzzddrgdktktxyua.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNka3h2enpkZHJnZGt0a3R4eXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNjU2MTEsImV4cCI6MjA5OTk0MTYxMX0.hexTPfwsBKcIjBVYH9c1MgZkwgawyTgxQRs3jOTnlUM';
+
+async function sbFetch(path, method='GET', body=null){
+  const opts = {
+    method,
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method==='POST' ? 'return=representation' : ''
+    }
+  };
+  if(body) opts.body = JSON.stringify(body);
+  const r = await fetch(SB_URL + '/rest/v1/' + path, opts);
+  if(!r.ok){ const e=await r.text(); console.error('SB error',e); return null; }
+  return method==='DELETE' ? true : r.json();
+}
+
+const db = {
+  get:    (t, q='')      => sbFetch(t + '?order=created_at.asc' + (q?'&'+q:'')),
+  insert: (t, row)       => sbFetch(t, 'POST', row),
+  update: (t, id, row)   => sbFetch(t + '?id=eq.' + id, 'PATCH', row),
+  delete: (t, id)        => sbFetch(t + '?id=eq.' + id, 'DELETE'),
+};
+
+// ── CONSTANTS ────────────────────────────────────────────
+const PRODUCTS = ["Pallet","Layer / Board","Box","OE Layer","Corner Pad Sheet"];
+const PLYS     = ["3","5","7"];
+const STATUSES = ["Pending","In Production","Partial Dispatch","Ready","Dispatched"];
+const TSTATS   = ["Pending","In progress","Done"];
+const JOINTS   = ["double","single"];
+const SUNITS   = ["in","cm"];
+
+const PLY_LAYERS = {
+  '3':[{l:'Top Paper',t:'liner'},{l:'Flute 1',t:'flute'},{l:'Base 1',t:'liner'}],
+  '5':[{l:'Top Paper',t:'liner'},{l:'Flute 1',t:'flute'},{l:'Base 1',t:'liner'},{l:'Flute 2',t:'flute'},{l:'Base 2',t:'liner'}],
+  '7':[{l:'Top Paper',t:'liner'},{l:'Flute 1',t:'flute'},{l:'Base 1',t:'liner'},{l:'Flute 2',t:'flute'},{l:'Base 2',t:'liner'},{l:'Flute 3',t:'flute'},{l:'Base 3',t:'liner'}]
+};
+const DEF_GSM = {'Top Paper':150,'Flute 1':120,'Base 1':150,'Flute 2':120,'Base 2':150,'Flute 3':120,'Base 3':150};
+
+// ── STATE ────────────────────────────────────────────────
+let parties=[], orders=[], tasks=[];
+let pf='all', oSF='All', tSF='All';
+let woF='all', pdF='all';
+let wReelEdited=false, wCutEdited=false, wTotalGsmEdited=false;
+
+// ── HELPERS ──────────────────────────────────────────────
+const o   = (list,sel)=>list.map(v=>`<option ${v==sel?'selected':''}>${v}</option>`).join('');
+const fmt = n=>n.toLocaleString('en-IN');
+const esc = s=>String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const today = ()=>new Date().toISOString().slice(0,10);
+const TODAY = today();
+
+function skCls(s){return s==='Pending'?'pn':s==='In Production'?'ip':s==='Partial Dispatch'?'pd':s==='Ready'?'rd':'ds';}
+function badge(s){return `<span class="bdg ${skCls(s)}">${s}</span>`;}
+
+function dispMeta(disp,status){
+  if(status==='Dispatched') return {label:'Dispatched',cls:'done'};
+  if(!disp) return {label:'No date',cls:'ok'};
+  if(disp<TODAY) return {label:'Overdue',cls:'overdue'};
+  if(disp===TODAY) return {label:'Today',cls:'today'};
+  const d=Math.round((new Date(disp)-new Date(TODAY))/864e5);
+  return {label:`${d}d away`,cls:d<=3?'today':'ok'};
+}
+
+function boardSizes(ord){
+  const f=(ord.su||'in')==='cm'?1/2.54:1;
+  const L=(ord.L||0)*f, W=(ord.W||0)*f, H=(ord.H||0)*f;
+  const reel=W+H+1;
+  const cut=(ord.joint||'double')==='double'?(L+W+2):(L*2+W*2+2);
+  return {reel:reel.toFixed(2),cut:cut.toFixed(2)};
+}
+
+function updateCustList(){
+  document.getElementById('custList').innerHTML=
+    parties.filter(p=>p.type==='Customer').map(p=>`<option value="${esc(p.name)}">`).join('');
+}
+
+// ── ORDER LIST ───────────────────────────────────────────
+function validateOrder(ord){
+  const errs=[];
+  if(!ord.cust||!ord.cust.trim()) errs.push('cust');
+  if(!ord.prod) errs.push('prod');
+  if(!ord.ply)  errs.push('ply');
+  if(!ord.L||ord.L<=0) errs.push('L');
+  if(!ord.W||ord.W<=0) errs.push('W');
+  if(!ord.H||ord.H<0)  errs.push('H');
+  if(!ord.qty||ord.qty<=0) errs.push('qty');
+  if(!ord.disp) errs.push('disp');
+  return errs;
+}
+function dateWarn(ord){
+  if(!ord.date||!ord.disp) return false;
+  return ord.disp < ord.date;
+}
+function renderOrders(){
+  const q=(document.getElementById('ol-search')?.value||'').toLowerCase().trim();
+  let list=oSF==='All'?orders:orders.filter(x=>x.status===oSF);
+  if(q) list=list.filter(x=>(x.cust||'').toLowerCase().includes(q)||(x.no||'').toLowerCase().includes(q));
+  document.getElementById('ol-body').innerHTML=list.map(ord=>{
+  const e=validateOrder(ord);
+  const w=dateWarn(ord);
+  const ec=f=>e.includes(f)?'cell err':'cell';
+  return '<tr class="'+(w?'warn-row':'')+'">'
+    +'<td><input type="date" class="cell num" value="'+ord.date+'" onchange="uO('+ord.id+',\'date\',this.value)"></td>'
+    +'<td><input class="cell num" value="'+esc(ord.no)+'" onchange="uO('+ord.id+',\'no\',this.value)" style="width:98px"></td>'
+    +'<td><input class="'+ec('cust')+'" list="custList" value="'+esc(ord.cust)+'" onchange="custChange('+ord.id+',this.value)" style="min-width:140px" placeholder="Customer *"></td>'
+    +'<td><select class="csel" onchange="uO('+ord.id+',\'prod\',this.value)">'+o(PRODUCTS,ord.prod)+'</select></td>'
+    +'<td><select class="csel" style="width:44px" onchange="uO('+ord.id+',\'ply\',this.value)">'+o(PLYS,ord.ply)+'</select></td>'
+    +'<td><div style="display:flex;align-items:center;gap:2px">'
+      +'<input class="'+ec('L')+' num" type="number" min="0" value="'+ord.L+'" onchange="uO('+ord.id+',\'L\',+this.value)" style="width:36px;text-align:center">'
+      +'<span style="color:var(--ink3);font-size:10px">×</span>'
+      +'<input class="'+ec('W')+' num" type="number" min="0" value="'+ord.W+'" onchange="uO('+ord.id+',\'W\',+this.value)" style="width:36px;text-align:center">'
+      +'<span style="color:var(--ink3);font-size:10px">×</span>'
+      +'<input class="'+ec('H')+' num" type="number" min="0" value="'+(ord.H||0)+'" onchange="uO('+ord.id+',\'H\',+this.value)" style="width:36px;text-align:center">'
+      +'<select class="csel" style="width:34px;font-size:10px" onchange="uO('+ord.id+',\'su\',this.value)">'+o(SUNITS,ord.su||'in')+'</select>'
+    +'</div></td>'
+    +'<td class="r"><input class="'+ec('qty')+' num" type="number" min="0" value="'+ord.qty+'" onchange="uO('+ord.id+',\'qty\',+this.value)" style="text-align:right;width:58px"></td>'
+    +'<td><select class="csel" onchange="uO('+ord.id+',\'joint\',this.value)">'+o(JOINTS,ord.joint||'double')+'</select></td>'
+    +'<td>'
+      +'<input type="date" class="'+ec('disp')+' num" value="'+(ord.disp||'')+'" onchange="uO('+ord.id+',\'disp\',this.value)">'
+      +(w?'<div class="warn-cell">⚠ before order date</div>':'')
+    +'</td>'
+    +'<td><div style="display:flex;align-items:center;gap:5px">'
+      +badge(ord.status)
+      +'<select class="csel" style="flex:1" onchange="uO('+ord.id+',\'status\',this.value)">'+o(STATUSES,ord.status)+'</select>'
+    +'</div></td>'
+    +'<td><button class="btn-del" onclick="delO('+ord.id+')">✕</button></td>'
+    +'</tr>';
+}).join('');
+
+    document.getElementById('co').textContent=orders.length;
+  document.getElementById('ol-sub').textContent=
+    `${orders.length} orders · ${orders.filter(x=>x.status!=='Dispatched').length} active`;
+
+  const counts={All:orders.length};
+  STATUSES.forEach(s=>counts[s]=orders.filter(x=>x.status===s).length);
+  document.getElementById('ol-filters').innerHTML=
+    ['All',...STATUSES].map(s=>`<button class="pill${oSF===s?' active':''}" onclick="olFilter('${s}')">${s} <span style="opacity:.55;font-size:10px;margin-left:2px;font-family:'JetBrains Mono',monospace">${counts[s]}</span></button>`).join('');
+
+  renderWorkOrder(); renderProductData();
+}
+
+async function uO(id,f,v){const x=orders.find(o=>o.id===id);if(x){x[f]=v;renderOrders();await db.update('orders',id,{[f]:v});}}
+async function custChange(id,v){
+  v=v.trim();if(!v)return;
+  if(!parties.find(p=>p.name.toLowerCase()===v.toLowerCase())){
+    const res=await db.insert('parties',{name:v,type:'Customer'});
+    if(res) parties.push(res[0]);
+    renderParties();
+  }
+  uO(id,'cust',v);
+}
+function addOrder(){
+  orders.unshift({id:oSeq++,date:today(),no:'',cust:'',prod:'Box',ply:'3',L:12,W:10,H:8,su:'in',qty:100,joint:'double',disp:'',status:'Pending'});
+  renderOrders();
+}
+async function delO(id){if(confirm('Delete this order?')){await db.delete('orders',id);orders=orders.filter(x=>x.id!==id);renderOrders();}}
+function olFilter(s){oSF=s;renderOrders();}
+
+// ── WORK ORDER ───────────────────────────────────────────
+function renderWorkOrder(){
+  const list=woF==='all'?orders:orders.filter(x=>x.status===woF);
+  const counts={};
+  STATUSES.forEach(s=>counts[s]=orders.filter(x=>x.status===s).length);
+
+  document.getElementById('cw').textContent=orders.length;
+  document.getElementById('wo-sub').textContent=`${list.length} of ${orders.length} orders`;
+
+  document.getElementById('wo-kpi').innerHTML=STATUSES.map(s=>
+    `<div class="kpi"><div class="kpi-lbl">${s}</div><div class="kpi-val">${counts[s]}</div><div class="kpi-sub">orders</div></div>`
+  ).join('');
+
+  document.getElementById('wo-filters').innerHTML=
+    ['all',...STATUSES].map(s=>`<button class="pill${woF===s?' active':''}" onclick="woFilter('${s}')">${s==='all'?'All':s}</button>`).join('');
+
+  if(!list.length){
+    document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:32px;color:var(--muted);font-size:12px">No orders</div>';
+    return;
+  }
+  document.getElementById('wo-list').innerHTML=list.map(ord=>{
+    const dm=dispMeta(ord.disp,ord.status);
+    return `<div class="wo-card">
+      <div class="wo-stripe ${skCls(ord.status)}"></div>
+      <div class="wo-body">
+        <div class="wo-top">
+          <div><div class="wo-cust">${esc(ord.cust)||'—'}</div><div class="wo-no">${esc(ord.no)}</div></div>
+          ${badge(ord.status)}
+        </div>
+        <div class="wo-grid">
+          <div><div class="wo-flbl">Ply</div><div class="wo-fval">${ord.ply}PLY</div></div>
+          <div><div class="wo-flbl">Product</div><div class="wo-fval t">${esc(ord.prod)}</div></div>
+          <div><div class="wo-flbl">Size</div><div class="wo-fval">${ord.L}×${ord.W}×${ord.H||0} ${ord.su||'in'}</div></div>
+          <div><div class="wo-flbl">Quantity</div><div class="wo-fval">${fmt(ord.qty)}</div></div>
+        </div>
+        <div class="wo-bot">
+          <div class="wo-disp ${dm.cls}">${ord.disp||'No date'} · ${dm.label}</div>
+          <select class="csel" style="width:148px;border:1px solid var(--line);border-radius:4px;height:26px;background:var(--surface)" onchange="woStatusChange(${ord.id},this.value)">${o(STATUSES,ord.status)}</select>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function woFilter(f){woF=f;renderWorkOrder();}
+async function woStatusChange(id,s){const x=orders.find(o=>o.id===id);if(x){x.status=s;renderOrders();await db.update('orders',id,{status:s});}}
+
+// ── TASKS ────────────────────────────────────────────────
+function renderTasks(){
+  const list=tSF==='All'?tasks:tasks.filter(t=>t.status===tSF);
+  document.getElementById('t-body').innerHTML=list.map(t=>`<tr>
+    <td><input type="date" class="cell num" value="${t.date}" onchange="uT(${t.id},'date',this.value)"></td>
+    <td><input class="cell" value="${esc(t.task)}" onchange="uT(${t.id},'task',this.value)"></td>
+    <td><input class="cell" value="${esc(t.assigned)}" onchange="uT(${t.id},'assigned',this.value)"></td>
+    <td><select class="csel" onchange="uT(${t.id},'status',this.value)">${o(TSTATS,t.status)}</select></td>
+    <td><button class="btn-del" onclick="delT(${t.id})">✕</button></td>
+  </tr>`).join('');
+  document.getElementById('ct').textContent=tasks.length;
+  const p=tasks.filter(t=>t.status==='Pending').length;
+  const ip=tasks.filter(t=>t.status==='In progress').length;
+  const d=tasks.filter(t=>t.status==='Done').length;
+  document.getElementById('t-sub').textContent=`${tasks.length} tasks · ${p} pending · ${ip} in progress · ${d} done`;
+  const tc={All:tasks.length,Pending:p,'In progress':ip,Done:d};
+  document.getElementById('t-filters').innerHTML=
+    ['All','Pending','In progress','Done'].map(s=>`<button class="pill${tSF===s?' active':''}" onclick="tFilter('${s}')">${s} <span style="opacity:.55;font-size:10px;margin-left:2px;font-family:'JetBrains Mono',monospace">${tc[s]}</span></button>`).join('');
+}
+async function uT(id,f,v){const x=tasks.find(t=>t.id===id);if(x){x[f]=v;renderTasks();await db.update('tasks',id,{[f]:v});}}
+async function addTask(){
+  const row={date:today(),task:'',assigned:'',status:'Pending'};
+  const res=await db.insert('tasks',row);
+  if(res) tasks.unshift(res[0]);
+  renderTasks();
+}
+async function delT(id){await db.delete('tasks',id);tasks=tasks.filter(t=>t.id!==id);renderTasks();}
+function tFilter(s){tSF=s;renderTasks();}
+
+// ── WEIGHT ───────────────────────────────────────────────
+function wPlyChange(){wTotalGsmEdited=false;
+  const ply=document.getElementById('w-ply').value;
+  document.getElementById('w-gsm-fields').innerHTML=PLY_LAYERS[ply].map((l,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:7px;height:7px;border-radius:50%;background:${l.t==='flute'?'var(--amber)':'var(--ink)'};flex-shrink:0"></div>
+        <span style="font-size:12px;color:${l.t==='flute'?'var(--amber)':'var(--ink2)'}">${l.l}</span>
+        ${l.t==='flute'?'<span style="font-size:10px;color:var(--amber);font-family:JetBrains Mono,monospace">×1.45</span>':''}
+      </div>
+      <input class="inp" type="number" id="wg${i}" value="${DEF_GSM[l.l]||120}" min="0" oninput="wCalcFromBoard()" style="width:75px;text-align:right">
+    </div>`).join('');
+  wCalc();
+}
+
+function wCalc(){
+  const unit=document.getElementById('w-unit').value;
+  const joint=document.getElementById('w-joint').value;
+  const f=unit==='cm'?1/2.54:1;
+  const L=(parseFloat(document.getElementById('w-L').value)||0)*f;
+  const W=(parseFloat(document.getElementById('w-W').value)||0)*f;
+  const H=(parseFloat(document.getElementById('w-H').value)||0)*f;
+  const reel=W+H+1;
+  const cut=joint==='double'?(L+W+2):(L*2+W*2+2);
+  if(!wReelEdited) document.getElementById('w-reel').value=reel.toFixed(2);
+  if(!wCutEdited)  document.getElementById('w-cut').value=cut.toFixed(2);
+  document.getElementById('w-unit-lbl').textContent=unit==='in'?'inches':'cm → converted to inches';
+  document.getElementById('w-reel-hint').textContent=wReelEdited?`Formula: ${reel.toFixed(2)} in`:'';
+  document.getElementById('w-cut-hint').textContent=wCutEdited?`Formula: ${cut.toFixed(2)} in`:'';
+  document.getElementById('w-cut-lbl').innerHTML=joint==='double'
+    ?'Cut Size <span style="font-weight:400;color:var(--ink3)">(L + W + 2)</span>'
+    :'Cut Size <span style="font-weight:400;color:var(--ink3)">(L×2 + W×2 + 2)</span>';
+  wCalcFromBoard();
+}
+
+function wCalcFromBoard(){
+  const ply=document.getElementById('w-ply').value;
+  const joint=document.getElementById('w-joint').value;
+  const reel=parseFloat(document.getElementById('w-reel').value)||0;
+  const cut=parseFloat(document.getElementById('w-cut').value)||0;
+  // compute gsm from layers
+  let computedGsm=0;
+  PLY_LAYERS[ply].forEach((l,i)=>{
+    const v=parseFloat(document.getElementById('wg'+i)?.value)||0;
+    computedGsm+=l.t==='flute'?v*1.45:v;
+  });
+  // update total GSM field unless user edited it manually
+  const gsmEl=document.getElementById('w-total-gsm');
+  if(gsmEl && !wTotalGsmEdited) gsmEl.value=Math.round(computedGsm);
+  const gsm=gsmEl?parseFloat(gsmEl.value)||0:computedGsm;
+  const area=(reel*cut)/1550;
+  const sheets=joint==='double'?2:1;
+  const wt=(area*gsm*sheets)/1000;
+  document.getElementById('w-result').textContent=wt>0?wt.toFixed(3):'—';
+  document.getElementById('w-formula').textContent=
+    `${reel.toFixed(2)}″ × ${cut.toFixed(2)}″ = ${area.toFixed(4)} m² × GSM ${Math.round(gsm)} × ${sheets} / 1000 = ${wt.toFixed(3)} kg`;
+}
+
+// ── PRODUCT DATA ─────────────────────────────────────────
+function renderProductData(){
+  const eligible=orders.filter(o=>o.status==='Dispatched'||o.status==='Partial Dispatch');
+  const custSel=document.getElementById('pdf-cust');
+  const reelSel=document.getElementById('pdf-reel');
+  const prevC=custSel.value, prevR=reelSel.value.replace('″','');
+  const custs=[...new Set(eligible.map(o=>o.cust).filter(Boolean))].sort();
+  const reels=[...new Set(eligible.map(o=>boardSizes(o).reel))].sort((a,b)=>+a-+b);
+  custSel.innerHTML=`<option value="">All customers</option>`+custs.map(c=>`<option ${c===prevC?'selected':''}>${c}</option>`).join('');
+  reelSel.innerHTML=`<option value="">All sizes</option>`+reels.map(r=>`<option ${r===prevR?'selected':''}>${r}″</option>`).join('');
+  let list=eligible;
+  if(custSel.value) list=list.filter(o=>o.cust===custSel.value);
+  if(reelSel.value) list=list.filter(o=>boardSizes(o).reel===reelSel.value.replace('″',''));
+  document.getElementById('pd-sub').textContent=`${eligible.length} entries · Dispatched & Partial Dispatch`;
+  document.getElementById('pd-note').textContent=(custSel.value||reelSel.value)?`${list.length} result${list.length!==1?'s':''}·filtered`:'';
+  document.getElementById('pd-foot-l').textContent=`${list.length} of ${eligible.length} entries`;
+  document.getElementById('pd-foot-r').textContent=list.length?`Total qty · ${fmt(list.reduce((s,o)=>s+o.qty,0))} pcs`:'';
+  document.getElementById('pd-body').innerHTML=list.length
+    ?list.map(ord=>{const{reel,cut}=boardSizes(ord);return`<tr>
+      <td style="font-weight:500">${esc(ord.cust)||'—'}</td>
+      <td style="color:var(--ink2)">${esc(ord.prod)}</td>
+      <td class="num">${ord.ply}PLY</td>
+      <td class="num">${reel}″</td>
+      <td class="num">${cut}″</td>
+      <td class="r num">${fmt(ord.qty)}</td>
+    </tr>`;}).join('')
+    :`<tr><td colspan="6" style="padding:32px;text-align:center;color:var(--muted);font-size:12px">No matching entries</td></tr>`;
+}
+function pdClear(){document.getElementById('pdf-cust').value='';document.getElementById('pdf-reel').value='';renderProductData();}
+
+// ── PARTIES ──────────────────────────────────────────────
+function renderParties(){
+  const list=pf==='all'?parties:parties.filter(p=>p.type===pf);
+  document.getElementById('p-body').innerHTML=list.map(p=>`<tr>
+    <td><input class="cell" value="${esc(p.name)}" onchange="uP(${p.id},'name',this.value)"></td>
+    <td><span class="bdg ${p.type==='Customer'?'rd':'ip'}">${p.type}</span></td>
+    <td><button class="btn-del" onclick="delP(${p.id})">✕</button></td>
+  </tr>`).join('');
+  const c=parties.filter(p=>p.type==='Customer').length;
+  const s=parties.filter(p=>p.type==='Supplier').length;
+  document.getElementById('cp').textContent=parties.length;
+  document.getElementById('p-sub').textContent=`${parties.length} parties · ${c} customers · ${s} suppliers`;
+  updateCustList();
+  document.getElementById('pf-all').classList.toggle('active',pf==='all');
+  document.getElementById('pf-c').classList.toggle('active',pf==='Customer');
+  document.getElementById('pf-s').classList.toggle('active',pf==='Supplier');
+}
+async function uP(id,f,v){const x=parties.find(p=>p.id===id);if(x){x[f]=v;renderParties();renderOrders();await db.update('parties',id,{[f]:v});}}
+async function addParty(){
+  const name=document.getElementById('p-name').value.trim();
+  const type=document.getElementById('p-type').value;
+  if(!name)return;
+  if(parties.find(p=>p.name.toLowerCase()===name.toLowerCase())){alert('Already exists.');return;}
+  const res=await db.insert('parties',{name,type});
+  if(res) parties.push(res[0]);
+  document.getElementById('p-name').value='';
+  renderParties();renderOrders();
+}
+async function delP(id){if(confirm('Delete?')){await db.delete('parties',id);parties=parties.filter(p=>p.id!==id);renderParties();renderOrders();}}
+function pFilter(f){pf=f;renderParties();}
+
+// ── NAV ──────────────────────────────────────────────────
+function nav(v){
+  document.querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
+  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='view-'+v));
+  const L={orderlist:'Order List',workstatus:'Work Status',tasks:'Tasks',weight:'Weight',productdata:'Product Data',parties:'Parties'};
+  document.getElementById('crumb').innerHTML=`karton / <b>${L[v]}</b>`;
+  if(v==='workstatus') renderWorkOrder();
+  if(v==='productdata') renderProductData();
+}
+
+// ── INIT ─────────────────────────────────────────────────
+async function init(){
+  // show loading state
+  document.getElementById('ol-body').innerHTML='<tr><td colspan="11" style="padding:24px;text-align:center;color:var(--muted)">Loading…</td></tr>';
+  const [p,o,t] = await Promise.all([
+    db.get('parties'),
+    db.get('orders'),
+    db.get('tasks')
+  ]);
+  parties = p||[];
+  orders  = o||[];
+  tasks   = t||[];
+  renderOrders(); renderTasks(); renderParties(); wPlyChange();
+  if(window.innerWidth<=720){
+    const h=document.getElementById('mob-scroll-hint');
+    if(h) h.style.display='block';
+  }
+}
+init();
+</script>
+</body>
+</html>
