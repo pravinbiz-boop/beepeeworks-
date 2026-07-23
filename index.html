@@ -2,431 +2,644 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Karton — Bee Pee Packaging</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>BeePeeWorks</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F8F7F4;--surface:#fff;--s2:#F4F2EE;--hover:#F0EEE8;
-  --line:#E8E5DE;--line2:#D4D0C6;
-  --ink:#1A1814;--ink2:#4D4A42;--ink3:#7A7669;--muted:#A39E91;
-  --green:#166534;--green-bg:#E8F0E9;
-  --amber:#92400E;--amber-bg:#F7EBD8;
-  --red:#991B1B;--red-bg:#F5E0E0;
-  --blue:#1E40AF;--blue-bg:#E2E8F5;
-  --r:8px;--r2:6px;
+  --bg:#F7F7F5;
+  --surface:#FFFFFF;
+  --s2:#F0EFEB;
+  --hover:#E8E7E3;
+  --line:#E2E0D8;
+  --line2:#D0CEC6;
+  --ink:#111827;
+  --ink2:#374151;
+  --ink3:#6B7280;
+  --muted:#9CA3AF;
+  --accent:#0D9488;
+  --accent2:#0F766E;
+  --accent-bg:#CCFBF1;
+  --amber:#B45309;       --amber-bg:#FEF3C7;
+  --green:#15803D;       --green-bg:#DCFCE7;
+  --red:#B91C1C;         --red-bg:#FEE2E2;
+  --blue:#1D4ED8;        --blue-bg:#DBEAFE;
+  --violet:#6D28D9;      --violet-bg:#EDE9FE;
+  --r:12px;--r2:10px;--r3:6px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.04),0 1px 3px rgba(0,0,0,.03);
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 2px 8px rgba(0,0,0,.04);
+  --shadow-md:0 2px 6px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:'Inter Tight',system-ui,sans-serif;font-size:13px;line-height:1.45;-webkit-font-smoothing:antialiased}
-.num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,sans-serif;font-size:13.5px;line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.num{font-family:'Inter',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em;font-weight:500}
 
-/* SHELL */
-.app{display:grid;grid-template-columns:210px 1fr;min-height:100vh}
+/* ── DESKTOP: LEFT SIDEBAR · MOBILE: BOTTOM NAV ── */
+.layout{display:flex;min-height:100vh}
+.sidenav{
+  width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--line);
+  padding:24px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:2px;
+}
+.brand{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;letter-spacing:-.03em;color:var(--accent2);padding:4px 10px 24px;white-space:nowrap}
+.brand span{color:var(--muted);font-weight:500}
+.nl{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r2);
+  font-family:'Inter',sans-serif;font-size:13.5px;font-weight:500;color:var(--ink3);
+  cursor:pointer;background:transparent;border:0;text-align:left;width:100%;
+  transition:all .15s ease;
+}
+.nl:hover{background:var(--s2);color:var(--ink)}
+.nl.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(13,148,136,.25)}
+.nl.active svg{color:#fff}
+.nl svg{width:18px;height:18px;flex-shrink:0;color:var(--ink3);transition:color .15s}
+.nl:hover svg{color:var(--ink2)}
+.main{flex:1;min-width:0}
+
+.bottomnav{display:none}
+
 @media(max-width:720px){
-  /* weight inner grids */
-  .wsec .cb[style*="grid-template-columns"]{grid-template-columns:1fr 1fr!important}
-  /* board size inputs */
-  #w-reel,#w-cut{width:90px!important}
-  .app{grid-template-columns:1fr}
-  .sb{display:none}
-  .mob-nav{display:flex!important}
-  .content{padding:12px}
-  .ph{flex-direction:column;gap:8px}
-  .ptitle{font-size:17px}
-  /* order list: stack on mobile */
-  .ovx{font-size:12px}
-  /* work order grid */
-  .wo-grid{grid-template-columns:repeat(2,1fr)!important}
-  .wo-status-sel{width:100%!important;min-width:unset!important}
-  .wo-bot{flex-direction:column;align-items:stretch}
-  /* weight page */
-  .w2{grid-template-columns:1fr!important}
-  /* kpi strip handled by auto-fill */
-  .kpi{padding:9px 10px}
-  /* addform wrap */
-  .addform{flex-direction:column;align-items:stretch}
-  .addform .sel,.addform .inp{width:100%!important}
-  .addform>div{width:100%}
-  /* pill filters scroll */
-  .fbar{flex-wrap:nowrap;overflow-x:auto}
-  /* wo filter pills */
-  #wo-filters{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
-  /* product data filters */
-  .card .addform .sel{width:100%!important}
+  .layout{flex-direction:column}
+  .sidenav{display:none}
+  .main{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+  .bottomnav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:30;
+    background:var(--surface);border-top:1px solid var(--line);
+    padding:8px 0 calc(8px + env(safe-area-inset-bottom,0px));justify-content:space-around;
+    box-shadow:0 -4px 20px rgba(0,0,0,.06);
+  }
+  .bn{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;padding:4px 2px;background:transparent;border:0;cursor:pointer;
+    font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:var(--muted);
+    min-width:0;transition:color .15s;
+  }
+  .bn svg{width:22px;height:22px;color:var(--muted);transition:color .15s}
+  .bn.active{color:var(--accent)}
+  .bn.active svg{color:var(--accent)}
+  .bn span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .wo-detail{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+  .fbar{-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+  .w-sticky{position:sticky;top:0;z-index:10}
+  .pd-m-card{background:var(--surface);border-radius:var(--r2);padding:10px 12px;box-shadow:var(--shadow-sm)}
+  .pd-m-row{display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .pd-m-detail{font-size:12px;font-weight:500;color:var(--ink);margin-top:4px}
+  .pd-m-detail span{color:var(--ink3);font-weight:400}
+  .pd-m-nums{display:flex;gap:12px;margin-top:5px;font-size:11px;color:var(--ink3)}
+  .pd-m-nums b{color:var(--ink);font-weight:600}
 }
 
-/* SIDEBAR */
-.sb{background:var(--bg);border-right:1px solid var(--line);padding:12px;height:100vh;position:sticky;top:0;display:flex;flex-direction:column;gap:1px}
-.brand{display:flex;align-items:center;gap:8px;padding:12px 8px 18px}
-.bmark{width:22px;height:22px;background:var(--ink);border-radius:5px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0}
-.btxt{font-weight:600;font-size:14px;letter-spacing:-.02em}
-.bsub{font-size:10px;color:var(--ink3);margin-top:1px}
-.ni{display:flex;align-items:center;gap:9px;padding:7px 8px;border-radius:4px;color:var(--ink2);cursor:pointer;border:0;background:transparent;font-family:inherit;font-size:13px;width:100%;text-align:left}
-.ni:hover{background:var(--hover);color:var(--ink)}
-.ni.active{background:var(--ink);color:#fff;font-weight:500}
-.ni .c{margin-left:auto;font-size:11px;font-family:'JetBrains Mono',monospace;opacity:.55}
-
-/* MOBILE NAV */
-.mob-nav{display:none;overflow-x:auto;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;scrollbar-width:none}
-.mob-nav::-webkit-scrollbar{display:none}
-.mni{flex-shrink:0;padding:12px 16px;font-size:12px;font-weight:500;color:var(--ink3);border-bottom:2px solid transparent;cursor:pointer;background:transparent;border-top:0;border-left:0;border-right:0;font-family:inherit;white-space:nowrap}
-.mni.active{color:var(--ink);border-bottom-color:var(--ink)}
-
-/* MAIN */
-.main{display:flex;flex-direction:column;min-width:0}
-.topbar{height:52px;border-bottom:1px solid var(--line);padding:0 24px;display:flex;align-items:center;position:sticky;top:0;background:var(--bg);z-index:10}
-@media(max-width:680px){.topbar{display:none}}
-.crumb{font-size:12px;color:var(--ink3)}.crumb b{color:var(--ink);font-weight:500}
-.content{padding:20px 24px}
-@media(max-width:680px){.content{padding:14px}}
+/* ── SHELL ── */
+.shell{padding:24px 20px;max-width:960px;margin:0 auto}
 .view{display:none}.view.active{display:block}
 
-/* PAGE */
-.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
-.ptitle{font-size:20px;font-weight:600;letter-spacing:-.02em;margin-bottom:3px}
-.psub{font-size:11px;color:var(--ink3);font-family:'JetBrains Mono',monospace}
+/* ── PAGE HEADER ── */
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.ptitle{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;letter-spacing:-.03em;color:var(--ink)}
+.psub{font-size:11.5px;color:var(--ink3);font-family:'Inter',sans-serif;margin-top:2px}
 
-/* CARD */
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
-.ch{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
-.ctitle{font-size:13px;font-weight:600}
-.cb{padding:14px 16px}
+/* ── CARD ── */
+.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow-sm);border:1px solid rgba(0,0,0,.04)}
+.ch{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.ctitle{font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--ink)}
+.cb{padding:16px}
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:12px;font-weight:500;height:28px;padding:0 12px;border-radius:var(--r2);border:1px solid transparent;cursor:pointer;background:transparent;color:var(--ink);white-space:nowrap}
-.btn-p{background:var(--ink);color:#fff}.btn-p:hover{background:#000}
-.btn-g{border-color:var(--line);background:var(--surface);color:var(--ink2)}.btn-g:hover{border-color:var(--line2);color:var(--ink)}
-.btn-sm{height:24px;padding:0 8px;font-size:11px}
-.btn-del{height:22px;width:22px;padding:0;border-radius:3px;color:var(--muted);background:transparent;border:0;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center}
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:12.5px;font-weight:500;height:34px;padding:0 16px;border-radius:var(--r2);border:1px solid transparent;cursor:pointer;background:transparent;color:var(--ink);white-space:nowrap;transition:all .15s ease}
+.btn-p{background:var(--accent);color:#fff;box-shadow:0 1px 3px rgba(13,148,136,.2)}.btn-p:hover{background:var(--accent2);box-shadow:0 2px 6px rgba(13,148,136,.3)}
+.btn-g{border-color:var(--line);background:var(--surface);color:var(--ink2);box-shadow:var(--shadow-sm)}.btn-g:hover{border-color:var(--line2);color:var(--ink);box-shadow:var(--shadow)}
+.btn-sm{height:28px;padding:0 12px;font-size:11.5px}
+.btn-del{height:24px;width:24px;padding:0;border-radius:var(--r3);color:var(--muted);background:transparent;border:0;cursor:pointer;font-size:15px;display:inline-flex;align-items:center;justify-content:center;transition:all .15s}
 .btn-del:hover{color:var(--red);background:var(--red-bg)}
+.btn-full{width:100%;justify-content:center;height:42px;font-size:13.5px;border-radius:var(--r2)}
 
-/* PILLS */
-.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;height:24px;padding:0 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);cursor:pointer;flex-shrink:0;font-family:inherit}
-.pill:hover{border-color:var(--line2);color:var(--ink)}.pill.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+/* ── PILLS ── */
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;height:30px;padding:0 14px;border-radius:15px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);cursor:pointer;flex-shrink:0;font-family:'Inter',sans-serif;font-weight:500;transition:all .15s ease;box-shadow:var(--shadow-sm)}
+.pill:hover{border-color:var(--line2);color:var(--ink);box-shadow:var(--shadow)}
+.pill.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 2px 6px rgba(13,148,136,.25)}
+.pill.pill-pn{background:var(--surface);border-color:var(--muted);color:var(--ink2)}
+.pill.pill-ip{background:var(--amber-bg);border-color:var(--amber);color:var(--ink)}
+.pill.pill-pd{background:var(--blue-bg);border-color:var(--blue);color:var(--ink)}
+.pill.pill-rd{background:var(--green-bg);border-color:var(--green);color:var(--ink)}
+.pill.pill-ds{background:var(--s2);border-color:var(--ink3);color:var(--ink2)}
+.pill.pill-pn.active{background:var(--muted);border-color:var(--muted);color:#fff;box-shadow:0 2px 6px rgba(156,163,175,.3)}
+.pill.pill-ip.active{background:var(--amber);border-color:var(--amber);color:#fff;box-shadow:0 2px 6px rgba(180,83,9,.25)}
+.pill.pill-pd.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 2px 6px rgba(29,78,216,.25)}
+.pill.pill-rd.active{background:var(--green);border-color:var(--green);color:#fff;box-shadow:0 2px 6px rgba(21,128,61,.25)}
+.pill.pill-ds.active{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.pill-count{font-size:10px;padding:1px 6px;border-radius:9px;background:rgba(0,0,0,.06);color:var(--ink3);font-weight:600;min-width:18px;text-align:center}
+.pill.active .pill-count{background:rgba(255,255,255,.22);color:#fff}
 
-/* BADGES */
-.bdg{display:inline-flex;align-items:center;font-size:10px;font-weight:600;height:19px;padding:0 7px;border-radius:9px;white-space:nowrap;letter-spacing:.01em}
+/* ── BADGES ── */
+.bdg{display:inline-flex;align-items:center;font-size:10px;font-weight:600;height:22px;padding:0 10px;border-radius:11px;white-space:nowrap;font-family:'Inter',sans-serif;letter-spacing:.01em}
 .bdg.pn{background:var(--s2);color:var(--ink3)}
 .bdg.ip{background:var(--amber-bg);color:var(--amber)}
 .bdg.pd{background:var(--blue-bg);color:var(--blue)}
 .bdg.rd{background:var(--green-bg);color:var(--green)}
 .bdg.ds{background:var(--s2);color:var(--ink3)}
 
-/* INPUTS */
-.inp{font-family:inherit;font-size:12px;height:28px;padding:0 8px;border-radius:var(--r2);border:1px solid var(--line);background:var(--surface);color:var(--ink);outline:0}
-.inp:focus{border-color:var(--ink);box-shadow:0 0 0 3px rgba(26,24,20,.07)}
-.sel{font-family:inherit;font-size:12px;height:28px;padding:0 8px;border-radius:var(--r2);border:1px solid var(--line);background:var(--surface);color:var(--ink);outline:0;cursor:pointer}
+/* ── INPUTS ── */
+.inp{font-family:inherit;font-size:13.5px;height:40px;padding:0 12px;border-radius:var(--r2);border:1px solid var(--line);background:var(--surface);color:var(--ink);outline:0;width:100%;transition:border-color .15s,box-shadow .15s}
+.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+.inp.err{border-color:var(--red);background:var(--red-bg)}
+.sel{font-family:inherit;font-size:13.5px;height:40px;padding:0 12px;border-radius:var(--r2);border:1px solid var(--line);background:var(--surface);color:var(--ink);outline:0;cursor:pointer;width:100%;transition:border-color .15s}
+.sel:focus{border-color:var(--accent)}
+.flbl{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;display:block}
 
-/* INLINE TABLE CELLS */
-.cell{font-family:inherit;font-size:12px;height:26px;padding:0 5px;width:100%;border:1px solid transparent;background:transparent;border-radius:3px;color:var(--ink);outline:0}
-.cell:hover{background:var(--hover)}.cell:focus{background:#fff;border-color:var(--ink)}
-.csel{font-family:inherit;font-size:12px;height:26px;padding:0 4px;width:100%;border:1px solid transparent;background:transparent;border-radius:3px;color:var(--ink);outline:0;cursor:pointer}
-.csel:hover{background:var(--hover)}
-
-/* TABLE */
+/* ── TABLE (new order input) ── */
 table.t{width:100%;border-collapse:collapse}
-.t th{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);background:var(--s2);text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
-.t td{padding:2px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
-.t tr:last-child td{border-bottom:0}
-.t tr:hover td{background:var(--hover)}
+.t th{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);background:var(--s2);text-align:left;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.t td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
 .t .r{text-align:right}
 .ovx{overflow-x:auto;-webkit-overflow-scrolling:touch}
-.cell.err{border-color:var(--red)!important;background:var(--red-bg)!important}
-.warn-row td{background:#FFFBEB!important}
-.warn-cell{font-size:10px;color:var(--amber);font-family:"JetBrains Mono",monospace;white-space:nowrap}
-.tfoot{padding:8px 14px;border-top:1px solid var(--line);font-size:11px;color:var(--ink3);display:flex;justify-content:space-between}
+.cell{font-family:inherit;font-size:12px;height:34px;padding:0 8px;width:100%;border:1px solid var(--line);background:var(--surface);border-radius:var(--r3);color:var(--ink);outline:0;transition:border-color .15s}
+.cell:focus{border-color:var(--accent)}
+.cell.err{border-color:var(--red);background:var(--red-bg)}
+.csel{font-family:inherit;font-size:12px;height:34px;padding:0 6px;width:100%;border:1px solid var(--line);background:var(--surface);border-radius:var(--r3);color:var(--ink);outline:0;cursor:pointer}
 
-/* FILTER BAR */
-.fbar{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;overflow-x:auto;padding:10px 14px;border-bottom:1px solid var(--line);scrollbar-width:none}
+/* ── ORDER CARDS (saved view) ── */
+.order-list{display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.ocard{background:var(--surface);border-radius:var(--r2);display:flex;overflow:hidden;cursor:pointer;transition:all .15s ease;box-shadow:var(--shadow-sm);border:1px solid transparent}
+.ocard.pn{background:var(--surface)}
+.ocard.ip{background:var(--amber-bg);border-color:rgba(180,83,9,.12)}
+.ocard.pd{background:var(--blue-bg);border-color:rgba(29,78,216,.1)}
+.ocard.rd{background:var(--green-bg);border-color:rgba(21,128,61,.1)}
+.ocard.ds{background:var(--s2)}
+.ocard:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
+.ocard:active{transform:translateY(0);box-shadow:var(--shadow-sm)}
+.ostripe{width:4px;flex-shrink:0;border-radius:4px 0 0 4px}
+.ostripe.pn{background:var(--muted)}.ostripe.ip{background:var(--amber)}
+.ostripe.pd{background:var(--blue)}.ostripe.rd{background:var(--green)}
+.ostripe.ds{background:var(--muted)}
+.obody{flex:1;padding:8px 10px;min-width:0}
+.orow1{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ocust{font-size:13.5px;font-weight:600;line-height:1.25;word-break:break-word}
+.ono{font-size:10.5px;font-family:'Inter',sans-serif;color:var(--ink3);margin-left:6px}
+.orow2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px}
+.odisp{font-size:11px;font-family:'Inter',sans-serif}
+.odisp.overdue{color:var(--red);font-weight:600}
+.odisp.today{color:var(--amber);font-weight:600}
+.odisp.ok{color:var(--ink3)}
+.odisp.done{color:var(--muted)}
+
+/* ── FILTER BAR ── */
+.fbar{display:flex;gap:6px;padding:8px 0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .fbar::-webkit-scrollbar{display:none}
 
-/* ADD FORM */
-.addform{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--s2)}
-.flbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
-
-/* WORK ORDER CARDS */
-.wo-list{display:flex;flex-direction:column;gap:10px;padding:14px}
-.wo-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);display:flex;overflow:hidden;transition:border-color .12s}
-.wo-card:hover{border-color:var(--line2)}
-.wo-stripe{width:4px;flex-shrink:0}
-.wo-stripe.pn{background:var(--line2)}
-.wo-stripe.ip{background:var(--amber)}.wo-stripe.pd{background:var(--blue)}
-.wo-stripe.rd{background:var(--green)}.wo-stripe.ds{background:var(--muted)}
-.wo-body{flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-width:0}
-.wo-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-.wo-cust{font-size:14px;font-weight:600;word-break:break-word}
-.wo-no{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--ink3);margin-top:2px}
-.wo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 16px}
-
-.wo-flbl{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
-.wo-fval{font-size:13px;font-weight:500;font-family:'JetBrains Mono',monospace;color:var(--ink)}
-.wo-fval.t{font-family:'Inter Tight',sans-serif}
-.wo-bot{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:8px;border-top:1px solid var(--line);flex-wrap:wrap;row-gap:6px}
-.wo-disp{font-size:11px;font-family:'JetBrains Mono',monospace}
+/* ── WORK STATUS CARDS ── */
+.wo-list{display:flex;flex-direction:column;gap:4px}
+.wo-card{background:var(--surface);border-radius:var(--r2);display:flex;overflow:hidden;box-shadow:var(--shadow-sm);border:1px solid transparent;transition:box-shadow .15s}
+.wo-card.pn{background:var(--surface)}
+.wo-card.ip{background:var(--amber-bg);border-color:rgba(180,83,9,.12)}
+.wo-card.pd{background:var(--blue-bg);border-color:rgba(29,78,216,.1)}
+.wo-card.rd{background:var(--green-bg);border-color:rgba(21,128,61,.1)}
+.wo-card.ds{background:var(--s2)}
+.wo-stripe{width:4px;flex-shrink:0;border-radius:4px 0 0 4px}
+.wo-stripe.pn{background:var(--muted)}.wo-stripe.ip{background:var(--amber)}
+.wo-stripe.pd{background:var(--blue)}.wo-stripe.rd{background:var(--green)}
+.wo-stripe.ds{background:var(--muted)}
+.wo-body{flex:1;padding:8px 10px;min-width:0}
+.wo-row1{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wo-cust{font-size:13.5px;font-weight:600;word-break:break-word}
+.wo-no{font-size:10.5px;font-family:'Inter',sans-serif;color:var(--ink3);margin-left:6px}
+.wo-row2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px}
+.wo-detail{font-size:12px;color:var(--ink);font-weight:500}
+.wo-detail span{color:var(--ink3);font-weight:400}
+.wo-disp{font-size:11px;font-family:'Inter',sans-serif;flex-shrink:0}
 .wo-disp.overdue{color:var(--red);font-weight:600}
 .wo-disp.today{color:var(--amber);font-weight:600}
-.wo-disp.ok{color:var(--ink3)}
-.wo-disp.done{color:var(--muted)}
+.wo-disp.ok{color:var(--ink3)}.wo-disp.done{color:var(--muted)}
+.wo-sel{font-family:inherit;font-size:11px;height:26px;padding:0 8px;border:1px solid var(--line);border-radius:var(--r3);background:var(--surface);color:var(--ink);outline:0;cursor:pointer;transition:border-color .15s}
+.wo-sel:focus{border-color:var(--accent)}
 
-/* KPI STRIP */
-.kpi-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:14px}
-.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:11px 14px}
-.kpi-lbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
-.kpi-val{font-size:20px;font-weight:600;letter-spacing:-.02em;font-family:'JetBrains Mono',monospace}
-.kpi-sub{font-size:10px;color:var(--ink3);margin-top:2px;font-family:'JetBrains Mono',monospace}
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--surface);border-radius:var(--r);padding:12px 14px;box-shadow:var(--shadow-sm)}
+.kpi-lbl{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
+.kpi-val{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:700;letter-spacing:-.03em}
 
-/* WEIGHT PAGE */
+/* ── TASKS ── */
+.tcard{background:var(--surface);border-left:4px solid var(--line2);border-radius:var(--r);display:flex;align-items:center;gap:8px;padding:8px 12px;transition:all .15s ease;box-shadow:var(--shadow-sm)}
+.tcard.Pending{border-left-color:var(--muted);background:var(--surface)}
+.tcard.In-progress{border-left-color:var(--amber);background:var(--amber-bg)}
+.tcard.Done{border-left-color:var(--green);background:var(--green-bg)}
+.tcard.Done .tname{color:var(--ink3);text-decoration:line-through}
+.task-list{display:flex;flex-direction:column;gap:4px}
+.tdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid transparent}
+.tdot.Pending{border-color:var(--muted);background:transparent}
+.tdot.In-progress{background:var(--amber);border-color:var(--amber)}
+.tdot.Done{background:var(--green);border-color:var(--green)}
+.tname{font-size:13px;font-weight:500;color:var(--ink);line-height:1.2}
+.tmeta{font-size:10.5px;color:var(--ink3);margin-top:1px}
+.tstatus-sel{font-family:'Inter',sans-serif;font-size:11px;border:1px solid var(--line);border-radius:var(--r3);background:var(--surface);height:30px;padding:0 8px;color:var(--ink);cursor:pointer;font-weight:500;transition:border-color .15s}
+.tstatus-sel:focus{border-color:var(--accent)}
+.btn-del-task{
+  height:32px;width:32px;padding:0;border-radius:var(--r3);color:var(--red);background:transparent;
+  border:1px solid var(--line);cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;
+  opacity:.5;transition:all .15s ease;
+}
+.btn-del-task:hover{opacity:1;background:var(--red-bg);border-color:var(--red)}
+
+/* ── MEMBER CHIPS ── */
+.mchip{display:inline-flex;align-items:center;gap:5px;font-size:11px;height:26px;padding:0 10px 0 4px;border-radius:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;transition:all .15s ease}
+.mchip:hover{border-color:var(--line2);color:var(--ink)}
+.mchip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.mchip-avatar{width:18px;height:18px;border-radius:50%;background:var(--accent-bg);color:var(--accent2);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;letter-spacing:-.02em}
+.mchip.active .mchip-avatar{background:rgba(255,255,255,.2);color:#fff}
+.mchip .pill-count{font-size:9px;padding:0 5px;border-radius:7px;background:rgba(0,0,0,.06);color:var(--ink3);font-weight:600;min-width:14px;text-align:center}
+.mchip.active .pill-count{background:rgba(255,255,255,.2);color:rgba(255,255,255,.8)}
+.mbar{display:flex;gap:5px;padding:2px 0 6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;align-items:center}
+.mbar::-webkit-scrollbar{display:none}
+.mbar-label{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:2px;flex-shrink:0}
+
+/* ── WEIGHT ── */
 .w2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
-@media(max-width:680px){.w2{grid-template-columns:1fr}}
-.wlbl{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px}
-.wout{font-size:22px;font-weight:600;font-family:'JetBrains Mono',monospace;letter-spacing:-.02em;color:var(--ink);margin-top:4px}
-.wsec{display:flex;flex-direction:column;gap:12px}
+.wsec{display:flex;flex-direction:column;gap:14px}
+.wlbl{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;display:block}
+
+/* ── FORM GRID ── */
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.frow{display:flex;flex-direction:column;gap:5px}
+
+/* ── ADD FORM ── */
+.addform{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--s2)}
+
+/* ── DRAWER (bottom sheet on mobile, right on desktop) ── */
+.drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40;display:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.drawer-backdrop.open{display:block}
+.drawer{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:20px 20px 0 0;z-index:50;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.12)}
+.drawer.open{transform:translateY(0)}
+.drawer-handle{width:40px;height:4px;background:var(--line2);border-radius:2px;margin:12px auto 4px}
+.drawer-head{padding:14px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.drawer-title{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:600;color:var(--ink)}
+.drawer-body{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.drawer-foot{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:10px;flex-shrink:0;background:var(--surface)}
+
+/* ── PRODUCT DATA ── */
+.pdcard{background:var(--surface);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow-sm)}
+.pd-list{display:flex;flex-direction:column;gap:8px}
+
+/* ── WARN ── */
+.warn-txt{font-size:10.5px;color:var(--amber);font-family:'Inter',sans-serif;margin-top:4px}
+
+/* ── MOBILE ── */
+@media(max-width:680px){
+  .shell{padding:16px 14px}
+  .w2{grid-template-columns:1fr}
+  .fg2{grid-template-columns:1fr}
+  .fg3{grid-template-columns:1fr 1fr}
+  .topnav{padding:0 14px}
+  .brand{font-size:16px;margin-right:12px}
+  .w-result-card{position:sticky;top:0;z-index:10}
+  .pill{height:36px;padding:0 14px;font-size:12px}
+  .btn{height:42px;padding:0 18px;font-size:13.5px}
+  .btn-sm{height:36px;padding:0 14px}
+  .tstatus-sel{height:36px;font-size:12px}
+  .wo-sel{height:32px;font-size:12px}
+  .btn-del-task{height:38px;width:38px}
+}
+
+/* ── LOGIN SCREEN ── */
+.login-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+.login-box{width:100%;max-width:340px;text-align:center}
+.login-box .brand{font-size:28px;padding:0 0 20px;display:block}
+.login-input{width:100%;height:48px;padding:0 16px;border:1px solid var(--line);border-radius:var(--r2);font-family:inherit;font-size:15px;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm);outline:none;transition:border-color .15s}
+.login-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,148,136,.12)}
+.login-btn{width:100%;height:48px;margin-top:12px;border:0;border-radius:var(--r2);background:var(--accent);color:#fff;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 1px 3px rgba(13,148,136,.2);transition:background .15s}
+.login-btn:hover{background:var(--accent2)}
+.login-btn:disabled{opacity:.6;cursor:not-allowed}
+.login-err{font-size:12px;color:var(--red);margin-top:10px;min-height:18px}
 </style>
 </head>
 <body>
-<div class="app">
 
-<!-- SIDEBAR -->
-<aside class="sb">
-  <div class="brand">
-    <div class="btxt" style="font-size:15px">Bee Pee Packaging</div>
+<!-- LOGIN SCREEN -->
+<div class="login-overlay" id="loginScreen">
+  <div class="login-box">
+    <div class="brand">BeePee<span>Works</span></div>
+    <input class="login-input" id="loginPw" type="password" placeholder="" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Enter</button>
+    <div class="login-err" id="loginErr"></div>
   </div>
-  <button class="ni active" data-v="orderlist" onclick="nav('orderlist')">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
-    Order List<span class="c" id="co">0</span>
+</div>
+
+<!-- SIDEBAR (desktop) -->
+<div class="layout">
+<aside class="sidenav">
+  <div class="brand">BeePee<span>Works</span></div>
+  <button class="nl active" data-v="tasks" onclick="nav('tasks')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Tasks
   </button>
-  <button class="ni" data-v="workstatus" onclick="nav('workstatus')">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
-    Work Status<span class="c" id="cw">0</span>
+  <button class="nl" data-v="orders" onclick="nav('orders')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+    Orders
   </button>
-  <button class="ni" data-v="tasks" onclick="nav('tasks')">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-    Tasks<span class="c" id="ct">0</span>
+  <button class="nl" data-v="workstatus" onclick="nav('workstatus')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+    Status
   </button>
-  <button class="ni" data-v="weight" onclick="nav('weight')">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3a4 4 0 0 0-4 4h8a4 4 0 0 0-4-4z"/><path d="M6.5 7H17.5L19 21H5L6.5 7z"/></svg>
+  <button class="nl" data-v="productdata" onclick="nav('productdata')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+    Data
+  </button>
+  <button class="nl" data-v="weight" onclick="nav('weight')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3a4 4 0 0 0-4 4h8a4 4 0 0 0-4-4z"/><path d="M6.5 7H17.5L19 21H5L6.5 7z"/></svg>
     Weight
   </button>
-  <button class="ni" data-v="productdata" onclick="nav('productdata')">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.27 6.96 8.73 5.05 8.73-5.05M12 22.08V12"/></svg>
-    Product Data
-  </button>
-  <button class="ni" data-v="parties" onclick="nav('parties')">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-    Parties<span class="c" id="cp">0</span>
-  </button>
-</aside>
+  </aside>
 
-<div class="main">
-  <!-- MOBILE NAV -->
-  <nav class="mob-nav">
-    <button class="mni active" data-v="orderlist" onclick="nav('orderlist')">Order List</button>
-    <button class="mni" data-v="workstatus" onclick="nav('workstatus')">Work Status</button>
-    <button class="mni" data-v="tasks" onclick="nav('tasks')">Tasks</button>
-    <button class="mni" data-v="weight" onclick="nav('weight')">Weight</button>
-    <button class="mni" data-v="productdata" onclick="nav('productdata')">Product Data</button>
-    <button class="mni" data-v="parties" onclick="nav('parties')">Parties</button>
+<main class="main">
+<div class="shell">
+
+  <!-- ORDERS -->
+  <section id="view-orders" class="view">
+    <div class="ph">
+      <div><div class="ptitle">Orders</div><div class="psub" id="ol-sub"></div></div>
+      <button class="btn btn-p" onclick="showNewOrderForm()">+ New</button>
+    </div>
+
+    <!-- New order input table (hidden by default) -->
+    <div id="new-order-form" class="card" style="display:none;margin-bottom:14px">
+      <div class="ch"><span class="ctitle">New Order</span><button class="btn-del" onclick="hideNewOrderForm()">✕</button></div>
+      <div class="cb">
+        <div class="fg2" style="margin-bottom:10px">
+          <div class="frow"><label class="flbl">Date</label><input type="date" class="inp" id="no-date"></div>
+          <div class="frow"><label class="flbl">Order No</label><input class="inp" id="no-no" placeholder="e.g. SO-2026-001"></div>
+        </div>
+        <div class="frow" style="margin-bottom:10px">
+          <label class="flbl">Customer *</label>
+          <input class="inp" id="no-cust" list="custList" placeholder="Type customer name">
+        </div>
+        <div class="fg2" style="margin-bottom:10px">
+          <div class="frow"><label class="flbl">Product *</label>
+            <select class="sel" id="no-prod">
+              <option value="">Select…</option>
+              <option>Pallet</option><option>Layer / Board</option><option>Box</option><option>OE Layer</option><option>Corner Pad Sheet</option>
+            </select>
+          </div>
+          <div class="frow"><label class="flbl">Ply *</label>
+            <select class="sel" id="no-ply"><option value="">Select…</option><option>3</option><option>5</option><option>7</option></select>
+          </div>
+        </div>
+        <div class="fg3" style="margin-bottom:10px">
+          <div class="frow"><label class="flbl">L *</label><input class="inp num" type="number" inputmode="decimal" id="no-L" min="0" placeholder="0"></div>
+          <div class="frow"><label class="flbl">W *</label><input class="inp num" type="number" inputmode="decimal" id="no-W" min="0" placeholder="0"></div>
+          <div class="frow"><label class="flbl">H *</label><input class="inp num" type="number" inputmode="decimal" id="no-H" min="0" placeholder="0"></div>
+        </div>
+        <div class="fg3" style="margin-bottom:10px">
+          <div class="frow"><label class="flbl">Unit</label>
+            <select class="sel" id="no-su"><option value="in">Inches</option><option value="cm">CM</option></select>
+          </div>
+          <div class="frow"><label class="flbl">Qty *</label><input class="inp num" type="number" inputmode="decimal" id="no-qty" min="0" placeholder="0"></div>
+          <div class="frow"><label class="flbl">Joint</label>
+            <select class="sel" id="no-joint"><option value="double">Double</option><option value="single">Single</option></select>
+          </div>
+        </div>
+        <div class="fg2" style="margin-bottom:14px">
+          <div class="frow"><label class="flbl">Dispatch Date *</label><input type="date" class="inp" id="no-disp"></div>
+          <div class="frow"><label class="flbl">Status</label>
+            <select class="sel" id="no-status">
+              <option>Pending</option><option>In Production</option><option>Partial Dispatch</option><option>Ready</option><option>Dispatched</option>
+            </select>
+          </div>
+        </div>
+        <div id="no-warn" class="warn-txt" style="display:none;margin-bottom:8px">⚠ Dispatch date is before order date</div>
+        <button class="btn btn-p btn-full" onclick="saveNewOrder()">Save Order</button>
+      </div>
+    </div>
+
+    <!-- Filter pills -->
+    <div class="fbar" id="ol-filters"></div>
+
+    <!-- Search -->
+    <div style="margin-bottom:12px">
+      <input class="inp" id="ol-search" placeholder="Search customer or order no…" oninput="renderOrders()">
+    </div>
+
+    <!-- Saved order cards -->
+    <div class="order-list" id="ol-cards"></div>
+  </section>
+
+  <!-- WORK STATUS -->
+  <section id="view-workstatus" class="view">
+    <div class="ph">
+      <div><div class="ptitle">Work Status</div><div class="psub" id="wo-sub"></div></div>
+    </div>
+    <div class="fbar" id="wo-filters"></div>
+    <div class="wo-list" id="wo-list"></div>
+  </section>
+
+  <!-- TASKS -->
+  <section id="view-tasks" class="view active">
+    <div class="ph">
+      <div><div class="ptitle">Tasks</div><div class="psub" id="t-sub"></div></div>
+      <button class="btn btn-p" onclick="addTask()">+ New</button>
+    </div>
+    <div class="fbar" id="t-filters"></div>
+    <div class="mbar" id="t-member-filters"></div>
+    <div class="task-list" id="t-list"></div>
+  </section>
+
+  <!-- WEIGHT -->
+  <section id="view-weight" class="view">
+    <div class="ph"><div><div class="ptitle">Weight Calculator</div><div class="psub">per box · kg · 3 decimals</div></div></div>
+
+    <!-- Result strip -->
+    <div class="card w-result-card" style="margin-bottom:14px;border-color:var(--accent)">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--ink);border-radius:11px 11px 0 0">
+        <span class="ctitle" style="color:#fff">Weight per Box</span>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <span style="font-size:32px;font-weight:700;letter-spacing:-.03em;font-family:'Inter',sans-serif;color:#fff;line-height:1" id="w-result">—</span>
+          <span style="font-size:13px;color:rgba(255,255,255,.6)">kg</span>
+        </div>
+      </div>
+      <div style="padding:8px 18px;font-size:10px;color:var(--ink3);font-family:'Inter',sans-serif;line-height:1.5" id="w-formula">—</div>
+    </div>
+
+    <div class="w2">
+      <!-- Left column: Config + Size + GSM -->
+      <div class="card">
+        <div class="cb" style="display:flex;flex-direction:column;gap:14px">
+          <!-- Config row -->
+          <div>
+            <div class="wlbl" style="margin-bottom:8px">Configuration</div>
+            <div class="fg3">
+              <div class="frow"><label class="wlbl">Ply</label><select class="sel" id="w-ply" onchange="wPlyChange()"><option>3</option><option>5</option><option>7</option></select></div>
+              <div class="frow"><label class="wlbl">Unit</label><select class="sel" id="w-unit" onchange="wCalc()"><option value="in">Inches</option><option value="cm">CM</option></select></div>
+              <div class="frow"><label class="wlbl">Joint</label><select class="sel" id="w-joint" onchange="wCalc()"><option value="double">Double</option><option value="single">Single</option></select></div>
+            </div>
+          </div>
+          <div style="height:1px;background:var(--line)"></div>
+          <!-- Box Size -->
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span class="wlbl" style="margin:0">Box Size</span><span style="font-size:10px;color:var(--ink3)" id="w-unit-lbl">inches</span></div>
+            <div class="fg3">
+              <div class="frow"><label class="wlbl">L</label><input class="inp num" type="number" inputmode="decimal" id="w-L" value="15" min="0" oninput="wCalc()"></div>
+              <div class="frow"><label class="wlbl">W</label><input class="inp num" type="number" inputmode="decimal" id="w-W" value="15" min="0" oninput="wCalc()"></div>
+              <div class="frow"><label class="wlbl">H</label><input class="inp num" type="number" inputmode="decimal" id="w-H" value="15" min="0" oninput="wCalc()"></div>
+            </div>
+          </div>
+          <div style="height:1px;background:var(--line)"></div>
+          <!-- Paper GSM -->
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span class="wlbl" style="margin:0">Paper GSM</span><span style="font-size:10px;color:var(--ink3)">flutes ×1.45</span></div>
+            <div style="display:flex;flex-direction:column;gap:8px" id="w-gsm-fields"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: Board Sizes + Total GSM -->
+      <div class="card">
+        <div class="cb" style="display:flex;flex-direction:column;gap:14px">
+          <!-- Board Sizes -->
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span class="wlbl" style="margin:0">Board Sizes</span><span style="font-size:10px;color:var(--ink3)">editable · inches</span></div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="frow" style="flex:1">
+                <label class="wlbl">Reel (W+H+1)</label>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <input class="inp num" type="number" inputmode="decimal" id="w-reel" step="0.01" oninput="wReelEdited=true;wCalcFromBoard()">
+                  <span style="font-size:11px;color:var(--ink3)">in</span>
+                </div>
+                <div class="warn-txt" id="w-reel-hint"></div>
+              </div>
+              <div class="frow" style="flex:1">
+                <label class="wlbl" id="w-cut-lbl">Cut (L+W+2)</label>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <input class="inp num" type="number" inputmode="decimal" id="w-cut" step="0.01" oninput="wCutEdited=true;wCalcFromBoard()">
+                  <span style="font-size:11px;color:var(--ink3)">in</span>
+                </div>
+                <div class="warn-txt" id="w-cut-hint"></div>
+              </div>
+            </div>
+          </div>
+          <div style="height:1px;background:var(--line)"></div>
+          <!-- Total GSM -->
+          <div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span class="wlbl" style="margin:0">Total Paper GSM</span><span style="font-size:10px;color:var(--ink3)">editable</span></div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <input class="inp num" type="number" inputmode="decimal" id="w-total-gsm" step="1" min="0" oninput="wTotalGsmEdited=true;wCalcFromBoard()" style="width:120px;font-size:16px;font-weight:600">
+              <span style="font-size:12px;color:var(--ink3)">g/m²</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCT DATA -->
+  <section id="view-productdata" class="view">
+    <div class="ph"><div><div class="ptitle">Product Data</div><div class="psub" id="pd-sub"></div></div></div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="addform">
+        <div style="flex:1;min-width:140px"><label class="flbl">Customer</label><select class="sel" id="pdf-cust" onchange="renderProductData()"><option value="">All customers</option></select></div>
+        <div style="flex:1;min-width:120px"><label class="flbl">Reel Size</label><select class="sel" id="pdf-reel" onchange="renderProductData()"><option value="">All sizes</option></select></div>
+        <button class="btn btn-g btn-sm" style="align-self:flex-end" onclick="pdClear()">↺ Clear</button>
+      </div>
+    </div>
+    <div class="psub" id="pd-note" style="margin-bottom:10px"></div>
+    <div class="pd-list" id="pd-list"></div>
+    <div style="font-size:11px;color:var(--ink3);margin-top:10px;display:flex;justify-content:space-between"><span id="pd-foot-l"></span><span id="pd-foot-r"></span></div>
+  </section>
+
+  <!-- PARTIES -->
+  <section id="view-parties" class="view">
+    <div class="ph"><div><div class="ptitle">Parties</div><div class="psub" id="p-sub"></div></div></div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="addform">
+        <div style="flex:1"><label class="flbl">Name</label><input class="inp" id="p-name" placeholder="Party name"></div>
+        <div style="width:140px"><label class="flbl">Type</label><select class="sel" id="p-type"><option>Customer</option><option>Supplier</option></select></div>
+        <button class="btn btn-p btn-sm" style="align-self:flex-end" onclick="addParty()">+ Add</button>
+      </div>
+    </div>
+    <div class="fbar">
+      <button class="pill active" id="pf-all" onclick="pFilter('all')">All</button>
+      <button class="pill" id="pf-c" onclick="pFilter('Customer')">Customers</button>
+      <button class="pill" id="pf-s" onclick="pFilter('Supplier')">Suppliers</button>
+    </div>
+    <div class="task-list" id="p-list" style="margin-top:10px"></div>
+  </section>
+
+</div><!-- /shell -->
+</main>
+</div><!-- /layout -->
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottomnav">
+  <button class="bn active" data-v="tasks" onclick="nav('tasks')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span>Tasks</span>
+  </button>
+  <button class="bn" data-v="orders" onclick="nav('orders')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+    <span>Orders</span>
+  </button>
+  <button class="bn" data-v="workstatus" onclick="nav('workstatus')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+    <span>Status</span>
+  </button>
+  <button class="bn" data-v="productdata" onclick="nav('productdata')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+    <span>Data</span>
+  </button>
+  <button class="bn" data-v="weight" onclick="nav('weight')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3a4 4 0 0 0-4 4h8a4 4 0 0 0-4-4z"/><path d="M6.5 7H17.5L19 21H5L6.5 7z"/></svg>
+    <span>Weight</span>
+  </button>
   </nav>
 
-  <div class="topbar"><div class="crumb" id="crumb">karton / <b>Order List</b></div></div>
-  <div id="mob-scroll-hint" style="display:none;font-size:11px;color:var(--ink3);padding:6px 14px;background:var(--s2);border-bottom:1px solid var(--line);text-align:center">← scroll table sideways →</div>
-
-  <div class="content">
-
-    <!-- ORDER LIST -->
-    <section id="view-orderlist" class="view active">
-      <div class="ph">
-        <div><div class="ptitle">Order List</div><div class="psub" id="ol-sub"></div></div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <input class="inp" id="ol-search" placeholder="Search customer / order no…" style="width:220px" oninput="renderOrders()">
-          <button class="btn btn-p" onclick="addOrder()">+ New order</button>
-        </div>
+<!-- EDIT ORDER DRAWER -->
+<div class="drawer-backdrop" id="ed-backdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="edit-drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-head">
+    <span class="drawer-title" id="ed-title">Edit Order</span>
+    <button class="btn-del" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="fg2">
+      <div class="frow"><label class="flbl">Date</label><input type="date" class="inp" id="ed-date"></div>
+      <div class="frow"><label class="flbl">Order No</label><input class="inp" id="ed-no"></div>
+    </div>
+    <div class="frow"><label class="flbl">Customer *</label><input class="inp" id="ed-cust" list="custList"></div>
+    <div class="fg2">
+      <div class="frow"><label class="flbl">Product *</label>
+        <select class="sel" id="ed-prod">
+          <option>Pallet</option><option>Layer / Board</option><option>Box</option><option>OE Layer</option><option>Corner Pad Sheet</option>
+        </select>
       </div>
-      <div class="card">
-        <div class="fbar" id="ol-filters"></div>
-        <div class="ovx">
-          <table class="t">
-            <thead><tr>
-              <th style="width:108px">Date</th>
-              <th style="width:108px">Order No</th>
-              <th style="min-width:130px">Customer</th>
-              <th style="min-width:120px">Product</th>
-              <th style="width:52px">Ply</th>
-              <th style="min-width:150px">Size L×W×H</th>
-              <th class="r" style="width:68px">Qty</th>
-              <th style="width:78px">Joint</th>
-              <th style="width:110px">Dispatch</th>
-              <th style="min-width:140px">Status</th>
-              <th style="width:28px"></th>
-            </tr></thead>
-            <tbody id="ol-body"></tbody>
-          </table>
-        </div>
+      <div class="frow"><label class="flbl">Ply *</label><select class="sel" id="ed-ply"><option>3</option><option>5</option><option>7</option></select></div>
+    </div>
+    <div>
+      <label class="flbl">Size L × W × H *</label>
+      <div class="fg3">
+        <input class="inp num" type="number" inputmode="decimal" id="ed-L" placeholder="L" min="0">
+        <input class="inp num" type="number" inputmode="decimal" id="ed-W" placeholder="W" min="0">
+        <input class="inp num" type="number" inputmode="decimal" id="ed-H" placeholder="H" min="0">
       </div>
-    </section>
-
-    <!-- WORK ORDER -->
-    <section id="view-workstatus" class="view">
-      <div class="ph">
-        <div><div class="ptitle">Work Status</div><div class="psub" id="wo-sub"></div></div>
-        <div style="display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;scrollbar-width:none" id="wo-filters"></div>
-      </div>
-      <div class="kpi-strip" id="wo-kpi"></div>
-      <div class="card">
-        <div class="wo-list" id="wo-list"></div>
-      </div>
-    </section>
-
-    <!-- TASKS -->
-    <section id="view-tasks" class="view">
-      <div class="ph">
-        <div><div class="ptitle">Tasks</div><div class="psub" id="t-sub"></div></div>
-        <button class="btn btn-p" onclick="addTask()">+ New task</button>
-      </div>
-      <div class="card">
-        <div class="fbar" id="t-filters"></div>
-        <div class="ovx">
-          <table class="t">
-            <thead><tr>
-              <th style="width:108px">Date</th>
-              <th>Task</th>
-              <th style="width:150px">Assigned</th>
-              <th style="width:135px">Status</th>
-              <th style="width:28px"></th>
-            </tr></thead>
-            <tbody id="t-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- WEIGHT -->
-    <section id="view-weight" class="view">
-      <div class="ph">
-        <div><div class="ptitle">Weight Calculator</div><div class="psub">Board size & weight per box · 3 decimal places</div></div>
-      </div>
-      <div class="w2">
-        <div class="wsec">
-          <div class="card">
-            <div class="ch"><span class="ctitle">Configuration</span></div>
-            <div class="cb" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-              <div><div class="wlbl">Ply</div><select class="sel" id="w-ply" onchange="wPlyChange()" style="width:100%"><option>3</option><option>5</option><option>7</option></select></div>
-              <div><div class="wlbl">Unit</div><select class="sel" id="w-unit" onchange="wCalc()" style="width:100%"><option value="in">Inches</option><option value="cm">CM</option></select></div>
-              <div><div class="wlbl">Joint</div><select class="sel" id="w-joint" onchange="wCalc()" style="width:100%"><option value="double">Double</option><option value="single">Single</option></select></div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="ch"><span class="ctitle">Box Size</span><span class="psub" id="w-unit-lbl">inches</span></div>
-            <div class="cb" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-              <div><div class="wlbl">Length (L)</div><input class="inp" type="number" id="w-L" value="15" min="0" oninput="wCalc()" style="width:100%"></div>
-              <div><div class="wlbl">Width (W)</div><input class="inp" type="number" id="w-W" value="15" min="0" oninput="wCalc()" style="width:100%"></div>
-              <div><div class="wlbl">Height (H)</div><input class="inp" type="number" id="w-H" value="15" min="0" oninput="wCalc()" style="width:100%"></div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="ch"><span class="ctitle">Paper GSM</span><span class="psub">Flutes × 1.45 applied</span></div>
-            <div class="cb" style="display:flex;flex-direction:column;gap:10px" id="w-gsm-fields"></div>
-          </div>
-        </div>
-        <div class="wsec">
-          <div class="card">
-            <div class="ch"><span class="ctitle">Board Sizes</span><span class="psub">auto-calculated · editable</span></div>
-            <div class="cb" style="display:flex;flex-direction:column;gap:14px">
-              <div>
-                <div class="wlbl">Reel Size <span style="font-weight:400;color:var(--ink3)">(W + H + 1)</span></div>
-                <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
-                  <input class="inp" type="number" id="w-reel" step="0.001" oninput="wReelEdited=true;wCalcFromBoard()" style="width:110px;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600">
-                  <span class="psub">in</span>
-                </div>
-                <div style="font-size:10px;color:var(--muted);margin-top:3px" id="w-reel-hint"></div>
-              </div>
-              <div style="height:1px;background:var(--line)"></div>
-              <div>
-                <div class="wlbl" id="w-cut-lbl">Cut Size <span style="font-weight:400;color:var(--ink3)">(L + W + 2)</span></div>
-                <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
-                  <input class="inp" type="number" id="w-cut" step="0.001" oninput="wCutEdited=true;wCalcFromBoard()" style="width:110px;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600">
-                  <span class="psub">in</span>
-                </div>
-                <div style="font-size:10px;color:var(--muted);margin-top:3px" id="w-cut-hint"></div>
-              </div>
-            </div>
-          </div>
-                    <div class="card">
-            <div class="ch"><span class="ctitle">Total Paper GSM</span><span class="psub">editable · used in weight calc</span></div>
-            <div class="cb" style="display:flex;align-items:center;gap:12px">
-              <input class="inp" type="number" id="w-total-gsm" step="1" min="0" oninput="wTotalGsmEdited=true;wCalcFromBoard()" style="width:120px;font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:600">
-              <span class="psub">g/m²</span>
-            </div>
-          </div>
-          <div class="card" style="border-color:var(--ink)">
-            <div class="ch" style="background:var(--ink);border-radius:7px 7px 0 0"><span class="ctitle" style="color:#fff">Weight per Box</span></div>
-            <div style="text-align:center;padding:28px 16px">
-              <div style="font-size:42px;font-weight:700;letter-spacing:-.03em;font-family:'JetBrains Mono',monospace;line-height:1" id="w-result">—</div>
-              <div style="font-size:13px;color:var(--ink3);margin-top:8px">kg</div>
-            </div>
-            <div style="border-top:1px solid var(--line);padding:10px 16px;font-size:11px;color:var(--ink3);font-family:'JetBrains Mono',monospace" id="w-formula">—</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PRODUCT DATA -->
-    <section id="view-productdata" class="view">
-      <div class="ph">
-        <div><div class="ptitle">Product Data</div><div class="psub" id="pd-sub"></div></div>
-      </div>
-      <div class="card" style="margin-bottom:12px">
-        <div class="addform">
-          <div><div class="flbl">Customer</div><select class="sel" id="pdf-cust" onchange="renderProductData()" style="width:180px"><option value="">All customers</option></select></div>
-          <div><div class="flbl">Reel Size</div><select class="sel" id="pdf-reel" onchange="renderProductData()" style="width:130px"><option value="">All sizes</option></select></div>
-          <button class="btn btn-g btn-sm" onclick="pdClear()">↺ Clear</button>
-          <span class="psub" id="pd-note" style="align-self:flex-end"></span>
-        </div>
-      </div>
-      <div class="card">
-        <div class="ovx">
-          <table class="t">
-            <thead><tr>
-              <th style="min-width:160px">Customer</th>
-              <th style="min-width:120px">Product</th>
-              <th style="width:60px">Ply</th>
-              <th style="width:100px">Reel Size</th>
-              <th style="width:100px">Cut Size</th>
-              <th class="r" style="width:90px">Quantity</th>
-            </tr></thead>
-            <tbody id="pd-body"></tbody>
-          </table>
-        </div>
-        <div class="tfoot"><span id="pd-foot-l"></span><span id="pd-foot-r"></span></div>
-      </div>
-    </section>
-
-    <!-- PARTIES -->
-    <section id="view-parties" class="view">
-      <div class="ph">
-        <div><div class="ptitle">Parties</div><div class="psub" id="p-sub"></div></div>
-      </div>
-      <div class="card" style="margin-bottom:12px">
-        <div class="addform">
-          <div><div class="flbl">Name</div><input class="inp" id="p-name" placeholder="Party name" style="width:220px"></div>
-          <div><div class="flbl">Type</div><select class="sel" id="p-type"><option>Customer</option><option>Supplier</option></select></div>
-          <button class="btn btn-p btn-sm" onclick="addParty()">+ Add</button>
-          <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <button class="pill active" id="pf-all" onclick="pFilter('all')">All</button>
-            <button class="pill" id="pf-c" onclick="pFilter('Customer')">Customers</button>
-            <button class="pill" id="pf-s" onclick="pFilter('Supplier')">Suppliers</button>
-          </div>
-        </div>
-        <table class="t">
-          <thead><tr><th>Name</th><th style="width:130px">Type</th><th style="width:28px"></th></tr></thead>
-          <tbody id="p-body"></tbody>
-        </table>
-      </div>
-    </section>
-
-  </div><!-- /content -->
-</div><!-- /main -->
-</div><!-- /app -->
+    </div>
+    <div class="fg2">
+      <div class="frow"><label class="flbl">Unit</label><select class="sel" id="ed-su"><option value="in">Inches</option><option value="cm">CM</option></select></div>
+      <div class="frow"><label class="flbl">Qty *</label><input class="inp num" type="number" inputmode="decimal" id="ed-qty" min="0"></div>
+    </div>
+    <div class="fg2">
+      <div class="frow"><label class="flbl">Joint</label><select class="sel" id="ed-joint"><option value="double">Double</option><option value="single">Single</option></select></div>
+      <div class="frow"><label class="flbl">Dispatch Date *</label><input type="date" class="inp" id="ed-disp"></div>
+    </div>
+    <div class="frow"><label class="flbl">Status</label>
+      <select class="sel" id="ed-status">
+        <option>Pending</option><option>In Production</option><option>Partial Dispatch</option><option>Ready</option><option>Dispatched</option>
+      </select>
+    </div>
+    <div class="warn-txt" id="ed-warn" style="display:none">⚠ Dispatch date is before order date</div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn btn-g btn-full" onclick="deleteFromDrawer()" style="flex:0 0 auto;width:auto;padding:0 16px;color:var(--red);border-color:var(--red)">Delete</button>
+    <button class="btn btn-g btn-full" onclick="duplicateOrder()" style="flex:0 0 auto;width:auto;padding:0 16px;color:var(--blue);border-color:var(--blue)">Duplicate</button>
+    <button class="btn btn-p btn-full" onclick="saveDrawer()">Save changes</button>
+  </div>
+</div>
 
 <datalist id="custList"></datalist>
 
@@ -434,255 +647,397 @@ table.t{width:100%;border-collapse:collapse}
 // ── SUPABASE ─────────────────────────────────────────────
 const SB_URL = 'https://cdkxvzzddrgdktktxyua.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNka3h2enpkZHJnZGt0a3R4eXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNjU2MTEsImV4cCI6MjA5OTk0MTYxMX0.hexTPfwsBKcIjBVYH9c1MgZkwgawyTgxQRs3jOTnlUM';
+const AUTH_EMAIL = 'team@beepee.com';
+let accessToken = null;
 
-async function sbFetch(path, method='GET', body=null){
-  const opts = {
-    method,
-    headers: {
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': method==='POST' ? 'return=representation' : ''
-    }
-  };
-  if(body) opts.body = JSON.stringify(body);
-  const r = await fetch(SB_URL + '/rest/v1/' + path, opts);
-  if(!r.ok){ const e=await r.text(); console.error('SB error',e); return null; }
-  return method==='DELETE' ? true : r.json();
+// ── AUTH ─────────────────────────────────────────────────
+function getSession(){
+  try{const s=localStorage.getItem('sb_session');return s?JSON.parse(s):null;}catch(e){return null;}
+}
+function saveSession(s){localStorage.setItem('sb_session',JSON.stringify(s));}
+function clearSession(){localStorage.removeItem('sb_session');}
+
+async function sbAuth(action,body){
+  const r=await fetch(SB_URL+'/auth/v1/'+action,{method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  return r.json();
 }
 
-const db = {
-  get:    (t, q='')      => sbFetch(t + '?order=created_at.asc' + (q?'&'+q:'')),
-  insert: (t, row)       => sbFetch(t, 'POST', row),
-  update: (t, id, row)   => sbFetch(t + '?id=eq.' + id, 'PATCH', row),
-  delete: (t, id)        => sbFetch(t + '?id=eq.' + id, 'DELETE'),
+async function refreshSession(rt){
+  const d=await sbAuth('token?grant_type=refresh_token',{refresh_token:rt});
+  if(d.access_token){saveSession(d);accessToken=d.access_token;return true;}
+  clearSession();return false;
+}
+
+async function checkAuth(){
+  const s=getSession();
+  if(!s||!s.access_token){showLogin();return;}
+  const exp=s.expires_at||0;
+  if(Date.now()/1000>exp-60){
+    if(s.refresh_token&&await refreshSession(s.refresh_token)){hideLogin();init();return;}
+    showLogin();return;
+  }
+  accessToken=s.access_token;hideLogin();init();
+}
+
+async function doLogin(){
+  const pw=document.getElementById('loginPw').value.trim();
+  const err=document.getElementById('loginErr');
+  const btn=document.getElementById('loginBtn');
+  if(!pw){err.textContent='Enter the password';return;}
+  btn.disabled=true;btn.textContent='Logging in…';err.textContent='';
+  const d=await sbAuth('token?grant_type=password',{email:AUTH_EMAIL,password:pw});
+  if(d.access_token){saveSession(d);accessToken=d.access_token;hideLogin();init();}
+  else{err.textContent='Wrong password';btn.disabled=false;btn.textContent='Login';}
+}
+
+function showLogin(){document.getElementById('loginScreen').style.display='flex';}
+function hideLogin(){document.getElementById('loginScreen').style.display='none';}
+
+async function sbFetch(path, method='GET', body=null){
+  const token=accessToken||SB_KEY;
+  const opts={method,headers:{'apikey':SB_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':''}};
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(SB_URL+'/rest/v1/'+path,opts);
+  if(r.status===401){clearSession();showLogin();return null;}
+  if(!r.ok){console.error('SB',await r.text());return null;}
+  return method==='DELETE'?true:r.json();
+}
+const db={
+  get:(t,q='')=>sbFetch(t+'?order=created_at.asc'+(q?'&'+q:'')),
+  insert:(t,row)=>sbFetch(t,'POST',row),
+  update:(t,id,row)=>sbFetch(t+'?id=eq.'+id,'PATCH',row),
+  delete:(t,id)=>sbFetch(t+'?id=eq.'+id,'DELETE'),
 };
 
 // ── CONSTANTS ────────────────────────────────────────────
-const PRODUCTS = ["Pallet","Layer / Board","Box","OE Layer","Corner Pad Sheet"];
-const PLYS     = ["3","5","7"];
-const STATUSES = ["Pending","In Production","Partial Dispatch","Ready","Dispatched"];
-const TSTATS   = ["Pending","In progress","Done"];
-const JOINTS   = ["double","single"];
-const SUNITS   = ["in","cm"];
-
-const PLY_LAYERS = {
+const PRODUCTS=['Pallet','Layer / Board','Box','OE Layer','Corner Pad Sheet'];
+const PLYS=['3','5','7'];
+const STATUSES=['Pending','In Production','Partial Dispatch','Ready','Dispatched'];
+const TSTATS=['Pending','In progress','Done'];
+const MEMBERS=['Mahesh','Kondal','Pravin'];
+const JOINTS=['double','single'];
+const SUNITS=['in','cm'];
+const PLY_LAYERS={
   '3':[{l:'Top Paper',t:'liner'},{l:'Flute 1',t:'flute'},{l:'Base 1',t:'liner'}],
   '5':[{l:'Top Paper',t:'liner'},{l:'Flute 1',t:'flute'},{l:'Base 1',t:'liner'},{l:'Flute 2',t:'flute'},{l:'Base 2',t:'liner'}],
   '7':[{l:'Top Paper',t:'liner'},{l:'Flute 1',t:'flute'},{l:'Base 1',t:'liner'},{l:'Flute 2',t:'flute'},{l:'Base 2',t:'liner'},{l:'Flute 3',t:'flute'},{l:'Base 3',t:'liner'}]
 };
-const DEF_GSM = {'Top Paper':150,'Flute 1':120,'Base 1':150,'Flute 2':120,'Base 2':150,'Flute 3':120,'Base 3':150};
+const DEF_GSM={'Top Paper':150,'Flute 1':120,'Base 1':150,'Flute 2':120,'Base 2':150,'Flute 3':120,'Base 3':150};
 
 // ── STATE ────────────────────────────────────────────────
 let parties=[], orders=[], tasks=[];
-let pf='all', oSF='All', tSF='All';
-let woF='all', pdF='all';
+let pf='all', oSF='All', tSF='All', tMF='All', woF='all';
+let editId=null;
 let wReelEdited=false, wCutEdited=false, wTotalGsmEdited=false;
 
 // ── HELPERS ──────────────────────────────────────────────
-const o   = (list,sel)=>list.map(v=>`<option ${v==sel?'selected':''}>${v}</option>`).join('');
-const fmt = n=>n.toLocaleString('en-IN');
-const esc = s=>String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-const today = ()=>new Date().toISOString().slice(0,10);
-const TODAY = today();
+const fmt=n=>(n||0).toLocaleString('en-IN');
+const ddmm=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const today=()=>new Date().toISOString().slice(0,10);
+const TODAY=today();
 
 function skCls(s){return s==='Pending'?'pn':s==='In Production'?'ip':s==='Partial Dispatch'?'pd':s==='Ready'?'rd':'ds';}
-function badge(s){return `<span class="bdg ${skCls(s)}">${s}</span>`;}
+function badge(s){return '<span class="bdg '+skCls(s)+'">'+esc(s)+'</span>';}
 
 function dispMeta(disp,status){
   if(status==='Dispatched') return {label:'Dispatched',cls:'done'};
-  if(!disp) return {label:'No date',cls:'ok'};
+  if(!disp) return {label:'No date set',cls:'ok'};
   if(disp<TODAY) return {label:'Overdue',cls:'overdue'};
-  if(disp===TODAY) return {label:'Today',cls:'today'};
+  if(disp===TODAY) return {label:'Due today',cls:'today'};
   const d=Math.round((new Date(disp)-new Date(TODAY))/864e5);
-  return {label:`${d}d away`,cls:d<=3?'today':'ok'};
+  return {label:d+'d away',cls:d<=3?'today':'ok'};
 }
-
 function boardSizes(ord){
   const f=(ord.su||'in')==='cm'?1/2.54:1;
-  const L=(ord.L||0)*f, W=(ord.W||0)*f, H=(ord.H||0)*f;
-  const reel=W+H+1;
-  const cut=(ord.joint||'double')==='double'?(L+W+2):(L*2+W*2+2);
-  return {reel:reel.toFixed(2),cut:cut.toFixed(2)};
+  const L=(ord.l||0)*f,W=(ord.w||0)*f,H=(ord.h||0)*f;
+  return {reel:(W+H+1).toFixed(2),cut:((ord.joint||'double')==='double'?(L+W+2):(L*2+W*2+2)).toFixed(2)};
 }
-
 function updateCustList(){
-  document.getElementById('custList').innerHTML=
-    parties.filter(p=>p.type==='Customer').map(p=>`<option value="${esc(p.name)}">`).join('');
+  document.getElementById('custList').innerHTML=parties.filter(p=>p.type==='Customer').map(p=>'<option value="'+esc(p.name)+'">').join('');
+}
+function setVal(id,v){const el=document.getElementById(id);if(el)el.value=v||'';}
+function getVal(id){return(document.getElementById(id)?.value||'').trim();}
+
+// ── ORDERS ───────────────────────────────────────────────
+function showNewOrderForm(){
+  document.getElementById('new-order-form').style.display='block';
+  document.getElementById('no-date').value=today();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function hideNewOrderForm(){document.getElementById('new-order-form').style.display='none';}
+
+async function saveNewOrder(){
+  const cust=getVal('no-cust'), prod=getVal('no-prod'), ply=getVal('no-ply');
+  const L=parseFloat(getVal('no-L'))||0, W=parseFloat(getVal('no-W'))||0;
+  const H=parseFloat(getVal('no-H'))||0, qty=parseFloat(getVal('no-qty'))||0;
+  const disp=getVal('no-disp'), date=getVal('no-date');
+
+  // Validate
+  const errs=[];
+  if(!cust) errs.push('no-cust');
+  if(!prod) errs.push('no-prod');
+  if(!ply)  errs.push('no-ply');
+  if(!L)    errs.push('no-L');
+  if(!W)    errs.push('no-W');
+  if(!qty)  errs.push('no-qty');
+  if(!disp) errs.push('no-disp');
+
+  document.querySelectorAll('.inp.err,.sel.err').forEach(el=>el.classList.remove('err'));
+  errs.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('err');});
+  if(errs.length) return;
+
+  // Date warning
+  const warnEl=document.getElementById('no-warn');
+  warnEl.style.display=(disp&&date&&disp<date)?'block':'none';
+
+  // Auto-create customer if new
+  if(!parties.find(p=>p.name.toLowerCase()===cust.toLowerCase())){
+    const res=await db.insert('parties',{name:cust,type:'Customer'});
+    if(res) parties.push(res[0]);
+    renderParties();
+  }
+
+  const row={date,no:getVal('no-no'),cust,prod,ply,l:L,w:W,h:H,su:getVal('no-su'),qty,joint:getVal('no-joint'),disp,status:getVal('no-status')};
+  const res=await db.insert('orders',row);
+  if(res){
+    orders.unshift(res[0]);
+    hideNewOrderForm();
+    // Reset form
+    ['no-no','no-cust','no-L','no-W','no-H','no-qty','no-disp'].forEach(id=>setVal(id,''));
+    document.getElementById('no-prod').value='';
+    document.getElementById('no-ply').value='';
+    document.getElementById('no-status').value='Pending';
+    renderOrders();
+  }
 }
 
-// ── ORDER LIST ───────────────────────────────────────────
-function validateOrder(ord){
-  const errs=[];
-  if(!ord.cust||!ord.cust.trim()) errs.push('cust');
-  if(!ord.prod) errs.push('prod');
-  if(!ord.ply)  errs.push('ply');
-  if(!ord.L||ord.L<=0) errs.push('L');
-  if(!ord.W||ord.W<=0) errs.push('W');
-  if(!ord.H||ord.H<0)  errs.push('H');
-  if(!ord.qty||ord.qty<=0) errs.push('qty');
-  if(!ord.disp) errs.push('disp');
-  return errs;
-}
-function dateWarn(ord){
-  if(!ord.date||!ord.disp) return false;
-  return ord.disp < ord.date;
-}
 function renderOrders(){
   const q=(document.getElementById('ol-search')?.value||'').toLowerCase().trim();
   let list=oSF==='All'?orders:orders.filter(x=>x.status===oSF);
   if(q) list=list.filter(x=>(x.cust||'').toLowerCase().includes(q)||(x.no||'').toLowerCase().includes(q));
-  document.getElementById('ol-body').innerHTML=list.map(ord=>{
-  const e=validateOrder(ord);
-  const w=dateWarn(ord);
-  const ec=f=>e.includes(f)?'cell err':'cell';
-  return '<tr class="'+(w?'warn-row':'')+'">'
-    +'<td><input type="date" class="cell num" value="'+ord.date+'" onchange="uO('+ord.id+',\'date\',this.value)"></td>'
-    +'<td><input class="cell num" value="'+esc(ord.no)+'" onchange="uO('+ord.id+',\'no\',this.value)" style="width:98px"></td>'
-    +'<td><input class="'+ec('cust')+'" list="custList" value="'+esc(ord.cust)+'" onchange="custChange('+ord.id+',this.value)" style="min-width:140px" placeholder="Customer *"></td>'
-    +'<td><select class="csel" onchange="uO('+ord.id+',\'prod\',this.value)">'+o(PRODUCTS,ord.prod)+'</select></td>'
-    +'<td><select class="csel" style="width:44px" onchange="uO('+ord.id+',\'ply\',this.value)">'+o(PLYS,ord.ply)+'</select></td>'
-    +'<td><div style="display:flex;align-items:center;gap:2px">'
-      +'<input class="'+ec('L')+' num" type="number" min="0" value="'+ord.L+'" onchange="uO('+ord.id+',\'L\',+this.value)" style="width:36px;text-align:center">'
-      +'<span style="color:var(--ink3);font-size:10px">×</span>'
-      +'<input class="'+ec('W')+' num" type="number" min="0" value="'+ord.W+'" onchange="uO('+ord.id+',\'W\',+this.value)" style="width:36px;text-align:center">'
-      +'<span style="color:var(--ink3);font-size:10px">×</span>'
-      +'<input class="'+ec('H')+' num" type="number" min="0" value="'+(ord.H||0)+'" onchange="uO('+ord.id+',\'H\',+this.value)" style="width:36px;text-align:center">'
-      +'<select class="csel" style="width:34px;font-size:10px" onchange="uO('+ord.id+',\'su\',this.value)">'+o(SUNITS,ord.su||'in')+'</select>'
-    +'</div></td>'
-    +'<td class="r"><input class="'+ec('qty')+' num" type="number" min="0" value="'+ord.qty+'" onchange="uO('+ord.id+',\'qty\',+this.value)" style="text-align:right;width:58px"></td>'
-    +'<td><select class="csel" onchange="uO('+ord.id+',\'joint\',this.value)">'+o(JOINTS,ord.joint||'double')+'</select></td>'
-    +'<td>'
-      +'<input type="date" class="'+ec('disp')+' num" value="'+(ord.disp||'')+'" onchange="uO('+ord.id+',\'disp\',this.value)">'
-      +(w?'<div class="warn-cell">⚠ before order date</div>':'')
-    +'</td>'
-    +'<td><div style="display:flex;align-items:center;gap:5px">'
-      +badge(ord.status)
-      +'<select class="csel" style="flex:1" onchange="uO('+ord.id+',\'status\',this.value)">'+o(STATUSES,ord.status)+'</select>'
-    +'</div></td>'
-    +'<td><button class="btn-del" onclick="delO('+ord.id+')">✕</button></td>'
-    +'</tr>';
-}).join('');
-
-    document.getElementById('co').textContent=orders.length;
-  document.getElementById('ol-sub').textContent=
-    `${orders.length} orders · ${orders.filter(x=>x.status!=='Dispatched').length} active`;
 
   const counts={All:orders.length};
   STATUSES.forEach(s=>counts[s]=orders.filter(x=>x.status===s).length);
   document.getElementById('ol-filters').innerHTML=
-    ['All',...STATUSES].map(s=>`<button class="pill${oSF===s?' active':''}" onclick="olFilter('${s}')">${s} <span style="opacity:.55;font-size:10px;margin-left:2px;font-family:'JetBrains Mono',monospace">${counts[s]}</span></button>`).join('');
+    ['All',...STATUSES].map(s=>{const pc=s==='All'?'':' pill-'+skCls(s);return '<button class="pill'+pc+(oSF===s?' active':'')+'" onclick="olFilter(\''+s+'\')">'+s+' <span class="pill-count">'+counts[s]+'</span></button>';}).join('');
 
-  renderWorkOrder(); renderProductData();
-}
-
-async function uO(id,f,v){const x=orders.find(o=>o.id===id);if(x){x[f]=v;renderOrders();await db.update('orders',id,{[f]:v});}}
-async function custChange(id,v){
-  v=v.trim();if(!v)return;
-  if(!parties.find(p=>p.name.toLowerCase()===v.toLowerCase())){
-    const res=await db.insert('parties',{name:v,type:'Customer'});
-    if(res) parties.push(res[0]);
-    renderParties();
-  }
-  uO(id,'cust',v);
-}
-function addOrder(){
-  orders.unshift({id:oSeq++,date:today(),no:'',cust:'',prod:'Box',ply:'3',L:12,W:10,H:8,su:'in',qty:100,joint:'double',disp:'',status:'Pending'});
-  renderOrders();
-}
-async function delO(id){if(confirm('Delete this order?')){await db.delete('orders',id);orders=orders.filter(x=>x.id!==id);renderOrders();}}
-function olFilter(s){oSF=s;renderOrders();}
-
-// ── WORK ORDER ───────────────────────────────────────────
-function renderWorkOrder(){
-  const list=woF==='all'?orders:orders.filter(x=>x.status===woF);
-  const counts={};
-  STATUSES.forEach(s=>counts[s]=orders.filter(x=>x.status===s).length);
-
-  document.getElementById('cw').textContent=orders.length;
-  document.getElementById('wo-sub').textContent=`${list.length} of ${orders.length} orders`;
-
-  document.getElementById('wo-kpi').innerHTML=STATUSES.map(s=>
-    `<div class="kpi"><div class="kpi-lbl">${s}</div><div class="kpi-val">${counts[s]}</div><div class="kpi-sub">orders</div></div>`
-  ).join('');
-
-  document.getElementById('wo-filters').innerHTML=
-    ['all',...STATUSES].map(s=>`<button class="pill${woF===s?' active':''}" onclick="woFilter('${s}')">${s==='all'?'All':s}</button>`).join('');
+  document.getElementById('ol-sub').textContent=orders.length+' orders · '+orders.filter(x=>x.status!=='Dispatched').length+' active';
 
   if(!list.length){
-    document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:32px;color:var(--muted);font-size:12px">No orders</div>';
+    document.getElementById('ol-cards').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No orders yet. Tap + New to add one.</div>';
     return;
   }
-  document.getElementById('wo-list').innerHTML=list.map(ord=>{
+
+  document.getElementById('ol-cards').innerHTML=list.map(ord=>{
     const dm=dispMeta(ord.disp,ord.status);
-    return `<div class="wo-card">
-      <div class="wo-stripe ${skCls(ord.status)}"></div>
-      <div class="wo-body">
-        <div class="wo-top">
-          <div><div class="wo-cust">${esc(ord.cust)||'—'}</div><div class="wo-no">${esc(ord.no)}</div></div>
-          ${badge(ord.status)}
-        </div>
-        <div class="wo-grid">
-          <div><div class="wo-flbl">Ply</div><div class="wo-fval">${ord.ply}PLY</div></div>
-          <div><div class="wo-flbl">Product</div><div class="wo-fval t">${esc(ord.prod)}</div></div>
-          <div><div class="wo-flbl">Size</div><div class="wo-fval">${ord.L}×${ord.W}×${ord.H||0} ${ord.su||'in'}</div></div>
-          <div><div class="wo-flbl">Quantity</div><div class="wo-fval">${fmt(ord.qty)}</div></div>
-        </div>
-        <div class="wo-bot">
-          <div class="wo-disp ${dm.cls}">${ord.disp||'No date'} · ${dm.label}</div>
-          <select class="csel" style="width:148px;border:1px solid var(--line);border-radius:4px;height:26px;background:var(--surface)" onchange="woStatusChange(${ord.id},this.value)">${o(STATUSES,ord.status)}</select>
-        </div>
-      </div>
-    </div>`;
+    const sk=skCls(ord.status);
+    return '<div class="ocard '+sk+'" onclick="openDrawer('+ord.id+')">'
+      +'<div class="ostripe '+sk+'"></div>'
+      +'<div class="obody">'
+        +'<div class="orow1">'
+          +'<div style="display:flex;align-items:center"><span class="ocust">'+esc(ord.cust||'—')+'</span><span class="ono">'+(ord.no||'')+'</span></div>'
+          +badge(ord.status)
+        +'</div>'
+        +'<div class="orow2">'
+          +'<span class="wo-detail">'+esc(ord.ply)+'PLY <span>·</span> '+esc(ord.prod)+' <span>·</span> '
+          +esc(String(ord.l||0))+'×'+esc(String(ord.w||0))+'×'+esc(String(ord.h||0))+' '+(ord.su||'in')+' <span>·</span> '
+          +fmt(ord.qty)+' nos.</span>'
+          +'<span class="odisp '+dm.cls+'">'+(ord.disp?ddmm(ord.disp):'No date')+' · '+dm.label+'</span>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
   }).join('');
 }
-function woFilter(f){woF=f;renderWorkOrder();}
-async function woStatusChange(id,s){const x=orders.find(o=>o.id===id);if(x){x.status=s;renderOrders();await db.update('orders',id,{status:s});}}
+function olFilter(s){oSF=s;renderOrders();}
+
+// ── DRAWER ───────────────────────────────────────────────
+function openDrawer(id){
+  const ord=orders.find(o=>o.id===id);
+  if(!ord) return;
+  editId=id;
+  document.getElementById('ed-title').textContent='Edit · '+(ord.no||ord.cust||'Order');
+  setVal('ed-date',ord.date); setVal('ed-no',ord.no); setVal('ed-cust',ord.cust);
+  setVal('ed-prod',ord.prod); setVal('ed-ply',ord.ply);
+  setVal('ed-L',ord.l); setVal('ed-W',ord.w); setVal('ed-H',ord.h||0);
+  setVal('ed-su',ord.su||'in'); setVal('ed-qty',ord.qty);
+  setVal('ed-joint',ord.joint||'double'); setVal('ed-disp',ord.disp);
+  setVal('ed-status',ord.status);
+  document.getElementById('ed-warn').style.display='none';
+  document.getElementById('ed-backdrop').classList.add('open');
+  document.getElementById('edit-drawer').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDrawer(){
+  document.getElementById('ed-backdrop').classList.remove('open');
+  document.getElementById('edit-drawer').classList.remove('open');
+  document.body.style.overflow='';
+  editId=null;
+}
+async function saveDrawer(){
+  if(!editId) return;
+  const row={
+    date:getVal('ed-date'),no:getVal('ed-no'),cust:getVal('ed-cust'),
+    prod:getVal('ed-prod'),ply:getVal('ed-ply'),
+    l:parseFloat(getVal('ed-L'))||0,w:parseFloat(getVal('ed-W'))||0,h:parseFloat(getVal('ed-H'))||0,
+    su:getVal('ed-su'),qty:parseFloat(getVal('ed-qty'))||0,
+    joint:getVal('ed-joint'),disp:getVal('ed-disp'),status:getVal('ed-status')
+  };
+  const warnEl=document.getElementById('ed-warn');
+  warnEl.style.display=(row.disp&&row.date&&row.disp<row.date)?'block':'none';
+  const x=orders.find(o=>o.id===editId);
+  if(x) Object.assign(x,row);
+  await db.update('orders',editId,row);
+  closeDrawer();
+  renderOrders(); renderWorkStatus(); renderProductData();
+}
+async function deleteFromDrawer(){
+  if(!editId||!confirm('Delete this order?')) return;
+  await db.delete('orders',editId);
+  orders=orders.filter(o=>o.id!==editId);
+  closeDrawer();
+  renderOrders(); renderWorkStatus(); renderProductData();
+}
+async function duplicateOrder(){
+  if(!editId) return;
+  const src=orders.find(o=>o.id===editId);
+  if(!src) return;
+  const row={date:today(),no:'',cust:src.cust,prod:src.prod,ply:src.ply,l:src.l,w:src.w,h:src.h,su:src.su||'in',qty:src.qty,joint:src.joint||'double',disp:'',status:'Pending'};
+  const res=await db.insert('orders',row);
+  if(res){orders.unshift(res[0]);closeDrawer();renderOrders();renderWorkStatus();renderProductData();}
+}
+
+// ── WORK STATUS ──────────────────────────────────────────
+function renderWorkStatus(){
+  let list=woF==='all'?[...orders]:orders.filter(x=>x.status===woF);
+  list.sort((a,b)=>{
+    const pa=a.status==='Dispatched'?2:(!a.disp?1:a.disp<TODAY?-2:a.disp===TODAY?-1:0);
+    const pb=b.status==='Dispatched'?2:(!b.disp?1:b.disp<TODAY?-2:b.disp===TODAY?-1:0);
+    if(pa!==pb) return pa-pb;
+    return (a.disp||'9').localeCompare(b.disp||'9');
+  });
+  const counts={};STATUSES.forEach(s=>counts[s]=orders.filter(x=>x.status===s).length);
+  document.getElementById('wo-sub').textContent=list.length+' of '+orders.length+' orders';
+  document.getElementById('wo-filters').innerHTML=
+    ['all',...STATUSES].map(s=>{const lbl=s==='all'?'All':s;const cnt=s==='all'?orders.length:counts[s];const pc=s==='all'?'':' pill-'+skCls(s);return '<button class="pill'+pc+(woF===s?' active':'')+'" onclick="woFilter(\''+s+'\')">'+lbl+' <span class="pill-count">'+cnt+'</span></button>';}).join('');
+  if(!list.length){document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No orders</div>';return;}
+  document.getElementById('wo-list').innerHTML=list.map(ord=>{
+    const dm=dispMeta(ord.disp,ord.status);
+    return '<div class="wo-card '+skCls(ord.status)+'">'
+      +'<div class="wo-stripe '+skCls(ord.status)+'"></div>'
+      +'<div class="wo-body">'
+        +'<div class="wo-row1">'
+          +'<div style="display:flex;align-items:center"><span class="wo-cust">'+esc(ord.cust||'—')+'</span><span class="wo-no">'+(ord.no||'')+'</span></div>'
+          +'<select class="wo-sel" onchange="woStatusChange('+ord.id+',this.value)">'+STATUSES.map(s=>'<option'+(s===ord.status?' selected':'')+'>'+s+'</option>').join('')+'</select>'
+        +'</div>'
+        +'<div class="wo-row2">'
+          +'<span class="wo-detail">'+esc(ord.ply)+'PLY <span>·</span> '+esc(ord.prod)+' <span>·</span> '
+          +esc(String(ord.l||0))+'×'+esc(String(ord.w||0))+'×'+esc(String(ord.h||0))+' '+(ord.su||'in')+' <span>·</span> '
+          +fmt(ord.qty)+' nos.</span>'
+          +'<span class="wo-disp '+dm.cls+'">'+(ord.disp?ddmm(ord.disp):'No date')+' · '+dm.label+'</span>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+function woFilter(f){woF=f;renderWorkStatus();}
+async function woStatusChange(id,s){
+  const x=orders.find(o=>o.id===id);
+  if(x){x.status=s;await db.update('orders',id,{status:s});renderOrders();renderWorkStatus();}
+}
 
 // ── TASKS ────────────────────────────────────────────────
 function renderTasks(){
-  const list=tSF==='All'?tasks:tasks.filter(t=>t.status===tSF);
-  document.getElementById('t-body').innerHTML=list.map(t=>`<tr>
-    <td><input type="date" class="cell num" value="${t.date}" onchange="uT(${t.id},'date',this.value)"></td>
-    <td><input class="cell" value="${esc(t.task)}" onchange="uT(${t.id},'task',this.value)"></td>
-    <td><input class="cell" value="${esc(t.assigned)}" onchange="uT(${t.id},'assigned',this.value)"></td>
-    <td><select class="csel" onchange="uT(${t.id},'status',this.value)">${o(TSTATS,t.status)}</select></td>
-    <td><button class="btn-del" onclick="delT(${t.id})">✕</button></td>
-  </tr>`).join('');
-  document.getElementById('ct').textContent=tasks.length;
-  const p=tasks.filter(t=>t.status==='Pending').length;
-  const ip=tasks.filter(t=>t.status==='In progress').length;
-  const d=tasks.filter(t=>t.status==='Done').length;
-  document.getElementById('t-sub').textContent=`${tasks.length} tasks · ${p} pending · ${ip} in progress · ${d} done`;
-  const tc={All:tasks.length,Pending:p,'In progress':ip,Done:d};
+  let list=tSF==='All'?[...tasks]:tasks.filter(t=>t.status===tSF);
+  if(tMF!=='All') list=list.filter(t=>t.assigned===tMF);
+  const counts={All:tasks.length};TSTATS.forEach(s=>counts[s]=tasks.filter(t=>t.status===s).length);
   document.getElementById('t-filters').innerHTML=
-    ['All','Pending','In progress','Done'].map(s=>`<button class="pill${tSF===s?' active':''}" onclick="tFilter('${s}')">${s} <span style="opacity:.55;font-size:10px;margin-left:2px;font-family:'JetBrains Mono',monospace">${tc[s]}</span></button>`).join('');
+    ['All',...TSTATS].map(s=>{
+      const clsMap={'Pending':'','In progress':' pill-ip','Done':' pill-rd'};
+      const cls=s==='All'?'':clsMap[s]||'';
+      return '<button class="pill'+cls+(tSF===s?' active':'')+'" onclick="tFilter(\''+s+'\')">'+s+' <span class="pill-count">'+(counts[s]||0)+'</span></button>';
+    }).join('');
+  const mCounts={All:tasks.length};MEMBERS.forEach(m=>mCounts[m]=tasks.filter(t=>t.assigned===m).length);
+  document.getElementById('t-member-filters').innerHTML='<span class="mbar-label">By</span>'+
+    ['All',...MEMBERS].map(m=>{
+      const ini=m==='All'?'':'<span class="mchip-avatar">'+m.charAt(0)+'</span>';
+      return '<button class="mchip'+(tMF===m?' active':'')+'" onclick="tMFilter(\''+m+'\')">'+ini+esc(m)+(m!=='All'?' <span class="pill-count">'+mCounts[m]+'</span>':'')+'</button>';
+    }).join('');
+  const p=counts['Pending']||0, ip=counts['In progress']||0;
+  document.getElementById('t-sub').textContent=tasks.length+' tasks · '+p+' pending · '+ip+' in progress';
+  if(!list.length){document.getElementById('t-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No tasks found.</div>';return;}
+  document.getElementById('t-list').innerHTML=list.map(t=>{
+    const clsName=(t.status||'Pending').replace(/ /g,'-');
+    return '<div class="tcard '+clsName+'">'
+      +'<div class="tdot '+clsName+'"></div>'
+      +'<div style="flex:1;min-width:0;cursor:pointer" onclick="editTaskName('+t.id+')">'
+        +'<div class="tname">'+esc(t.task||'—')+'</div>'
+        +'<div class="tmeta">'+esc(t.assigned||'—')+' · '+esc(t.date||'')+'</div>'
+      +'</div>'
+      +'<select class="tstatus-sel" onchange="uT('+t.id+',\'status\',this.value)">'
+        +TSTATS.map(s=>'<option'+(s===t.status?' selected':'')+'>'+s+'</option>').join('')
+      +'</select>'
+      +'<button class="btn-del-task" onclick="confirmDelTask('+t.id+')" aria-label="Delete task">🗑</button>'
+    +'</div>';
+  }).join('');
 }
-async function uT(id,f,v){const x=tasks.find(t=>t.id===id);if(x){x[f]=v;renderTasks();await db.update('tasks',id,{[f]:v});}}
-async function addTask(){
-  const row={date:today(),task:'',assigned:'',status:'Pending'};
+function confirmDelTask(id){
+  const t=tasks.find(x=>x.id===id);
+  if(!t) return;
+  const name=t.task||'this task';
+  if(confirm('Delete this task?  "'+name+'"  This action cannot be undone.')){
+    delT(id);
+  }
+}
+function addTask(){
+  if(document.getElementById('t-new-row')) return;
+  const row=document.createElement('div');
+  row.className='tcard Pending';row.id='t-new-row';
+  row.innerHTML='<div class="tdot Pending"></div>'
+    +'<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">'
+      +'<input class="inp" id="t-new-name" placeholder="Task name" style="height:32px;font-size:13px">'
+      +'<select class="tstatus-sel" id="t-new-assign" style="height:28px;font-size:12px;width:100%"><option value="">Unassigned</option>'+MEMBERS.map(m=>'<option>'+m+'</option>').join('')+'</select>'
+    +'</div>'
+    +'<button class="btn btn-p btn-sm" onclick="saveNewTask()">Add</button>'
+    +'<button class="btn-del-task" onclick="cancelNewTask()">✕</button>';
+  document.getElementById('t-list').prepend(row);
+  document.getElementById('t-new-name').focus();
+}
+async function saveNewTask(){
+  const name=(document.getElementById('t-new-name').value||'').trim();
+  const assigned=(document.getElementById('t-new-assign').value||'').trim();
+  if(!name){document.getElementById('t-new-name').focus();return;}
+  const row={date:today(),task:name,assigned:assigned,status:'Pending'};
   const res=await db.insert('tasks',row);
-  if(res) tasks.unshift(res[0]);
-  renderTasks();
+  if(res){tasks.unshift(res[0]);renderTasks();}
 }
-async function delT(id){await db.delete('tasks',id);tasks=tasks.filter(t=>t.id!==id);renderTasks();}
+function cancelNewTask(){const r=document.getElementById('t-new-row');if(r)r.remove();}
+async function uT(id,f,v){const x=tasks.find(t=>t.id===id);if(x){x[f]=v;await db.update('tasks',id,{[f]:v});renderTasks();}}
+async function delT(id){if(confirm('Delete task?')){await db.delete('tasks',id);tasks=tasks.filter(t=>t.id!==id);renderTasks();}}
 function tFilter(s){tSF=s;renderTasks();}
+function tMFilter(m){tMF=m;renderTasks();}
+function editTaskName(id){
+  const t=tasks.find(x=>x.id===id);if(!t)return;
+  const v=prompt('Edit task name:',t.task||'');
+  if(v!==null&&v.trim())uT(id,'task',v.trim());
+}
 
 // ── WEIGHT ───────────────────────────────────────────────
-function wPlyChange(){wTotalGsmEdited=false;
+function wPlyChange(){
+  wTotalGsmEdited=false;
   const ply=document.getElementById('w-ply').value;
-  document.getElementById('w-gsm-fields').innerHTML=PLY_LAYERS[ply].map((l,i)=>`
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="width:7px;height:7px;border-radius:50%;background:${l.t==='flute'?'var(--amber)':'var(--ink)'};flex-shrink:0"></div>
-        <span style="font-size:12px;color:${l.t==='flute'?'var(--amber)':'var(--ink2)'}">${l.l}</span>
-        ${l.t==='flute'?'<span style="font-size:10px;color:var(--amber);font-family:JetBrains Mono,monospace">×1.45</span>':''}
-      </div>
-      <input class="inp" type="number" id="wg${i}" value="${DEF_GSM[l.l]||120}" min="0" oninput="wCalcFromBoard()" style="width:75px;text-align:right">
-    </div>`).join('');
+  document.getElementById('w-gsm-fields').innerHTML=PLY_LAYERS[ply].map((l,i)=>
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">'
+    +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<div style="width:7px;height:7px;border-radius:50%;background:'+(l.t==='flute'?'var(--amber)':'var(--ink)')+'"></div>'
+      +'<span style="font-size:12px;color:'+(l.t==='flute'?'var(--amber)':'var(--ink2)')+'">'+l.l+'</span>'
+      +(l.t==='flute'?'<span style="font-size:10px;color:var(--amber);font-family:Inter,sans-serif">×1.45</span>':'')
+    +'</div>'
+    +'<input class="inp num" type="number" inputmode="decimal" id="wg'+i+'" value="'+(DEF_GSM[l.l]||120)+'" min="0" oninput="wCalcFromBoard()" style="width:75px;text-align:right;height:32px">'
+    +'</div>'
+  ).join('');
   wCalc();
 }
-
 function wCalc(){
   const unit=document.getElementById('w-unit').value;
   const joint=document.getElementById('w-joint').value;
@@ -690,40 +1045,31 @@ function wCalc(){
   const L=(parseFloat(document.getElementById('w-L').value)||0)*f;
   const W=(parseFloat(document.getElementById('w-W').value)||0)*f;
   const H=(parseFloat(document.getElementById('w-H').value)||0)*f;
-  const reel=W+H+1;
-  const cut=joint==='double'?(L+W+2):(L*2+W*2+2);
-  if(!wReelEdited) document.getElementById('w-reel').value=reel.toFixed(2);
-  if(!wCutEdited)  document.getElementById('w-cut').value=cut.toFixed(2);
-  document.getElementById('w-unit-lbl').textContent=unit==='in'?'inches':'cm → converted to inches';
-  document.getElementById('w-reel-hint').textContent=wReelEdited?`Formula: ${reel.toFixed(2)} in`:'';
-  document.getElementById('w-cut-hint').textContent=wCutEdited?`Formula: ${cut.toFixed(2)} in`:'';
-  document.getElementById('w-cut-lbl').innerHTML=joint==='double'
-    ?'Cut Size <span style="font-weight:400;color:var(--ink3)">(L + W + 2)</span>'
-    :'Cut Size <span style="font-weight:400;color:var(--ink3)">(L×2 + W×2 + 2)</span>';
+  const reel=W+H+1, cut=joint==='double'?(L+W+2):(L*2+W*2+2);
+  if(!wReelEdited){const el=document.getElementById('w-reel');if(el)el.value=reel.toFixed(2);}
+  if(!wCutEdited){const el=document.getElementById('w-cut');if(el)el.value=cut.toFixed(2);}
+  document.getElementById('w-unit-lbl').textContent=unit==='in'?'inches':'cm → inches';
+  document.getElementById('w-reel-hint').textContent=wReelEdited?'Formula: '+reel.toFixed(2)+' in':'';
+  document.getElementById('w-cut-hint').textContent=wCutEdited?'Formula: '+cut.toFixed(2)+' in':'';
+  document.getElementById('w-cut-lbl').textContent=joint==='double'?'Cut Size (L+W+2)':'Cut Size (L×2+W×2+2)';
   wCalcFromBoard();
 }
-
 function wCalcFromBoard(){
   const ply=document.getElementById('w-ply').value;
   const joint=document.getElementById('w-joint').value;
-  const reel=parseFloat(document.getElementById('w-reel').value)||0;
-  const cut=parseFloat(document.getElementById('w-cut').value)||0;
-  // compute gsm from layers
-  let computedGsm=0;
-  PLY_LAYERS[ply].forEach((l,i)=>{
-    const v=parseFloat(document.getElementById('wg'+i)?.value)||0;
-    computedGsm+=l.t==='flute'?v*1.45:v;
-  });
-  // update total GSM field unless user edited it manually
+  const reel=parseFloat(document.getElementById('w-reel')?.value)||0;
+  const cut=parseFloat(document.getElementById('w-cut')?.value)||0;
+  let gsm=0;
+  PLY_LAYERS[ply].forEach((l,i)=>{const v=parseFloat(document.getElementById('wg'+i)?.value)||0;gsm+=l.t==='flute'?v*1.45:v;});
   const gsmEl=document.getElementById('w-total-gsm');
-  if(gsmEl && !wTotalGsmEdited) gsmEl.value=Math.round(computedGsm);
-  const gsm=gsmEl?parseFloat(gsmEl.value)||0:computedGsm;
-  const area=(reel*cut)/1550;
+  if(gsmEl&&!wTotalGsmEdited) gsmEl.value=Math.round(gsm);
+  const g=gsmEl?parseFloat(gsmEl.value)||0:gsm;
   const sheets=joint==='double'?2:1;
-  const wt=(area*gsm*sheets)/1000;
-  document.getElementById('w-result').textContent=wt>0?wt.toFixed(3):'—';
-  document.getElementById('w-formula').textContent=
-    `${reel.toFixed(2)}″ × ${cut.toFixed(2)}″ = ${area.toFixed(4)} m² × GSM ${Math.round(gsm)} × ${sheets} / 1000 = ${wt.toFixed(3)} kg`;
+  const wt=(reel*cut/1550)*g*sheets/1000;
+  const res=document.getElementById('w-result');
+  if(res) res.textContent=wt>0?wt.toFixed(3):'—';
+  const fm=document.getElementById('w-formula');
+  if(fm) fm.textContent=reel.toFixed(2)+'″ × '+cut.toFixed(2)+'″ = '+(reel*cut/1550).toFixed(4)+' m² × '+Math.round(g)+' GSM × '+sheets+' = '+wt.toFixed(3)+' kg';
 }
 
 // ── PRODUCT DATA ─────────────────────────────────────────
@@ -734,88 +1080,96 @@ function renderProductData(){
   const prevC=custSel.value, prevR=reelSel.value.replace('″','');
   const custs=[...new Set(eligible.map(o=>o.cust).filter(Boolean))].sort();
   const reels=[...new Set(eligible.map(o=>boardSizes(o).reel))].sort((a,b)=>+a-+b);
-  custSel.innerHTML=`<option value="">All customers</option>`+custs.map(c=>`<option ${c===prevC?'selected':''}>${c}</option>`).join('');
-  reelSel.innerHTML=`<option value="">All sizes</option>`+reels.map(r=>`<option ${r===prevR?'selected':''}>${r}″</option>`).join('');
+  custSel.innerHTML='<option value="">All customers</option>'+custs.map(c=>'<option'+(c===prevC?' selected':'')+'>'+c+'</option>').join('');
+  reelSel.innerHTML='<option value="">All sizes</option>'+reels.map(r=>'<option'+(r===prevR?' selected':'')+'>'+r+'″</option>').join('');
   let list=eligible;
   if(custSel.value) list=list.filter(o=>o.cust===custSel.value);
   if(reelSel.value) list=list.filter(o=>boardSizes(o).reel===reelSel.value.replace('″',''));
-  document.getElementById('pd-sub').textContent=`${eligible.length} entries · Dispatched & Partial Dispatch`;
-  document.getElementById('pd-note').textContent=(custSel.value||reelSel.value)?`${list.length} result${list.length!==1?'s':''}·filtered`:'';
-  document.getElementById('pd-foot-l').textContent=`${list.length} of ${eligible.length} entries`;
-  document.getElementById('pd-foot-r').textContent=list.length?`Total qty · ${fmt(list.reduce((s,o)=>s+o.qty,0))} pcs`:'';
-  document.getElementById('pd-body').innerHTML=list.length
-    ?list.map(ord=>{const{reel,cut}=boardSizes(ord);return`<tr>
-      <td style="font-weight:500">${esc(ord.cust)||'—'}</td>
-      <td style="color:var(--ink2)">${esc(ord.prod)}</td>
-      <td class="num">${ord.ply}PLY</td>
-      <td class="num">${reel}″</td>
-      <td class="num">${cut}″</td>
-      <td class="r num">${fmt(ord.qty)}</td>
-    </tr>`;}).join('')
-    :`<tr><td colspan="6" style="padding:32px;text-align:center;color:var(--muted);font-size:12px">No matching entries</td></tr>`;
+  document.getElementById('pd-sub').textContent=eligible.length+' entries · Dispatched & Partial Dispatch';
+  document.getElementById('pd-note').textContent=(custSel.value||reelSel.value)?list.length+' filtered result'+(list.length!==1?'s':''):'';
+  document.getElementById('pd-foot-l').textContent=list.length+' of '+eligible.length;
+  document.getElementById('pd-foot-r').textContent=list.length?'Total qty · '+fmt(list.reduce((s,o)=>s+o.qty,0))+' pcs':'';
+  if(!list.length){document.getElementById('pd-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No matching entries</div>';return;}
+  const mob=window.innerWidth<=720;
+  if(mob){
+    document.getElementById('pd-list').innerHTML='<div style="display:flex;flex-direction:column;gap:5px">'+list.map(ord=>{
+      const {reel,cut}=boardSizes(ord);
+      return '<div class="pd-m-card">'
+        +'<div class="pd-m-row"><span style="font-size:13px;font-weight:600">'+esc(ord.cust||'—')+'</span>'+badge(ord.status)+'</div>'
+        +'<div class="pd-m-detail">'+esc(ord.ply)+'PLY <span>·</span> '+esc(ord.prod)+'</div>'
+        +'<div class="pd-m-nums"><span>Reel <b>'+reel+'″</b></span><span>Cut <b>'+cut+'″</b></span><span>Qty <b>'+fmt(ord.qty)+' nos.</b></span></div>'
+      +'</div>';
+    }).join('')+'</div>';
+  } else {
+    document.getElementById('pd-list').innerHTML='<div class="ovx"><table class="t"><thead><tr><th>Customer</th><th>Product</th><th>Ply</th><th class="r">Reel</th><th class="r">Cut</th><th class="r">Qty</th><th>Status</th></tr></thead><tbody>'
+      +list.map(ord=>{
+        const {reel,cut}=boardSizes(ord);
+        return '<tr>'
+          +'<td style="font-weight:500">'+esc(ord.cust||'—')+'</td>'
+          +'<td>'+esc(ord.prod)+'</td>'
+          +'<td class="num">'+esc(ord.ply)+'</td>'
+          +'<td class="num r">'+reel+'″</td>'
+          +'<td class="num r">'+cut+'″</td>'
+          +'<td class="num r">'+fmt(ord.qty)+'</td>'
+          +'<td>'+badge(ord.status)+'</td>'
+        +'</tr>';
+      }).join('')
+      +'</tbody></table></div>';
+  }
 }
 function pdClear(){document.getElementById('pdf-cust').value='';document.getElementById('pdf-reel').value='';renderProductData();}
 
 // ── PARTIES ──────────────────────────────────────────────
 function renderParties(){
   const list=pf==='all'?parties:parties.filter(p=>p.type===pf);
-  document.getElementById('p-body').innerHTML=list.map(p=>`<tr>
-    <td><input class="cell" value="${esc(p.name)}" onchange="uP(${p.id},'name',this.value)"></td>
-    <td><span class="bdg ${p.type==='Customer'?'rd':'ip'}">${p.type}</span></td>
-    <td><button class="btn-del" onclick="delP(${p.id})">✕</button></td>
-  </tr>`).join('');
+  document.getElementById('p-list').innerHTML=list.map(p=>'<div class="tcard">'
+    +'<div style="flex:1;font-size:13px;font-weight:500">'+esc(p.name)+'</div>'
+    +'<span class="bdg '+(p.type==='Customer'?'rd':'ip')+'">'+esc(p.type)+'</span>'
+    +'<button class="btn-del" onclick="delP('+p.id+')">✕</button>'
+  +'</div>').join('');
   const c=parties.filter(p=>p.type==='Customer').length;
   const s=parties.filter(p=>p.type==='Supplier').length;
-  document.getElementById('cp').textContent=parties.length;
-  document.getElementById('p-sub').textContent=`${parties.length} parties · ${c} customers · ${s} suppliers`;
-  updateCustList();
+  document.getElementById('p-sub').textContent=parties.length+' parties · '+c+' customers · '+s+' suppliers';
   document.getElementById('pf-all').classList.toggle('active',pf==='all');
   document.getElementById('pf-c').classList.toggle('active',pf==='Customer');
   document.getElementById('pf-s').classList.toggle('active',pf==='Supplier');
+  updateCustList();
 }
-async function uP(id,f,v){const x=parties.find(p=>p.id===id);if(x){x[f]=v;renderParties();renderOrders();await db.update('parties',id,{[f]:v});}}
 async function addParty(){
   const name=document.getElementById('p-name').value.trim();
   const type=document.getElementById('p-type').value;
-  if(!name)return;
+  if(!name) return;
   if(parties.find(p=>p.name.toLowerCase()===name.toLowerCase())){alert('Already exists.');return;}
   const res=await db.insert('parties',{name,type});
   if(res) parties.push(res[0]);
   document.getElementById('p-name').value='';
-  renderParties();renderOrders();
+  renderParties();
 }
-async function delP(id){if(confirm('Delete?')){await db.delete('parties',id);parties=parties.filter(p=>p.id!==id);renderParties();renderOrders();}}
+async function delP(id){
+  if(!confirm('Delete?')) return;
+  await db.delete('parties',id);
+  parties=parties.filter(p=>p.id!==id);
+  renderParties();
+}
 function pFilter(f){pf=f;renderParties();}
 
 // ── NAV ──────────────────────────────────────────────────
 function nav(v){
   document.querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='view-'+v));
-  const L={orderlist:'Order List',workstatus:'Work Status',tasks:'Tasks',weight:'Weight',productdata:'Product Data',parties:'Parties'};
-  document.getElementById('crumb').innerHTML=`karton / <b>${L[v]}</b>`;
-  if(v==='workstatus') renderWorkOrder();
+  if(v==='workstatus') renderWorkStatus();
   if(v==='productdata') renderProductData();
 }
 
 // ── INIT ─────────────────────────────────────────────────
 async function init(){
-  // show loading state
-  document.getElementById('ol-body').innerHTML='<tr><td colspan="11" style="padding:24px;text-align:center;color:var(--muted)">Loading…</td></tr>';
-  const [p,o,t] = await Promise.all([
-    db.get('parties'),
-    db.get('orders'),
-    db.get('tasks')
-  ]);
-  parties = p||[];
-  orders  = o||[];
-  tasks   = t||[];
+  document.getElementById('ol-cards').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Loading…</div>';
+  const [p,o,t]=await Promise.all([db.get('parties'),db.get('orders'),db.get('tasks')]);
+  parties=p||[]; orders=o||[]; tasks=t||[];
   renderOrders(); renderTasks(); renderParties(); wPlyChange();
-  if(window.innerWidth<=720){
-    const h=document.getElementById('mob-scroll-hint');
-    if(h) h.style.display='block';
-  }
 }
-init();
+checkAuth();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkAuth();});
 </script>
 </body>
 </html>
