@@ -73,7 +73,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-
     font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:var(--muted);
     min-width:0;transition:color .15s;
   }
-  .bn svg{width:22px;height:22px;color:var(--muted);transition:color .15s}
+  .bn svg{width:20px;height:20px;color:var(--muted);transition:color .15s}
   .bn.active{color:var(--accent)}
   .bn.active svg{color:var(--accent)}
   .bn span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -140,7 +140,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-
 /* ── INPUTS ── */
 .inp{font-family:inherit;font-size:13.5px;height:40px;padding:0 12px;border-radius:var(--r2);border:1px solid var(--line);background:var(--surface);color:var(--ink);outline:0;width:100%;transition:border-color .15s,box-shadow .15s}
 .inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
-.inp.err{border-color:var(--red);background:var(--red-bg)}
+.inp.err,.sel.err{border-color:var(--red)!important;background:var(--red-bg,#FEE2E2)!important}
 .sel{font-family:inherit;font-size:13.5px;height:40px;padding:0 12px;border-radius:var(--r2);border:1px solid var(--line);background:var(--surface);color:var(--ink);outline:0;cursor:pointer;width:100%;transition:border-color .15s}
 .sel:focus{border-color:var(--accent)}
 .flbl{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;display:block}
@@ -239,6 +239,17 @@ table.t{width:100%;border-collapse:collapse}
 }
 .btn-del-task:hover{opacity:1;background:var(--red-bg);border-color:var(--red)}
 
+/* ── SOP ── */
+.sop-section{margin-bottom:20px;background:var(--surface);border-radius:var(--r2);border:1px solid var(--line);overflow:hidden;box-shadow:var(--shadow-sm)}.sop-section.sop-blue{border-left:3px solid var(--blue)}.sop-section.sop-green{border-left:3px solid var(--green)}
+.sop-header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}.sop-section.sop-blue .sop-header{background:var(--blue-bg)}.sop-section.sop-green .sop-header{background:var(--green-bg)}.sop-header .sop-icon{background:var(--surface)!important;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.sop-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sop-label{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.sop-item{display:flex;gap:12px;padding:11px 14px;border-bottom:1px solid color-mix(in srgb,var(--line) 50%,transparent);align-items:flex-start;transition:background .15s}
+.sop-item:last-child{border-bottom:0}
+.sop-item:active{background:var(--bg)}
+.sop-num{width:24px;height:24px;border-radius:8px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.sop-text{font-size:13.5px;color:var(--ink);line-height:1.55;font-weight:400}
+
 /* ── MEMBER CHIPS ── */
 .mchip{display:inline-flex;align-items:center;gap:5px;font-size:11px;height:26px;padding:0 10px 0 4px;border-radius:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;transition:all .15s ease}
 .mchip:hover{border-color:var(--line2);color:var(--ink)}
@@ -255,6 +266,14 @@ table.t{width:100%;border-collapse:collapse}
 .w2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
 .wsec{display:flex;flex-direction:column;gap:14px}
 .wlbl{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;display:block}
+.w-result-strip{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:linear-gradient(135deg,var(--ink) 0%,#1a3a4a 100%);border-radius:var(--r) var(--r) 0 0}
+.w-result-val{font-size:36px;font-weight:700;letter-spacing:-.03em;font-family:'Space Grotesk',sans-serif;color:#fff;line-height:1}
+.w-result-unit{font-size:13px;color:rgba(255,255,255,.5);font-weight:500}
+.w-formula-bar{padding:8px 18px;font-size:10px;color:var(--ink3);font-family:'Inter',sans-serif;line-height:1.5;background:var(--s2);border-top:1px solid var(--line)}
+.w-sec-title{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.w-sec-icon{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.w-sec-badge{font-size:10px;color:var(--ink3);background:var(--s2);padding:2px 8px;border-radius:10px;font-weight:500}
+.w-divider{height:1px;background:var(--line);margin:2px 0}
 
 /* ── FORM GRID ── */
 .fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -347,6 +366,10 @@ table.t{width:100%;border-collapse:collapse}
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3a4 4 0 0 0-4 4h8a4 4 0 0 0-4-4z"/><path d="M6.5 7H17.5L19 21H5L6.5 7z"/></svg>
     Weight
   </button>
+  <button class="nl" data-v="sop" onclick="nav('sop')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    SOP
+  </button>
   </aside>
 
 <main class="main">
@@ -373,7 +396,7 @@ table.t{width:100%;border-collapse:collapse}
         </div>
         <div class="fg2" style="margin-bottom:10px">
           <div class="frow"><label class="flbl">Product *</label>
-            <select class="sel" id="no-prod">
+            <select class="sel" id="no-prod" onchange="toggleH('no')">
               <option value="">Select…</option>
               <option>Pallet</option><option>Layer / Board</option><option>Box</option><option>OE Layer</option><option>Corner Pad Sheet</option>
             </select>
@@ -385,7 +408,7 @@ table.t{width:100%;border-collapse:collapse}
         <div class="fg3" style="margin-bottom:10px">
           <div class="frow"><label class="flbl">L *</label><input class="inp num" type="number" inputmode="decimal" id="no-L" min="0" placeholder="0"></div>
           <div class="frow"><label class="flbl">W *</label><input class="inp num" type="number" inputmode="decimal" id="no-W" min="0" placeholder="0"></div>
-          <div class="frow"><label class="flbl">H *</label><input class="inp num" type="number" inputmode="decimal" id="no-H" min="0" placeholder="0"></div>
+          <div class="frow" id="no-H-wrap" style="display:none"><label class="flbl">H *</label><input class="inp num" type="number" inputmode="decimal" id="no-H" min="0" placeholder="0"></div>
         </div>
         <div class="fg3" style="margin-bottom:10px">
           <div class="frow"><label class="flbl">Unit</label>
@@ -446,15 +469,15 @@ table.t{width:100%;border-collapse:collapse}
     <div class="ph"><div><div class="ptitle">Weight Calculator</div><div class="psub">per box · kg · 3 decimals</div></div></div>
 
     <!-- Result strip -->
-    <div class="card w-result-card" style="margin-bottom:14px;border-color:var(--accent)">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--ink);border-radius:11px 11px 0 0">
-        <span class="ctitle" style="color:#fff">Weight per Box</span>
+    <div class="card w-result-card" style="margin-bottom:14px;overflow:hidden">
+      <div class="w-result-strip">
+        <div><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.5)">Weight per Box</span></div>
         <div style="display:flex;align-items:baseline;gap:6px">
-          <span style="font-size:32px;font-weight:700;letter-spacing:-.03em;font-family:'Inter',sans-serif;color:#fff;line-height:1" id="w-result">—</span>
-          <span style="font-size:13px;color:rgba(255,255,255,.6)">kg</span>
+          <span class="w-result-val" id="w-result">—</span>
+          <span class="w-result-unit">kg</span>
         </div>
       </div>
-      <div style="padding:8px 18px;font-size:10px;color:var(--ink3);font-family:'Inter',sans-serif;line-height:1.5" id="w-formula">—</div>
+      <div class="w-formula-bar" id="w-formula">—</div>
     </div>
 
     <div class="w2">
@@ -463,27 +486,38 @@ table.t{width:100%;border-collapse:collapse}
         <div class="cb" style="display:flex;flex-direction:column;gap:14px">
           <!-- Config row -->
           <div>
-            <div class="wlbl" style="margin-bottom:8px">Configuration</div>
+            <div class="w-sec-title">
+              <div class="w-sec-icon" style="background:var(--accent-bg);color:var(--accent)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div>
+              <span class="wlbl" style="margin:0">Configuration</span>
+            </div>
             <div class="fg3">
               <div class="frow"><label class="wlbl">Ply</label><select class="sel" id="w-ply" onchange="wPlyChange()"><option>3</option><option>5</option><option>7</option></select></div>
               <div class="frow"><label class="wlbl">Unit</label><select class="sel" id="w-unit" onchange="wCalc()"><option value="in">Inches</option><option value="cm">CM</option></select></div>
               <div class="frow"><label class="wlbl">Joint</label><select class="sel" id="w-joint" onchange="wCalc()"><option value="double">Double</option><option value="single">Single</option></select></div>
             </div>
           </div>
-          <div style="height:1px;background:var(--line)"></div>
+          <div class="w-divider"></div>
           <!-- Box Size -->
           <div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span class="wlbl" style="margin:0">Box Size</span><span style="font-size:10px;color:var(--ink3)" id="w-unit-lbl">inches</span></div>
+            <div class="w-sec-title">
+              <div class="w-sec-icon" style="background:var(--blue-bg);color:var(--blue)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+              <span class="wlbl" style="margin:0">Box Size</span>
+              <span class="w-sec-badge" id="w-unit-lbl">inches</span>
+            </div>
             <div class="fg3">
               <div class="frow"><label class="wlbl">L</label><input class="inp num" type="number" inputmode="decimal" id="w-L" value="15" min="0" oninput="wCalc()"></div>
               <div class="frow"><label class="wlbl">W</label><input class="inp num" type="number" inputmode="decimal" id="w-W" value="15" min="0" oninput="wCalc()"></div>
               <div class="frow"><label class="wlbl">H</label><input class="inp num" type="number" inputmode="decimal" id="w-H" value="15" min="0" oninput="wCalc()"></div>
             </div>
           </div>
-          <div style="height:1px;background:var(--line)"></div>
+          <div class="w-divider"></div>
           <!-- Paper GSM -->
           <div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span class="wlbl" style="margin:0">Paper GSM</span><span style="font-size:10px;color:var(--ink3)">flutes ×1.45</span></div>
+            <div class="w-sec-title">
+              <div class="w-sec-icon" style="background:var(--amber-bg,#FEF3C7);color:var(--amber)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M2 20h20M5 20V8l7-5 7 5v12"/><path d="M9 20v-4h6v4"/></svg></div>
+              <span class="wlbl" style="margin:0">Paper GSM</span>
+              <span class="w-sec-badge">flutes ×1.45</span>
+            </div>
             <div style="display:flex;flex-direction:column;gap:8px" id="w-gsm-fields"></div>
           </div>
         </div>
@@ -494,7 +528,12 @@ table.t{width:100%;border-collapse:collapse}
         <div class="cb" style="display:flex;flex-direction:column;gap:14px">
           <!-- Board Sizes -->
           <div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span class="wlbl" style="margin:0">Board Sizes</span><span style="font-size:10px;color:var(--ink3)">editable · inches</span></div>
+            <div class="w-sec-title">
+              <div class="w-sec-icon" style="background:var(--green-bg);color:var(--green)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M21 3H3v18h18V3z"/><path d="M21 9H3M21 15H3M9 3v18"/></svg></div>
+              <span class="wlbl" style="margin:0">Board Sizes</span>
+              <span class="w-sec-badge">editable · in</span>
+              <button class="btn btn-g btn-sm" id="w-board-reset" style="display:none;height:22px;padding:0 8px;font-size:10px;margin-left:auto" onclick="wBoardReset()">↺ Auto</button>
+            </div>
             <div style="display:flex;gap:12px;align-items:flex-start">
               <div class="frow" style="flex:1">
                 <label class="wlbl">Reel (W+H+1)</label>
@@ -514,10 +553,14 @@ table.t{width:100%;border-collapse:collapse}
               </div>
             </div>
           </div>
-          <div style="height:1px;background:var(--line)"></div>
+          <div class="w-divider"></div>
           <!-- Total GSM -->
           <div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><span class="wlbl" style="margin:0">Total Paper GSM</span><span style="font-size:10px;color:var(--ink3)">editable</span></div>
+            <div class="w-sec-title">
+              <div class="w-sec-icon" style="background:var(--red-bg,#FEE2E2);color:var(--red)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
+              <span class="wlbl" style="margin:0">Total Paper GSM</span>
+              <span class="w-sec-badge">editable</span>
+            </div>
             <div style="display:flex;align-items:center;gap:8px">
               <input class="inp num" type="number" inputmode="decimal" id="w-total-gsm" step="1" min="0" oninput="wTotalGsmEdited=true;wCalcFromBoard()" style="width:120px;font-size:16px;font-weight:600">
               <span style="font-size:12px;color:var(--ink3)">g/m²</span>
@@ -525,6 +568,39 @@ table.t{width:100%;border-collapse:collapse}
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- SOP -->
+  <section id="view-sop" class="view">
+    <div class="ph"><div><div class="ptitle">Standard Operating Procedures</div><div class="psub">Good Principles</div></div></div>
+
+    <div class="sop-section sop-blue">
+      <div class="sop-header">
+        <div class="sop-icon" style="background:var(--blue-bg);color:var(--blue)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></div>
+        <span class="sop-label" style="color:var(--blue)">Production & quality</span>
+      </div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">1</div><div class="sop-text">Plan the next day's production before the end of each working day.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">2</div><div class="sop-text">Forecast customer urgency and prioritize production accordingly.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">3</div><div class="sop-text">Ensure consistent quality checks at every stage and on every machine output.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">4</div><div class="sop-text">Keep machines, tools, and work areas clean and organized (5S).</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">5</div><div class="sop-text">Carry out preventive maintenance on every machine at least once a month.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">6</div><div class="sop-text">Communicate dispatch schedules and expected delivery timelines well in advance.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">7</div><div class="sop-text">Record production, wastage, and delays immediately after every job.</div></div>
+    </div>
+
+    <div class="sop-section sop-green">
+      <div class="sop-header">
+        <div class="sop-icon" style="background:var(--green-bg);color:var(--green)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <span class="sop-label" style="color:var(--green)">Accounting & finance</span>
+      </div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">1</div><div class="sop-text">Record every financial transaction on the same day.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">2</div><div class="sop-text">Reconcile bank accounts daily or at least once every week.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">3</div><div class="sop-text">Monitor receivables regularly and follow up on invoices overdue by 30 days.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">4</div><div class="sop-text">Review daily cash flow and upcoming payment commitments.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">5</div><div class="sop-text">Complete all statutory compliances well before their due dates.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">6</div><div class="sop-text">Verify supplier invoices and customer collections before closing each day.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">7</div><div class="sop-text">Review key financial KPIs and outstanding balances with management every week.</div></div>
     </div>
   </section>
 
@@ -587,6 +663,10 @@ table.t{width:100%;border-collapse:collapse}
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3a4 4 0 0 0-4 4h8a4 4 0 0 0-4-4z"/><path d="M6.5 7H17.5L19 21H5L6.5 7z"/></svg>
     <span>Weight</span>
   </button>
+  <button class="bn" data-v="sop" onclick="nav('sop')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    <span>SOP</span>
+  </button>
   </nav>
 
 <!-- EDIT ORDER DRAWER -->
@@ -605,18 +685,18 @@ table.t{width:100%;border-collapse:collapse}
     <div class="frow"><label class="flbl">Customer *</label><input class="inp" id="ed-cust" list="custList"></div>
     <div class="fg2">
       <div class="frow"><label class="flbl">Product *</label>
-        <select class="sel" id="ed-prod">
+        <select class="sel" id="ed-prod" onchange="toggleH('ed')">
           <option>Pallet</option><option>Layer / Board</option><option>Box</option><option>OE Layer</option><option>Corner Pad Sheet</option>
         </select>
       </div>
       <div class="frow"><label class="flbl">Ply *</label><select class="sel" id="ed-ply"><option>3</option><option>5</option><option>7</option></select></div>
     </div>
     <div>
-      <label class="flbl">Size L × W × H *</label>
+      <label class="flbl" id="ed-size-lbl">Size L × W × H *</label>
       <div class="fg3">
         <input class="inp num" type="number" inputmode="decimal" id="ed-L" placeholder="L" min="0">
         <input class="inp num" type="number" inputmode="decimal" id="ed-W" placeholder="W" min="0">
-        <input class="inp num" type="number" inputmode="decimal" id="ed-H" placeholder="H" min="0">
+        <input class="inp num" type="number" inputmode="decimal" id="ed-H" placeholder="H" min="0" style="display:none">
       </div>
     </div>
     <div class="fg2">
@@ -814,15 +894,16 @@ async function saveNewOrder(){
 
 function renderOrders(){
   const q=(document.getElementById('ol-search')?.value||'').toLowerCase().trim();
-  let list=oSF==='All'?orders:orders.filter(x=>x.status===oSF);
-  if(q) list=list.filter(x=>(x.cust||'').toLowerCase().includes(q)||(x.no||'').toLowerCase().includes(q));
+  let list=oSF==='All'?orders.filter(x=>x.status!=='Dispatched'):orders.filter(x=>x.status===oSF);
+  if(q) list=list.filter(x=>(x.cust||'').toLowerCase().includes(q)||(x.no||'').toLowerCase().includes(q)||(String(x.l||0)+'×'+String(x.w||0)+(x.prod==='Box'?'×'+String(x.h||0):'')).includes(q));
 
   const counts={All:orders.length};
   STATUSES.forEach(s=>counts[s]=orders.filter(x=>x.status===s).length);
   document.getElementById('ol-filters').innerHTML=
     ['All',...STATUSES].map(s=>{const pc=s==='All'?'':' pill-'+skCls(s);return '<button class="pill'+pc+(oSF===s?' active':'')+'" onclick="olFilter(\''+s+'\')">'+s+' <span class="pill-count">'+counts[s]+'</span></button>';}).join('');
 
-  document.getElementById('ol-sub').textContent=orders.length+' orders · '+orders.filter(x=>x.status!=='Dispatched').length+' active';
+  const activeCount=orders.filter(x=>x.status!=='Dispatched').length;
+  document.getElementById('ol-sub').textContent=activeCount+' active · '+orders.length+' total';
 
   if(!list.length){
     document.getElementById('ol-cards').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No orders yet. Tap + New to add one.</div>';
@@ -841,7 +922,7 @@ function renderOrders(){
         +'</div>'
         +'<div class="orow2">'
           +'<span class="wo-detail">'+esc(ord.ply)+'PLY <span>·</span> '+esc(ord.prod)+' <span>·</span> '
-          +esc(String(ord.l||0))+'×'+esc(String(ord.w||0))+'×'+esc(String(ord.h||0))+' '+(ord.su||'in')+' <span>·</span> '
+          +esc(String(ord.l||0))+'×'+esc(String(ord.w||0))+(ord.prod==='Box'?'×'+esc(String(ord.h||0)):'')+' '+(ord.su||'in')+' <span>·</span> '
           +fmt(ord.qty)+' nos.</span>'
           +'<span class="odisp '+dm.cls+'">'+(ord.disp?ddmm(ord.disp):'No date')+' · '+dm.label+'</span>'
         +'</div>'
@@ -852,6 +933,18 @@ function renderOrders(){
 function olFilter(s){oSF=s;renderOrders();}
 
 // ── DRAWER ───────────────────────────────────────────────
+function toggleH(prefix){
+  const prod=getVal(prefix+'-prod');
+  const isBox=prod==='Box';
+  if(prefix==='no'){
+    document.getElementById('no-H-wrap').style.display=isBox?'':'none';
+    if(!isBox) setVal('no-H','');
+  } else {
+    document.getElementById('ed-H').style.display=isBox?'':'none';
+    document.getElementById('ed-size-lbl').textContent=isBox?'Size L × W × H *':'Size L × W *';
+    if(!isBox) setVal('ed-H','0');
+  }
+}
 function openDrawer(id){
   const ord=orders.find(o=>o.id===id);
   if(!ord) return;
@@ -860,6 +953,7 @@ function openDrawer(id){
   setVal('ed-date',ord.date); setVal('ed-no',ord.no); setVal('ed-cust',ord.cust);
   setVal('ed-prod',ord.prod); setVal('ed-ply',ord.ply);
   setVal('ed-L',ord.l); setVal('ed-W',ord.w); setVal('ed-H',ord.h||0);
+  toggleH('ed');
   setVal('ed-su',ord.su||'in'); setVal('ed-qty',ord.qty);
   setVal('ed-joint',ord.joint||'double'); setVal('ed-disp',ord.disp);
   setVal('ed-status',ord.status);
@@ -909,7 +1003,7 @@ async function duplicateOrder(){
 
 // ── WORK STATUS ──────────────────────────────────────────
 function renderWorkStatus(){
-  let list=woF==='all'?[...orders]:orders.filter(x=>x.status===woF);
+  let list=woF==='all'?orders.filter(x=>x.status!=='Dispatched'):orders.filter(x=>x.status===woF);
   list.sort((a,b)=>{
     const pa=a.status==='Dispatched'?2:(!a.disp?1:a.disp<TODAY?-2:a.disp===TODAY?-1:0);
     const pb=b.status==='Dispatched'?2:(!b.disp?1:b.disp<TODAY?-2:b.disp===TODAY?-1:0);
@@ -932,7 +1026,7 @@ function renderWorkStatus(){
         +'</div>'
         +'<div class="wo-row2">'
           +'<span class="wo-detail">'+esc(ord.ply)+'PLY <span>·</span> '+esc(ord.prod)+' <span>·</span> '
-          +esc(String(ord.l||0))+'×'+esc(String(ord.w||0))+'×'+esc(String(ord.h||0))+' '+(ord.su||'in')+' <span>·</span> '
+          +esc(String(ord.l||0))+'×'+esc(String(ord.w||0))+(ord.prod==='Box'?'×'+esc(String(ord.h||0)):'')+' '+(ord.su||'in')+' <span>·</span> '
           +fmt(ord.qty)+' nos.</span>'
           +'<span class="wo-disp '+dm.cls+'">'+(ord.disp?ddmm(ord.disp):'No date')+' · '+dm.label+'</span>'
         +'</div>'
@@ -1052,8 +1146,10 @@ function wCalc(){
   document.getElementById('w-reel-hint').textContent=wReelEdited?'Formula: '+reel.toFixed(2)+' in':'';
   document.getElementById('w-cut-hint').textContent=wCutEdited?'Formula: '+cut.toFixed(2)+' in':'';
   document.getElementById('w-cut-lbl').textContent=joint==='double'?'Cut Size (L+W+2)':'Cut Size (L×2+W×2+2)';
+  document.getElementById('w-board-reset').style.display=(wReelEdited||wCutEdited)?'inline-flex':'none';
   wCalcFromBoard();
 }
+function wBoardReset(){wReelEdited=false;wCutEdited=false;document.getElementById('w-board-reset').style.display='none';wCalc();}
 function wCalcFromBoard(){
   const ply=document.getElementById('w-ply').value;
   const joint=document.getElementById('w-joint').value;
