@@ -392,7 +392,7 @@ table.t{width:100%;border-collapse:collapse}
       <div class="cb">
         <div class="fg2" style="margin-bottom:10px">
           <div class="frow"><label class="flbl">Date</label><input type="date" class="inp" id="no-date"></div>
-          <div class="frow"><label class="flbl">Order No</label><input class="inp" id="no-no" placeholder="e.g. SO-2026-001"></div>
+          <div class="frow"><label class="flbl">Order No</label><input class="inp" id="no-no"></div>
         </div>
         <div class="frow" style="margin-bottom:10px">
           <label class="flbl">Customer *</label>
@@ -402,11 +402,11 @@ table.t{width:100%;border-collapse:collapse}
           <div class="frow"><label class="flbl">Product *</label>
             <select class="sel" id="no-prod" onchange="toggleH('no')">
               <option value="">Select…</option>
-              <option>Pallet</option><option>Layer / Board</option><option>Box</option><option>OE Layer</option><option>Corner Pad Sheet</option>
+              <option>Box</option><option>Pallet</option><option>Layer / Board</option><option>OE Layer</option><option>Corner Pad</option>
             </select>
           </div>
           <div class="frow"><label class="flbl">Ply *</label>
-            <select class="sel" id="no-ply"><option value="">Select…</option><option>3</option><option>5</option><option>7</option></select>
+            <select class="sel" id="no-ply"><option value="">Select…</option><option>2</option><option>3</option><option>5</option><option>7</option></select>
           </div>
         </div>
         <div class="fg3" style="margin-bottom:10px">
@@ -542,7 +542,7 @@ table.t{width:100%;border-collapse:collapse}
               <div class="frow" style="flex:1">
                 <label class="wlbl">Reel (W+H+1)</label>
                 <div style="display:flex;align-items:center;gap:6px">
-                  <input class="inp num" type="number" inputmode="decimal" id="w-reel" step="0.01" oninput="wReelEdited=true;wCalcFromBoard()">
+                  <input class="inp num" type="number" inputmode="decimal" id="w-reel" step="0.01" oninput="wReelEdited=true;wCalc()">
                   <span style="font-size:11px;color:var(--ink3)">in</span>
                 </div>
                 <div class="warn-txt" id="w-reel-hint"></div>
@@ -550,7 +550,7 @@ table.t{width:100%;border-collapse:collapse}
               <div class="frow" style="flex:1">
                 <label class="wlbl" id="w-cut-lbl">Cut (L+W+2)</label>
                 <div style="display:flex;align-items:center;gap:6px">
-                  <input class="inp num" type="number" inputmode="decimal" id="w-cut" step="0.01" oninput="wCutEdited=true;wCalcFromBoard()">
+                  <input class="inp num" type="number" inputmode="decimal" id="w-cut" step="0.01" oninput="wCutEdited=true;wCalc()">
                   <span style="font-size:11px;color:var(--ink3)">in</span>
                 </div>
                 <div class="warn-txt" id="w-cut-hint"></div>
@@ -690,10 +690,10 @@ table.t{width:100%;border-collapse:collapse}
     <div class="fg2">
       <div class="frow"><label class="flbl">Product *</label>
         <select class="sel" id="ed-prod" onchange="toggleH('ed')">
-          <option>Pallet</option><option>Layer / Board</option><option>Box</option><option>OE Layer</option><option>Corner Pad Sheet</option>
+          <option>Box</option><option>Pallet</option><option>Layer / Board</option><option>OE Layer</option><option>Corner Pad</option>
         </select>
       </div>
-      <div class="frow"><label class="flbl">Ply *</label><select class="sel" id="ed-ply"><option>3</option><option>5</option><option>7</option></select></div>
+      <div class="frow"><label class="flbl">Ply *</label><select class="sel" id="ed-ply"><option>2</option><option>3</option><option>5</option><option>7</option></select></div>
     </div>
     <div>
       <label class="flbl" id="ed-size-lbl">Size L × W × H *</label>
@@ -784,7 +784,10 @@ async function sbFetch(path, method='GET', body=null){
   const r=await fetch(SB_URL+'/rest/v1/'+path,opts);
   if(r.status===401){clearSession();showLogin();return null;}
   if(!r.ok){console.error('SB',await r.text());return null;}
-  return method==='DELETE'?true:r.json();
+  // PATCH/DELETE return 204 with no body; only POST (return=representation) has JSON
+  if(method==='DELETE'||r.status===204) return true;
+  const text=await r.text();
+  return text?JSON.parse(text):true;
 }
 const db={
   get:(t,q='')=>sbFetch(t+'?order=created_at.asc'+(q?'&'+q:'')),
@@ -794,8 +797,8 @@ const db={
 };
 
 // ── CONSTANTS ────────────────────────────────────────────
-const PRODUCTS=['Pallet','Layer / Board','Box','OE Layer','Corner Pad Sheet'];
-const PLYS=['3','5','7'];
+const PRODUCTS=['Box','Pallet','Layer / Board','OE Layer','Corner Pad'];
+const PLYS=['2','3','5','7'];
 const STATUSES=['Pending','In Production','Partial Dispatch','Ready','Dispatched'];
 const TSTATS=['Pending','In progress','Done'];
 const MEMBERS=['Mahesh','Kondal','Pravin'];
@@ -838,7 +841,12 @@ function boardSizes(ord){
   return {reel:(W+H+1).toFixed(2),cut:((ord.joint||'double')==='double'?(L+W+2):(L*2+W*2+2)).toFixed(2)};
 }
 function updateCustList(){
-  document.getElementById('custList').innerHTML=parties.filter(p=>p.type==='Customer').map(p=>'<option value="'+esc(p.name)+'">').join('');
+  // Suggest every known customer — from the parties list AND any name seen in orders (case-insensitive, deduped)
+  const names=new Map();
+  parties.filter(p=>p.type==='Customer').forEach(p=>{if(p.name){const k=p.name.toLowerCase();if(!names.has(k))names.set(k,p.name);}});
+  orders.forEach(o=>{if(o.cust){const k=o.cust.toLowerCase();if(!names.has(k))names.set(k,o.cust);}});
+  const list=[...names.values()].sort((a,b)=>a.localeCompare(b));
+  document.getElementById('custList').innerHTML=list.map(n=>'<option value="'+esc(n)+'">').join('');
 }
 function setVal(id,v){const el=document.getElementById(id);if(el)el.value=v||'';}
 function getVal(id){return(document.getElementById(id)?.value||'').trim();}
@@ -864,6 +872,7 @@ async function saveNewOrder(){
   if(!ply)  errs.push('no-ply');
   if(!L)    errs.push('no-L');
   if(!W)    errs.push('no-W');
+  if(prod==='Box'&&!H) errs.push('no-H');
   if(!qty)  errs.push('no-qty');
   if(!disp) errs.push('no-disp');
 
@@ -968,6 +977,7 @@ function openDrawer(id){
   setVal('ed-joint',ord.joint||'double'); setVal('ed-disp',ord.disp);
   setVal('ed-status',ord.status);
   document.getElementById('ed-warn').style.display='none';
+  document.querySelectorAll('#edit-drawer .inp.err,#edit-drawer .sel.err').forEach(el=>el.classList.remove('err'));
   document.getElementById('ed-backdrop').classList.add('open');
   document.getElementById('edit-drawer').classList.add('open');
   document.body.style.overflow='hidden';
@@ -987,6 +997,17 @@ async function saveDrawer(){
     su:getVal('ed-su'),qty:parseFloat(getVal('ed-qty'))||0,
     joint:getVal('ed-joint'),disp:getVal('ed-disp'),status:getVal('ed-status')
   };
+  // Required-field validation (mirrors the New Order form)
+  const errs=[];
+  if(!row.cust) errs.push('ed-cust');
+  if(!row.l)    errs.push('ed-L');
+  if(!row.w)    errs.push('ed-W');
+  if(row.prod==='Box'&&!row.h) errs.push('ed-H');
+  if(!row.qty)  errs.push('ed-qty');
+  if(!row.disp) errs.push('ed-disp');
+  document.querySelectorAll('#edit-drawer .inp.err,#edit-drawer .sel.err').forEach(el=>el.classList.remove('err'));
+  errs.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('err');});
+  if(errs.length) return;
   const warnEl=document.getElementById('ed-warn');
   if(row.disp&&row.date&&row.disp<row.date){warnEl.style.display='block';return;}
   warnEl.style.display='none';
