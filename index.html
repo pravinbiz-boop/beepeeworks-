@@ -911,9 +911,9 @@ function renderOrders(){
   let list=orders.filter(x=>x.status===oSF);
   if(q) list=list.filter(x=>(x.cust||'').toLowerCase().includes(q)||(x.no||'').toLowerCase().includes(q)||(String(x.l||0)+'×'+String(x.w||0)+(x.prod==='Box'?'×'+String(x.h||0):'')).includes(q));
 
-  // Dispatched = completed log → newest dispatch first; active statuses → earliest (most urgent) first, no-date last
-  if(oSF==='Dispatched') list.sort((a,b)=>(b.disp||'').localeCompare(a.disp||''));
-  else list.sort((a,b)=>(a.disp||'9999-99-99').localeCompare(b.disp||'9999-99-99'));
+  // Most recently moved (status updated) first — same rule for every pill
+  const mv=o=>o.updated_at||o.created_at||'';
+  list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
 
   const counts={All:orders.length};
   STATUSES.forEach(s=>counts[s]=orders.filter(x=>x.status===s).length);
@@ -1012,6 +1012,7 @@ async function saveDrawer(){
   if(row.disp&&row.date&&row.disp<row.date){warnEl.style.display='block';return;}
   warnEl.style.display='none';
   const x=orders.find(o=>o.id===editId);
+  if(x && row.status!==x.status) row.updated_at=new Date().toISOString();
   if(x) Object.assign(x,row);
   await db.update('orders',editId,row);
   closeDrawer();
@@ -1036,17 +1037,9 @@ async function duplicateOrder(){
 // ── WORK STATUS ──────────────────────────────────────────
 function renderWorkStatus(){
   let list=orders.filter(x=>x.status===woF);
-  if(woF==='Dispatched'){
-    // Completed log → newest dispatch first, no-date last
-    list.sort((a,b)=>(b.disp||'').localeCompare(a.disp||''));
-  } else {
-    list.sort((a,b)=>{
-      const pa=a.status==='Dispatched'?2:(!a.disp?1:a.disp<TODAY?-2:a.disp===TODAY?-1:0);
-      const pb=b.status==='Dispatched'?2:(!b.disp?1:b.disp<TODAY?-2:b.disp===TODAY?-1:0);
-      if(pa!==pb) return pa-pb;
-      return (a.disp||'9').localeCompare(b.disp||'9');
-    });
-  }
+  // Most recently moved (status updated) first — same rule for every pill
+  const mv=o=>o.updated_at||o.created_at||'';
+  list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
   const counts={};STATUSES.forEach(s=>counts[s]=orders.filter(x=>x.status===s).length);
   document.getElementById('wo-sub').textContent=list.length+' of '+orders.length+' orders';
   document.getElementById('wo-filters').innerHTML=
@@ -1074,7 +1067,7 @@ function renderWorkStatus(){
 function woFilter(f){woF=f;renderWorkStatus();}
 async function woStatusChange(id,s){
   const x=orders.find(o=>o.id===id);
-  if(x){x.status=s;await db.update('orders',id,{status:s});renderOrders();renderWorkStatus();}
+  if(x){const ts=new Date().toISOString();x.status=s;x.updated_at=ts;await db.update('orders',id,{status:s,updated_at:ts});renderOrders();renderWorkStatus();}
 }
 
 // ── TASKS ────────────────────────────────────────────────
