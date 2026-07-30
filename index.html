@@ -382,7 +382,7 @@ table.t{width:100%;border-collapse:collapse}
   <!-- ORDERS -->
   <section id="view-orders" class="view">
     <div class="ph">
-      <div><div class="ptitle">Orders</div><div class="psub" id="ol-sub"></div></div>
+      <div><div class="ptitle">Orders</div></div>
       <button class="btn btn-p" onclick="showNewOrderForm()">+ New</button>
     </div>
 
@@ -451,7 +451,7 @@ table.t{width:100%;border-collapse:collapse}
   <!-- WORK STATUS -->
   <section id="view-workstatus" class="view">
     <div class="ph">
-      <div><div class="ptitle">Work Status</div><div class="psub" id="wo-sub"></div></div>
+      <div><div class="ptitle">Work Status</div></div>
     </div>
     <div class="fbar" id="wo-filters"></div>
     <div class="wo-list" id="wo-list"></div>
@@ -460,7 +460,7 @@ table.t{width:100%;border-collapse:collapse}
   <!-- TASKS -->
   <section id="view-tasks" class="view active">
     <div class="ph">
-      <div><div class="ptitle">Tasks</div><div class="psub" id="t-sub"></div></div>
+      <div><div class="ptitle">Tasks</div></div>
       <button class="btn btn-p" onclick="addTask()">+ New</button>
     </div>
     <div class="fbar" id="t-filters"></div>
@@ -470,7 +470,7 @@ table.t{width:100%;border-collapse:collapse}
 
   <!-- WEIGHT -->
   <section id="view-weight" class="view">
-    <div class="ph"><div><div class="ptitle">Weight Calculator</div><div class="psub">per box · kg · 3 decimals</div></div></div>
+    <div class="ph"><div><div class="ptitle">Weight Calculator</div></div></div>
 
     <!-- Result strip -->
     <div class="card w-result-card" style="margin-bottom:14px;overflow:hidden">
@@ -577,7 +577,7 @@ table.t{width:100%;border-collapse:collapse}
 
   <!-- SOP -->
   <section id="view-sop" class="view">
-    <div class="ph"><div><div class="ptitle">Standard Operating Procedures</div><div class="psub">Good Principles</div></div></div>
+    <div class="ph"><div><div class="ptitle">Standard Operating Procedures</div></div></div>
 
     <div class="sop-section sop-blue">
       <div class="sop-header">
@@ -610,7 +610,7 @@ table.t{width:100%;border-collapse:collapse}
 
   <!-- PRODUCT DATA -->
   <section id="view-productdata" class="view">
-    <div class="ph"><div><div class="ptitle">Product Data</div><div class="psub" id="pd-sub"></div></div></div>
+    <div class="ph"><div><div class="ptitle">Product Data</div></div></div>
     <div class="card" style="margin-bottom:12px">
       <div class="addform">
         <div style="flex:1;min-width:140px"><label class="flbl">Customer</label><select class="sel" id="pdf-cust" onchange="renderProductData()"><option value="">All customers</option></select></div>
@@ -625,7 +625,7 @@ table.t{width:100%;border-collapse:collapse}
 
   <!-- PARTIES -->
   <section id="view-parties" class="view">
-    <div class="ph"><div><div class="ptitle">Parties</div><div class="psub" id="p-sub"></div></div></div>
+    <div class="ph"><div><div class="ptitle">Parties</div></div></div>
     <div class="card" style="margin-bottom:12px">
       <div class="addform">
         <div style="flex:1"><label class="flbl">Name</label><input class="inp" id="p-name" placeholder="Party name"></div>
@@ -920,9 +920,6 @@ function renderOrders(){
   document.getElementById('ol-filters').innerHTML=
     STATUSES.map(s=>{const pc=' pill-'+skCls(s);return '<button class="pill'+pc+(oSF===s?' active':'')+'" onclick="olFilter(\''+s+'\')">'+s+' <span class="pill-count">'+counts[s]+'</span></button>';}).join('');
 
-  const activeCount=orders.filter(x=>x.status!=='Dispatched').length;
-  document.getElementById('ol-sub').textContent=activeCount+' active · '+orders.length+' total';
-
   if(!list.length){
     const msg=q?'No orders match your search.':orders.length?'No '+oSF+' orders.':'No orders yet. Tap + New to add one.';
     document.getElementById('ol-cards').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+'</div>';
@@ -1041,7 +1038,6 @@ function renderWorkStatus(){
   const mv=o=>o.updated_at||o.created_at||'';
   list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
   const counts={};STATUSES.forEach(s=>counts[s]=orders.filter(x=>x.status===s).length);
-  document.getElementById('wo-sub').textContent=list.length+' of '+orders.length+' orders';
   document.getElementById('wo-filters').innerHTML=
     STATUSES.map(s=>{const pc=' pill-'+skCls(s);return '<button class="pill'+pc+(woF===s?' active':'')+'" onclick="woFilter(\''+s+'\')">'+s+' <span class="pill-count">'+counts[s]+'</span></button>';}).join('');
   if(!list.length){document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc('No '+woF+' orders.')+'</div>';return;}
@@ -1087,8 +1083,6 @@ function renderTasks(){
       const ini=m==='All'?'':'<span class="mchip-avatar">'+m.charAt(0)+'</span>';
       return '<button class="mchip'+(tMF===m?' active':'')+'" onclick="tMFilter(\''+m+'\')">'+ini+esc(m)+(m!=='All'?' <span class="pill-count">'+mCounts[m]+'</span>':'')+'</button>';
     }).join('');
-  const p=counts['Pending']||0, ip=counts['In progress']||0;
-  document.getElementById('t-sub').textContent=tasks.length+' tasks · '+p+' pending · '+ip+' in progress';
   if(!list.length){document.getElementById('t-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No tasks found.</div>';return;}
   document.getElementById('t-list').innerHTML=list.map(t=>{
     const clsName=(t.status||'Pending').replace(/ /g,'-');
@@ -1211,7 +1205,6 @@ function renderProductData(){
   let list=eligible;
   if(custSel.value) list=list.filter(o=>o.cust===custSel.value);
   if(reelSel.value) list=list.filter(o=>boardSizes(o).reel===reelSel.value.replace('″',''));
-  document.getElementById('pd-sub').textContent=eligible.length+' entries · Dispatched & Partial Dispatch';
   document.getElementById('pd-note').textContent=(custSel.value||reelSel.value)?list.length+' filtered result'+(list.length!==1?'s':''):'';
   document.getElementById('pd-foot-l').textContent=list.length+' of '+eligible.length;
   document.getElementById('pd-foot-r').textContent=list.length?'Total qty · '+fmt(list.reduce((s,o)=>s+o.qty,0))+' pcs':'';
@@ -1253,9 +1246,6 @@ function renderParties(){
     +'<span class="bdg '+(p.type==='Customer'?'rd':'ip')+'">'+esc(p.type)+'</span>'
     +'<button class="btn-del" onclick="delP('+p.id+')">✕</button>'
   +'</div>').join('');
-  const c=parties.filter(p=>p.type==='Customer').length;
-  const s=parties.filter(p=>p.type==='Supplier').length;
-  document.getElementById('p-sub').textContent=parties.length+' parties · '+c+' customers · '+s+' suppliers';
   document.getElementById('pf-all').classList.toggle('active',pf==='all');
   document.getElementById('pf-c').classList.toggle('active',pf==='Customer');
   document.getElementById('pf-s').classList.toggle('active',pf==='Supplier');
