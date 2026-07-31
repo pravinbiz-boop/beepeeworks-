@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>BeePeeWorks</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F8FAFC;
+  --surface:#FFFFFF;
+  --s2:#F1F5F9;
+  --hover:#E2E8F0;
+  --line:#E2E8F0;
+  --line2:#CBD5E1;
+  --ink:#1E293B;
+  --ink2:#334155;
+  --ink3:#64748B;
+  --muted:#94A3B8;
+  --accent:#4F46E5;
+  --accent2:#4338CA;
+  --accent-bg:#EEF2FF;
+  --amber:#B45309;       --amber-bg:#FEF3C7;
+  --green:#15803D;       --green-bg:#DCFCE7;
+  --red:#B91C1C;         --red-bg:#FEE2E2;
+  --blue:#1D4ED8;        --blue-bg:#DBEAFE;
+  --violet:#6D28D9;      --violet-bg:#EDE9FE;
+  --r:16px;--r2:12px;--r3:8px;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.03);
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 2px 6px rgba(0,0,0,.03);
+  --shadow-md:0 2px 6px rgba(0,0,0,.05),0 4px 12px rgba(0,0,0,.04);
+  --bw:0.8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-apple-system,sans-serif;font-size:13.5px;line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.num{font-family:'Manrope',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em;font-weight:500}
+
+/* ── DESKTOP: LEFT SIDEBAR · MOBILE: BOTTOM NAV ── */
+.layout{display:flex;min-height:100vh}
+.sidenav{
+  width:240px;flex-shrink:0;background:var(--surface);border-right:var(--bw) solid var(--line);
+  padding:24px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:2px;
+}
+.brand{font-family:'Outfit',sans-serif;font-weight:700;font-size:18px;letter-spacing:-.03em;color:var(--ink);padding:4px 10px 6px;white-space:nowrap}
+.brand span{color:var(--muted);font-weight:500}
+.brand-sub{font-size:10px;color:var(--ink3);font-weight:500;padding:0 10px 20px;letter-spacing:.01em}
+.nl{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r2);
+  font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;color:var(--ink3);
+  cursor:pointer;background:transparent;border:0;text-align:left;width:100%;
+  transition:all .15s ease;
+}
+.nl:hover{background:var(--s2);color:var(--ink)}
+.nl.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(79,70,229,.2)}
+.nl.active svg{color:#fff}
+.nl svg{width:18px;height:18px;flex-shrink:0;color:var(--ink3);transition:color .15s}
+.nl:hover svg{color:var(--ink2)}
+.main{flex:1;min-width:0}
+
+.bottomnav{display:none}
+
+@media(max-width:720px){
+  .layout{flex-direction:column}
+  .sidenav{display:none}
+  .main{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+  .bottomnav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:30;
+    background:rgba(255,255,255,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border-top:var(--bw) solid var(--line);
+    padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px));justify-content:space-around;
+  }
+  .bn{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:2px;padding:4px 2px;background:transparent;border:0;cursor:pointer;
+    font-family:'Manrope',sans-serif;font-size:10px;font-weight:500;color:var(--muted);
+    min-width:0;transition:color .15s;
+  }
+  .bn svg{width:20px;height:20px;color:var(--muted);transition:color .15s}
+  .bn.active{color:var(--accent);font-weight:600}
+  .bn.active svg{color:var(--accent)}
+  .bn span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .wo-detail{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+  .fbar{-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}
+  .w-sticky{position:sticky;top:0;z-index:10}
+  .pd-m-card{background:var(--surface);border-radius:var(--r2);padding:10px 12px;box-shadow:var(--shadow-sm)}
+  .pd-m-row{display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .pd-m-detail{font-size:12px;font-weight:500;color:var(--ink);margin-top:4px}
+  .pd-m-detail span{color:var(--ink3);font-weight:400}
+  .pd-m-nums{display:flex;gap:12px;margin-top:5px;font-size:11px;color:var(--ink3)}
+  .pd-m-nums b{color:var(--ink);font-weight:600}
+}
+
+/* ── SHELL ── */
+.shell{padding:24px 20px;max-width:960px;margin:0 auto}
+.view{display:none}.view.active{display:block}
+
+/* ── PAGE HEADER ── */
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
+.ptitle{font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.psub{font-size:11px;color:var(--ink3);font-family:'Manrope',sans-serif;margin-top:1px}
+
+/* ── CARD ── */
+.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow-sm);border:var(--bw) solid var(--line)}
+.ch{padding:12px 16px;border-bottom:var(--bw) solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.ctitle{font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;color:var(--ink)}
+.cb{padding:16px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:13px;font-weight:600;height:38px;padding:0 14px;border-radius:var(--r2);border:0;cursor:pointer;background:transparent;color:var(--ink);white-space:nowrap;transition:all .15s ease}
+.btn-p{background:var(--accent);color:#fff}.btn-p:hover{background:var(--accent2)}
+.btn-g{border:var(--bw) solid var(--line);background:var(--surface);color:var(--ink2)}.btn-g:hover{border-color:var(--line2);color:var(--ink)}
+.btn-sm{height:28px;padding:0 12px;font-size:11.5px}
+.btn-del{height:24px;width:24px;padding:0;border-radius:var(--r3);color:var(--muted);background:transparent;border:0;cursor:pointer;font-size:15px;display:inline-flex;align-items:center;justify-content:center;transition:all .15s}
+.btn-del:hover{color:var(--red);background:var(--red-bg)}
+.btn-full{width:100%;justify-content:center;height:44px;font-size:14px;border-radius:var(--r2)}
+
+/* ── PILLS ── */
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;height:28px;padding:0 12px;border-radius:9999px;border:0;background:var(--s2);color:var(--ink3);cursor:pointer;flex-shrink:0;font-family:'Manrope',sans-serif;font-weight:600;transition:all .15s ease}
+.pill:hover{background:var(--hover);color:var(--ink2)}
+.pill.active{background:var(--accent);color:#fff}
+.pill.pill-pn{background:var(--s2);color:var(--ink3)}
+.pill.pill-ip{background:var(--s2);color:var(--ink3)}
+.pill.pill-pd{background:var(--s2);color:var(--ink3)}
+.pill.pill-rd{background:var(--s2);color:var(--ink3)}
+.pill.pill-ds{background:var(--s2);color:var(--ink3)}
+.pill.pill-pn.active{background:#475569;color:#fff}
+.pill.pill-ip.active{background:var(--amber);color:#fff}
+.pill.pill-pd.active{background:var(--blue);color:#fff}
+.pill.pill-rd.active{background:var(--green);color:#fff}
+.pill.pill-ds.active{background:var(--ink);color:#fff}
+.pill-count{font-size:10px;padding:1px 6px;border-radius:9px;background:rgba(0,0,0,.06);color:var(--ink3);font-weight:600;min-width:18px;text-align:center}
+.pill.active .pill-count{background:rgba(255,255,255,.22);color:#fff}
+
+/* ── BADGES ── */
+.bdg{display:inline-flex;align-items:center;font-size:10px;font-weight:600;height:22px;padding:0 10px;border-radius:11px;white-space:nowrap;font-family:'Manrope',sans-serif;letter-spacing:.01em}
+.bdg.pn{background:var(--s2);color:var(--ink3)}
+.bdg.ip{background:var(--amber-bg);color:var(--amber)}
+.bdg.pd{background:var(--blue-bg);color:var(--blue)}
+.bdg.rd{background:var(--green-bg);color:var(--green)}
+.bdg.ds{background:var(--s2);color:var(--ink3)}
+
+/* ── INPUTS ── */
+.inp{font-family:inherit;font-size:14px;height:38px;padding:0 12px;border-radius:var(--r2);border:var(--bw) solid var(--line);background:var(--surface);color:var(--ink);outline:0;width:100%;transition:border-color .15s,box-shadow .15s}
+.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.08)}
+.inp.err,.sel.err{border-color:var(--red)!important;background:var(--red-bg,#FEE2E2)!important}
+.sel{font-family:inherit;font-size:14px;height:38px;padding:0 12px;border-radius:var(--r2);border:var(--bw) solid var(--line);background:var(--surface);color:var(--ink);outline:0;cursor:pointer;width:100%;transition:border-color .15s}
+.sel:focus{border-color:var(--accent)}
+.flbl{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;display:block}
+
+/* ── TABLE (new order input) ── */
+table.t{width:100%;border-collapse:collapse}
+.t th{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);background:var(--s2);text-align:left;padding:10px;border-bottom:var(--bw) solid var(--line);white-space:nowrap}
+.t td{padding:6px 8px;border-bottom:var(--bw) solid var(--line);vertical-align:middle}
+.t .r{text-align:right}
+.ovx{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cell{font-family:inherit;font-size:12px;height:34px;padding:0 8px;width:100%;border:var(--bw) solid var(--line);background:var(--surface);border-radius:var(--r3);color:var(--ink);outline:0;transition:border-color .15s}
+.cell:focus{border-color:var(--accent)}
+.cell.err{border-color:var(--red);background:var(--red-bg)}
+.csel{font-family:inherit;font-size:12px;height:34px;padding:0 6px;width:100%;border:var(--bw) solid var(--line);background:var(--surface);border-radius:var(--r3);color:var(--ink);outline:0;cursor:pointer}
+
+/* ── ORDER CARDS (saved view) ── */
+.order-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.ocard{background:var(--surface);border-radius:var(--r2);display:flex;overflow:hidden;cursor:pointer;transition:all .15s ease;border:var(--bw) solid var(--line)}
+.ocard.pn{background:var(--surface)}
+.ocard.ip{background:var(--amber-bg);border-color:rgba(180,83,9,.1)}
+.ocard.pd{background:var(--blue-bg);border-color:rgba(29,78,216,.08)}
+.ocard.rd{background:var(--green-bg);border-color:rgba(21,128,61,.08)}
+.ocard.ds{background:var(--s2);border-color:var(--line)}
+.ocard:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
+.ocard:active{transform:translateY(0)}
+.ostripe{width:3px;flex-shrink:0}
+.ostripe.pn{background:var(--muted)}.ostripe.ip{background:var(--amber)}
+.ostripe.pd{background:var(--blue)}.ostripe.rd{background:var(--green)}
+.ostripe.ds{background:var(--muted)}
+.obody{flex:1;padding:8px 10px;min-width:0}
+.orow1{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ocust{font-size:13.5px;font-weight:600;line-height:1.25;word-break:break-word}
+.ono{font-size:10.5px;font-family:'Manrope',sans-serif;color:var(--ink3);margin-left:6px}
+.orow2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px}
+.odisp{font-size:11px;font-family:'Manrope',sans-serif}
+.odisp.overdue{color:var(--red);font-weight:600}
+.odisp.today{color:var(--amber);font-weight:600}
+.odisp.ok{color:var(--ink3)}
+.odisp.done{color:var(--muted)}
+
+/* ── FILTER BAR ── */
+.fbar{display:flex;gap:6px;padding:8px 0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.fbar::-webkit-scrollbar{display:none}
+
+/* ── WORK STATUS CARDS ── */
+.wo-list{display:flex;flex-direction:column;gap:6px}
+.wo-card{background:var(--surface);border-radius:var(--r2);display:flex;overflow:hidden;border:var(--bw) solid var(--line);transition:box-shadow .15s}
+.wo-card.pn{background:var(--surface)}
+.wo-card.ip{background:var(--amber-bg);border-color:rgba(180,83,9,.1)}
+.wo-card.pd{background:var(--blue-bg);border-color:rgba(29,78,216,.08)}
+.wo-card.rd{background:var(--green-bg);border-color:rgba(21,128,61,.08)}
+.wo-card.ds{background:var(--s2);border-color:var(--line)}
+.wo-stripe{width:3px;flex-shrink:0}
+.wo-stripe.pn{background:var(--muted)}.wo-stripe.ip{background:var(--amber)}
+.wo-stripe.pd{background:var(--blue)}.wo-stripe.rd{background:var(--green)}
+.wo-stripe.ds{background:var(--muted)}
+.wo-body{flex:1;padding:8px 10px;min-width:0}
+.wo-row1{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wo-cust{font-size:13.5px;font-weight:600;word-break:break-word}
+.wo-no{font-size:10.5px;font-family:'Manrope',sans-serif;color:var(--ink3);margin-left:6px}
+.wo-row2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px}
+.wo-detail{font-size:12px;color:var(--ink);font-weight:500}
+.wo-detail span{color:var(--ink3);font-weight:400}
+.wo-disp{font-size:11px;font-family:'Manrope',sans-serif;flex-shrink:0}
+.wo-disp.overdue{color:var(--red);font-weight:600}
+.wo-disp.today{color:var(--amber);font-weight:600}
+.wo-disp.ok{color:var(--ink3)}.wo-disp.done{color:var(--muted)}
+.wo-sel{font-family:inherit;font-size:11px;height:26px;padding:0 8px;border:var(--bw) solid var(--line);border-radius:var(--r3);background:var(--surface);color:var(--ink);outline:0;cursor:pointer;transition:border-color .15s}
+.wo-sel:focus{border-color:var(--accent)}
+
+/* ── KPI STRIP ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:14px}
+.kpi{background:var(--surface);border-radius:var(--r2);padding:12px 14px;border:var(--bw) solid var(--line)}
+.kpi-lbl{font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
+.kpi-val{font-family:'Outfit',sans-serif;font-size:22px;font-weight:700;letter-spacing:-.03em}
+
+/* ── TASKS ── */
+.tcard{background:var(--surface);border-left:3px solid var(--line2);border-radius:var(--r2);display:flex;align-items:center;gap:8px;padding:10px 12px;transition:all .15s ease;border:var(--bw) solid var(--line);border-left-width:3px}
+.tcard.Pending{border-left-color:var(--muted);background:var(--surface)}
+.tcard.In-progress{border-left-color:var(--amber);background:var(--amber-bg);border-color:rgba(180,83,9,.1)}
+.tcard.Done{border-left-color:var(--green);background:var(--green-bg);border-color:rgba(21,128,61,.08)}
+.tcard.Done .tname{color:var(--ink3);text-decoration:line-through}
+.task-list{display:flex;flex-direction:column;gap:6px}
+.tdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid transparent}
+.tdot.Pending{border-color:var(--muted);background:transparent}
+.tdot.In-progress{background:var(--amber);border-color:var(--amber)}
+.tdot.Done{background:var(--green);border-color:var(--green)}
+.tname{font-size:13px;font-weight:500;color:var(--ink);line-height:1.3}
+.tmeta{font-size:10.5px;color:var(--ink3);margin-top:1px}
+.tstatus-sel{font-family:'Manrope',sans-serif;font-size:11px;border:var(--bw) solid var(--line);border-radius:var(--r3);background:var(--surface);height:30px;padding:0 8px;color:var(--ink);cursor:pointer;font-weight:500;transition:border-color .15s}
+.tstatus-sel:focus{border-color:var(--accent)}
+.btn-del-task{
+  height:32px;width:32px;padding:0;border-radius:var(--r3);color:var(--red);background:transparent;
+  border:var(--bw) solid var(--line);cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;
+  opacity:.5;transition:all .15s ease;
+}
+.btn-del-task:hover{opacity:1;background:var(--red-bg);border-color:var(--red)}
+
+/* ── SOP ── */
+.sop-section{margin-bottom:20px;background:var(--surface);border-radius:var(--r2);border:var(--bw) solid var(--line);overflow:hidden;box-shadow:var(--shadow-sm)}.sop-section.sop-blue{border-left:3px solid var(--blue)}.sop-section.sop-green{border-left:3px solid var(--green)}
+.sop-header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:var(--bw) solid var(--line)}.sop-section.sop-blue .sop-header{background:var(--blue-bg)}.sop-section.sop-green .sop-header{background:var(--green-bg)}.sop-header .sop-icon{background:var(--surface)!important;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.sop-icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sop-label{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.sop-item{display:flex;gap:12px;padding:11px 14px;border-bottom:var(--bw) solid color-mix(in srgb,var(--line) 50%,transparent);align-items:flex-start;transition:background .15s}
+.sop-item:last-child{border-bottom:0}
+.sop-item:active{background:var(--bg)}
+.sop-num{width:24px;height:24px;border-radius:8px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.sop-text{font-size:13.5px;color:var(--ink);line-height:1.55;font-weight:400}
+
+/* ── MEMBER CHIPS ── */
+.mchip{display:inline-flex;align-items:center;gap:5px;font-size:11px;height:26px;padding:0 10px 0 4px;border-radius:9999px;border:var(--bw) solid var(--line);background:var(--surface);color:var(--ink2);cursor:pointer;font-family:'Manrope',sans-serif;font-weight:500;transition:all .15s ease}
+.mchip:hover{border-color:var(--line2);color:var(--ink)}
+.mchip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.mchip-avatar{width:18px;height:18px;border-radius:50%;background:var(--accent-bg);color:var(--accent2);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;letter-spacing:-.02em}
+.mchip.active .mchip-avatar{background:rgba(255,255,255,.2);color:#fff}
+.mchip .pill-count{font-size:9px;padding:0 5px;border-radius:7px;background:rgba(0,0,0,.06);color:var(--ink3);font-weight:600;min-width:14px;text-align:center}
+.mchip.active .pill-count{background:rgba(255,255,255,.2);color:rgba(255,255,255,.8)}
+.mbar{display:flex;gap:6px;padding:2px 0 8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;align-items:center}
+.mbar::-webkit-scrollbar{display:none}
+.mbar-label{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-right:2px;flex-shrink:0}
+
+/* ── WEIGHT ── */
+.w2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.wsec{display:flex;flex-direction:column;gap:14px}
+.wlbl{font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px;display:block}
+.w-result-strip{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:linear-gradient(135deg,var(--ink) 0%,#1a3a4a 100%);border-radius:var(--r) var(--r) 0 0}
+.w-result-val{font-size:36px;font-weight:700;letter-spacing:-.03em;font-family:'Outfit',sans-serif;color:#fff;line-height:1}
+.w-result-unit{font-size:13px;color:rgba(255,255,255,.5);font-weight:500}
+.w-formula-bar{padding:8px 18px;font-size:10px;color:var(--ink3);font-family:'Manrope',sans-serif;line-height:1.5;background:var(--s2);border-top:var(--bw) solid var(--line)}
+.w-sec-title{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.w-sec-icon{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.w-sec-badge{font-size:10px;color:var(--ink3);background:var(--s2);padding:2px 8px;border-radius:10px;font-weight:500}
+.w-divider{height:1px;background:var(--line);margin:2px 0}
+
+/* ── FORM GRID ── */
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.frow{display:flex;flex-direction:column;gap:5px}
+
+/* ── ADD FORM ── */
+.addform{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;padding:14px 16px;border-bottom:var(--bw) solid var(--line);background:var(--s2)}
+
+/* ── DRAWER (bottom sheet on mobile, right on desktop) ── */
+.drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40;display:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.drawer-backdrop.open{display:block}
+.drawer{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:20px 20px 0 0;z-index:50;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.12)}
+.drawer.open{transform:translateY(0)}
+.drawer-handle{width:40px;height:4px;background:var(--line2);border-radius:2px;margin:12px auto 4px}
+.drawer-head{padding:14px 20px;border-bottom:var(--bw) solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.drawer-title{font-family:'Outfit',sans-serif;font-size:17px;font-weight:600;color:var(--ink)}
+.drawer-body{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.drawer-foot{padding:14px 20px;border-top:var(--bw) solid var(--line);display:flex;gap:10px;flex-shrink:0;background:var(--surface)}
+
+/* ── PRODUCT DATA ── */
+.pdcard{background:var(--surface);border-radius:var(--r2);padding:12px 14px;display:flex;flex-direction:column;gap:6px;border:var(--bw) solid var(--line)}
+.pd-list{display:flex;flex-direction:column;gap:8px}
+
+/* ── WARN ── */
+.warn-txt{font-size:10.5px;color:var(--amber);font-family:'Manrope',sans-serif;margin-top:4px}
+
+/* ── MOBILE ── */
+@media(max-width:680px){
+  .shell{padding:16px 14px}
+  .w2{grid-template-columns:1fr}
+  .fg2{grid-template-columns:1fr}
+  .fg3{grid-template-columns:1fr 1fr}
+  .topnav{padding:0 14px}
+  .brand{font-size:16px;margin-right:12px}
+  .w-result-card{position:sticky;top:0;z-index:10}
+  .pill{height:36px;padding:0 14px;font-size:12px}
+  .btn{height:42px;padding:0 18px;font-size:13.5px}
+  .btn-sm{height:36px;padding:0 14px}
+  .tstatus-sel{height:36px;font-size:12px}
+  .wo-sel{height:32px;font-size:12px}
+  .btn-del-task{height:38px;width:38px}
+  .mchip{height:34px;padding:0 12px 0 5px}
+  .btn-del{height:32px;width:32px;font-size:16px}
+}
+
+/* ── LOGIN SCREEN ── */
+.login-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+.login-box{width:100%;max-width:340px;text-align:center}
+.login-box .brand{font-size:28px;padding:0 0 20px;display:block}
+.login-input{width:100%;height:48px;padding:0 16px;border:var(--bw) solid var(--line);border-radius:var(--r2);font-family:inherit;font-size:15px;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm);outline:none;transition:border-color .15s}
+.login-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.12)}
+.login-btn{width:100%;height:48px;margin-top:12px;border:0;border-radius:var(--r2);background:var(--accent);color:#fff;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 1px 3px rgba(79,70,229,.2);transition:background .15s}
+.login-btn:hover{background:var(--accent2)}
+.login-btn:disabled{opacity:.6;cursor:not-allowed}
+.login-err{font-size:12px;color:var(--red);margin-top:10px;min-height:18px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-overlay" id="loginScreen">
+  <div class="login-box">
+    <div class="brand">BeePee<span>Works</span></div>
+    <input class="login-input" id="loginPw" type="password" placeholder="" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Enter</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- SIDEBAR (desktop) -->
+<div class="layout">
+<aside class="sidenav">
+  <div class="brand">BeePee<span>Works</span></div>
+  <button class="nl active" data-v="tasks" onclick="nav('tasks')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    Tasks
+  </button>
+  <button class="nl" data-v="orders" onclick="nav('orders')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+    Orders
+  </button>
+  <button class="nl" data-v="workstatus" onclick="nav('workstatus')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+    Status
+  </button>
+  <button class="nl" data-v="productdata" onclick="nav('productdata')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+    Data
+  </button>
+  <button class="nl" data-v="weight" onclick="nav('weight')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3a4 4 0 0 0-4 4h8a4 4 0 0 0-4-4z"/><path d="M6.5 7H17.5L19 21H5L6.5 7z"/></svg>
+    Weight
+  </button>
+  <button class="nl" data-v="sop" onclick="nav('sop')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    SOP
+  </button>
+  </aside>
+
+<main class="main">
+<div class="shell">
+
+  <!-- ORDERS -->
+  <section id="view-orders" class="view">
+    <div class="ph">
+      <div><div class="ptitle">Orders</div></div>
+      <button class="btn btn-p" onclick="showNewOrderForm()">+ New</button>
+    </div>
+
+    <!-- New order input table (hidden by default) -->
+    <div id="new-order-form" class="card" style="display:none;margin-bottom:14px">
+      <div class="ch"><span class="ctitle">New Order</span><button class="btn-del" onclick="hideNewOrderForm()">✕</button></div>
+      <div class="cb">
+        <div class="fg2" style="margin-bottom:10px">
+          <div class="frow"><label class="flbl">Date</label><input type="date" class="inp" id="no-date"></div>
+          <div class="frow"><label class="flbl">Order No</label><input class="inp" id="no-no"></div>
+        </div>
+        <div class="frow" style="margin-bottom:10px">
+          <label class="flbl">Customer *</label>
+          <input class="inp" id="no-cust" list="custList" placeholder="Type customer name">
+        </div>
+        <div class="fg2" style="margin-bottom:10px">
+          <div class="frow"><label class="flbl">Product *</label>
+            <select class="sel" id="no-prod" onchange="toggleH('no')">
+              <option value="">Select…</option>
+              <option>Box</option><option>Pallet</option><option>Layer / Board</option><option>OE Layer</option><option>Corner Pad</option>
+            </select>
+          </div>
+          <div class="frow"><label class="flbl">Ply *</label>
+            <select class="sel" id="no-ply"><option value="">Select…</option><option>2</option><option>3</option><option>5</option><option>7</option></select>
+          </div>
+        </div>
+        <div class="fg3" style="margin-bottom:10px">
+          <div class="frow"><label class="flbl">L *</label><input class="inp num" type="number" inputmode="decimal" id="no-L" min="0" placeholder="0"></div>
+          <div class="frow"><label class="flbl">W *</label><input class="inp num" type="number" inputmode="decimal" id="no-W" min="0" placeholder="0"></div>
+          <div class="frow" id="no-H-wrap" style="display:none"><label class="flbl">H *</label><input class="inp num" type="number" inputmode="decimal" id="no-H" min="0" placeholder="0"></div>
+        </div>
+        <div class="fg3" style="margin-bottom:10px">
+          <div class="frow"><label class="flbl">Unit</label>
+            <select class="sel" id="no-su"><option value="in">Inches</option><option value="cm">CM</option></select>
+          </div>
+          <div class="frow"><label class="flbl">Qty *</label><input class="inp num" type="number" inputmode="decimal" id="no-qty" min="0" placeholder="0"></div>
+          <div class="frow"><label class="flbl">Joint</label>
+            <select class="sel" id="no-joint"><option value="double">Double</option><option value="single">Single</option></select>
+          </div>
+        </div>
+        <div class="fg2" style="margin-bottom:14px">
+          <div class="frow"><label class="flbl">Dispatch Date *</label><input type="date" class="inp" id="no-disp"></div>
+          <div class="frow"><label class="flbl">Status</label>
+            <select class="sel" id="no-status">
+              <option>Pending</option><option>In Production</option><option>Partial Dispatch</option><option>Ready</option><option>Dispatched</option>
+            </select>
+          </div>
+        </div>
+        <div id="no-warn" class="warn-txt" style="display:none;margin-bottom:8px">⚠ Dispatch date is before order date</div>
+        <button class="btn btn-p btn-full" onclick="saveNewOrder()">Save Order</button>
+      </div>
+    </div>
+
+    <!-- Filter pills -->
+    <div class="fbar" id="ol-filters"></div>
+
+    <!-- Search -->
+    <div style="margin-bottom:12px">
+      <input class="inp" id="ol-search" placeholder="Search customer or order no…" oninput="renderOrders()">
+    </div>
+
+    <!-- Saved order cards -->
+    <div class="order-list" id="ol-cards"></div>
+  </section>
+
+  <!-- WORK STATUS -->
+  <section id="view-workstatus" class="view">
+    <div class="ph">
+      <div><div class="ptitle">Work Status</div></div>
+    </div>
+    <div class="fbar" id="wo-filters"></div>
+    <div class="wo-list" id="wo-list"></div>
+  </section>
+
+  <!-- TASKS -->
+  <section id="view-tasks" class="view active">
+    <div class="ph">
+      <div><div class="ptitle">Tasks</div></div>
+      <button class="btn btn-p" onclick="addTask()">+ New</button>
+    </div>
+    <div class="fbar" id="t-filters"></div>
+    <div class="mbar" id="t-member-filters"></div>
+    <div class="task-list" id="t-list"></div>
+  </section>
+
+  <!-- WEIGHT -->
+  <section id="view-weight" class="view">
+    <div class="ph"><div><div class="ptitle">Weight Calculator</div></div></div>
+
+    <!-- Result strip -->
+    <div class="card w-result-card" style="margin-bottom:14px;overflow:hidden">
+      <div class="w-result-strip">
+        <div><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.5)">Weight per Box</span></div>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <span class="w-result-val" id="w-result">—</span>
+          <span class="w-result-unit">kg</span>
+        </div>
+      </div>
+      <div class="w-formula-bar" id="w-formula">—</div>
+    </div>
+
+    <div class="w2">
+      <!-- Left column: Config + Size + GSM -->
+      <div class="card">
+        <div class="cb" style="display:flex;flex-direction:column;gap:14px">
+          <!-- Config row -->
+          <div>
+            <div class="w-sec-title">
+              <div class="w-sec-icon" style="background:var(--accent-bg);color:var(--accent)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div>
+              <span class="wlbl" style="margin:0">Configuration</span>
+            </div>
+            <div class="fg3">
+              <div class="frow"><label class="wlbl">Ply</label><select class="sel" id="w-ply" onchange="wPlyChange()"><option>3</option><option>5</option><option>7</option></select></div>
+              <div class="frow"><label class="wlbl">Unit</label><select class="sel" id="w-unit" onchange="wCalc()"><option value="in">Inches</option><option value="cm">CM</option></select></div>
+              <div class="frow"><label class="wlbl">Joint</label><select class="sel" id="w-joint" onchange="wCalc()"><option value="double">Double</option><option value="single">Single</option></select></div>
+            </div>
+          </div>
+          <div class="w-divider"></div>
+          <!-- Box Size -->
+          <div>
+            <div class="w-sec-title">
+              <div class="w-sec-icon" style="background:var(--blue-bg);color:var(--blue)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+              <span class="wlbl" style="margin:0">Box Size</span>
+              <span class="w-sec-badge" id="w-unit-lbl">inches</span>
+            </div>
+            <div class="fg3">
+              <div class="frow"><label class="wlbl">L</label><input class="inp num" type="number" inputmode="decimal" id="w-L" value="15" min="0" oninput="wCalc()"></div>
+              <div class="frow"><label class="wlbl">W</label><input class="inp num" type="number" inputmode="decimal" id="w-W" value="15" min="0" oninput="wCalc()"></div>
+              <div class="frow"><label class="wlbl">H</label><input class="inp num" type="number" inputmode="decimal" id="w-H" value="15" min="0" oninput="wCalc()"></div>
+            </div>
+          </div>
+          <div class="w-divider"></div>
+          <!-- Paper GSM -->
+          <div>
+            <div class="w-sec-title">
+              <div class="w-sec-icon" style="background:var(--amber-bg,#FEF3C7);color:var(--amber)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M2 20h20M5 20V8l7-5 7 5v12"/><path d="M9 20v-4h6v4"/></svg></div>
+              <span class="wlbl" style="margin:0">Paper GSM</span>
+              <span class="w-sec-badge">flutes ×1.45</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px" id="w-gsm-fields"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column: Board Sizes + Total GSM -->
+      <div class="card">
+        <div class="cb" style="display:flex;flex-direction:column;gap:14px">
+          <!-- Board Sizes -->
+          <div>
+            <div class="w-sec-title">
+              <div class="w-sec-icon" style="background:var(--green-bg);color:var(--green)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M21 3H3v18h18V3z"/><path d="M21 9H3M21 15H3M9 3v18"/></svg></div>
+              <span class="wlbl" style="margin:0">Board Sizes</span>
+              <span class="w-sec-badge">editable · in</span>
+              <button class="btn btn-g btn-sm" id="w-board-reset" style="display:none;height:22px;padding:0 8px;font-size:10px;margin-left:auto" onclick="wBoardReset()">↺ Auto</button>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <div class="frow" style="flex:1">
+                <label class="wlbl">Reel (W+H+1)</label>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <input class="inp num" type="number" inputmode="decimal" id="w-reel" step="0.01" oninput="wReelEdited=true;wCalc()">
+                  <span style="font-size:11px;color:var(--ink3)">in</span>
+                </div>
+                <div class="warn-txt" id="w-reel-hint"></div>
+              </div>
+              <div class="frow" style="flex:1">
+                <label class="wlbl" id="w-cut-lbl">Cut (L+W+2)</label>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <input class="inp num" type="number" inputmode="decimal" id="w-cut" step="0.01" oninput="wCutEdited=true;wCalc()">
+                  <span style="font-size:11px;color:var(--ink3)">in</span>
+                </div>
+                <div class="warn-txt" id="w-cut-hint"></div>
+              </div>
+            </div>
+          </div>
+          <div class="w-divider"></div>
+          <!-- Total GSM -->
+          <div>
+            <div class="w-sec-title">
+              <div class="w-sec-icon" style="background:var(--red-bg,#FEE2E2);color:var(--red)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
+              <span class="wlbl" style="margin:0">Total Paper GSM</span>
+              <span class="w-sec-badge">editable</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <input class="inp num" type="number" inputmode="decimal" id="w-total-gsm" step="1" min="0" oninput="wTotalGsmEdited=true;wCalcFromBoard()" style="width:120px;font-size:16px;font-weight:600">
+              <span style="font-size:12px;color:var(--ink3)">g/m²</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOP -->
+  <section id="view-sop" class="view">
+    <div class="ph"><div><div class="ptitle">Standard Operating Procedures</div></div></div>
+
+    <div class="sop-section sop-blue">
+      <div class="sop-header">
+        <div class="sop-icon" style="background:var(--blue-bg);color:var(--blue)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></div>
+        <span class="sop-label" style="color:var(--blue)">Production & quality</span>
+      </div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">1</div><div class="sop-text">Plan the next day's production before the end of each working day.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">2</div><div class="sop-text">Forecast customer urgency and prioritize production accordingly.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">3</div><div class="sop-text">Ensure consistent quality checks at every stage and on every machine output.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">4</div><div class="sop-text">Keep machines, tools, and work areas clean and organized (5S).</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">5</div><div class="sop-text">Carry out preventive maintenance on every machine at least once a month.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">6</div><div class="sop-text">Communicate dispatch schedules and expected delivery timelines well in advance.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--blue-bg);color:var(--blue)">7</div><div class="sop-text">Record production, wastage, and delays immediately after every job.</div></div>
+    </div>
+
+    <div class="sop-section sop-green">
+      <div class="sop-header">
+        <div class="sop-icon" style="background:var(--green-bg);color:var(--green)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <span class="sop-label" style="color:var(--green)">Accounting & finance</span>
+      </div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">1</div><div class="sop-text">Record every financial transaction on the same day.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">2</div><div class="sop-text">Reconcile bank accounts daily or at least once every week.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">3</div><div class="sop-text">Monitor receivables regularly and follow up on invoices overdue by 30 days.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">4</div><div class="sop-text">Review daily cash flow and upcoming payment commitments.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">5</div><div class="sop-text">Complete all statutory compliances well before their due dates.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">6</div><div class="sop-text">Verify supplier invoices and customer collections before closing each day.</div></div>
+      <div class="sop-item"><div class="sop-num" style="background:var(--green-bg);color:var(--green)">7</div><div class="sop-text">Review key financial KPIs and outstanding balances with management every week.</div></div>
+    </div>
+  </section>
+
+  <!-- PRODUCT DATA -->
+  <section id="view-productdata" class="view">
+    <div class="ph"><div><div class="ptitle">Product Data</div></div></div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="addform">
+        <div style="flex:1;min-width:140px"><label class="flbl">Customer</label><select class="sel" id="pdf-cust" onchange="renderProductData()"><option value="">All customers</option></select></div>
+        <div style="flex:1;min-width:120px"><label class="flbl">Reel Size</label><select class="sel" id="pdf-reel" onchange="renderProductData()"><option value="">All sizes</option></select></div>
+        <button class="btn btn-g btn-sm" style="align-self:flex-end" onclick="pdClear()">↺ Clear</button>
+      </div>
+    </div>
+    <div class="psub" id="pd-note" style="margin-bottom:10px"></div>
+    <div class="pd-list" id="pd-list"></div>
+    <div style="font-size:11px;color:var(--ink3);margin-top:10px;display:flex;justify-content:space-between"><span id="pd-foot-l"></span><span id="pd-foot-r"></span></div>
+  </section>
+
+  <!-- PARTIES -->
+  <section id="view-parties" class="view">
+    <div class="ph"><div><div class="ptitle">Parties</div></div></div>
+    <div class="card" style="margin-bottom:12px">
+      <div class="addform">
+        <div style="flex:1"><label class="flbl">Name</label><input class="inp" id="p-name" placeholder="Party name"></div>
+        <div style="width:140px"><label class="flbl">Type</label><select class="sel" id="p-type"><option>Customer</option><option>Supplier</option></select></div>
+        <button class="btn btn-p btn-sm" style="align-self:flex-end" onclick="addParty()">+ Add</button>
+      </div>
+    </div>
+    <div class="fbar">
+      <button class="pill active" id="pf-all" onclick="pFilter('all')">All</button>
+      <button class="pill" id="pf-c" onclick="pFilter('Customer')">Customers</button>
+      <button class="pill" id="pf-s" onclick="pFilter('Supplier')">Suppliers</button>
+    </div>
+    <div class="task-list" id="p-list" style="margin-top:10px"></div>
+  </section>
+
+</div><!-- /shell -->
+</main>
+</div><!-- /layout -->
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottomnav">
+  <button class="bn active" data-v="tasks" onclick="nav('tasks')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span>Tasks</span>
+  </button>
+  <button class="bn" data-v="orders" onclick="nav('orders')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+    <span>Orders</span>
+  </button>
+  <button class="bn" data-v="workstatus" onclick="nav('workstatus')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+    <span>Status</span>
+  </button>
+  <button class="bn" data-v="productdata" onclick="nav('productdata')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+    <span>Data</span>
+  </button>
+  <button class="bn" data-v="weight" onclick="nav('weight')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3a4 4 0 0 0-4 4h8a4 4 0 0 0-4-4z"/><path d="M6.5 7H17.5L19 21H5L6.5 7z"/></svg>
+    <span>Weight</span>
+  </button>
+  <button class="bn" data-v="sop" onclick="nav('sop')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    <span>SOP</span>
+  </button>
+  </nav>
+
+<!-- EDIT ORDER DRAWER -->
+<div class="drawer-backdrop" id="ed-backdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="edit-drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-head">
+    <span class="drawer-title" id="ed-title">Edit Order</span>
+    <button class="btn-del" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="fg2">
+      <div class="frow"><label class="flbl">Date</label><input type="date" class="inp" id="ed-date"></div>
+      <div class="frow"><label class="flbl">Order No</label><input class="inp" id="ed-no"></div>
+    </div>
+    <div class="frow"><label class="flbl">Customer *</label><input class="inp" id="ed-cust" list="custList"></div>
+    <div class="fg2">
+      <div class="frow"><label class="flbl">Product *</label>
+        <select class="sel" id="ed-prod" onchange="toggleH('ed')">
+          <option>Box</option><option>Pallet</option><option>Layer / Board</option><option>OE Layer</option><option>Corner Pad</option>
+        </select>
+      </div>
+      <div class="frow"><label class="flbl">Ply *</label><select class="sel" id="ed-ply"><option>2</option><option>3</option><option>5</option><option>7</option></select></div>
+    </div>
+    <div>
+      <label class="flbl" id="ed-size-lbl">Size L × W × H *</label>
+      <div class="fg3">
+        <input class="inp num" type="number" inputmode="decimal" id="ed-L" placeholder="L" min="0">
+        <input class="inp num" type="number" inputmode="decimal" id="ed-W" placeholder="W" min="0">
+        <input class="inp num" type="number" inputmode="decimal" id="ed-H" placeholder="H" min="0" style="display:none">
+      </div>
+    </div>
+    <div class="fg2">
+      <div class="frow"><label class="flbl">Unit</label><select class="sel" id="ed-su"><option value="in">Inches</option><option value="cm">CM</option></select></div>
+      <div class="frow"><label class="flbl">Qty *</label><input class="inp num" type="number" inputmode="decimal" id="ed-qty" min="0"></div>
+    </div>
+    <div class="fg2">
+      <div class="frow"><label class="flbl">Joint</label><select class="sel" id="ed-joint"><option value="double">Double</option><option value="single">Single</option></select></div>
+      <div class="frow"><label class="flbl">Dispatch Date *</label><input type="date" class="inp" id="ed-disp"></div>
+    </div>
+    <div class="frow"><label class="flbl">Status</label>
+      <select class="sel" id="ed-status">
+        <option>Pending</option><option>In Production</option><option>Partial Dispatch</option><option>Ready</option><option>Dispatched</option>
+      </select>
+    </div>
+    <div class="warn-txt" id="ed-warn" style="display:none">⚠ Dispatch date is before order date</div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn btn-g btn-full" onclick="deleteFromDrawer()" style="flex:0 0 auto;width:auto;padding:0 16px;color:var(--red);border-color:var(--red)">Delete</button>
+    <button class="btn btn-g btn-full" onclick="duplicateOrder()" style="flex:0 0 auto;width:auto;padding:0 16px;color:var(--blue);border-color:var(--blue)">Duplicate</button>
+    <button class="btn btn-p btn-full" onclick="saveDrawer()">Save changes</button>
+  </div>
+</div>
+
+<datalist id="custList"></datalist>
+
+<script>
+// ── SUPABASE ─────────────────────────────────────────────
+const SB_URL = 'https://cdkxvzzddrgdktktxyua.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNka3h2enpkZHJnZGt0a3R4eXVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzNjU2MTEsImV4cCI6MjA5OTk0MTYxMX0.hexTPfwsBKcIjBVYH9c1MgZkwgawyTgxQRs3jOTnlUM';
+const AUTH_EMAIL = 'team@beepee.com';
+let accessToken = null;
+
+// ── AUTH ─────────────────────────────────────────────────
+function getSession(){
+  try{const s=localStorage.getItem('sb_session');return s?JSON.parse(s):null;}catch(e){return null;}
+}
+function saveSession(s){localStorage.setItem('sb_session',JSON.stringify(s));}
+function clearSession(){localStorage.removeItem('sb_session');}
+
+async function sbAuth(action,body){
+  const r=await fetch(SB_URL+'/auth/v1/'+action,{method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  return r.json();
+}
+
+async function refreshSession(rt){
+  const d=await sbAuth('token?grant_type=refresh_token',{refresh_token:rt});
+  if(d.access_token){saveSession(d);accessToken=d.access_token;return true;}
+  clearSession();return false;
+}
+
+async function checkAuth(){
+  const s=getSession();
+  if(!s||!s.access_token){showLogin();return;}
+  const exp=s.expires_at||0;
+  if(Date.now()/1000>exp-60){
+    if(s.refresh_token&&await refreshSession(s.refresh_token)){hideLogin();init();return;}
+    showLogin();return;
+  }
+  accessToken=s.access_token;hideLogin();init();
+}
+
+async function doLogin(){
+  const pw=document.getElementById('loginPw').value.trim();
+  const err=document.getElementById('loginErr');
+  const btn=document.getElementById('loginBtn');
+  if(!pw){err.textContent='Enter the password';return;}
+  btn.disabled=true;btn.textContent='Logging in…';err.textContent='';
+  const d=await sbAuth('token?grant_type=password',{email:AUTH_EMAIL,password:pw});
+  if(d.access_token){saveSession(d);accessToken=d.access_token;hideLogin();init();}
+  else{err.textContent='Wrong password';btn.disabled=false;btn.textContent='Enter';}
+}
+
+function showLogin(){document.getElementById('loginScreen').style.display='flex';}
+function hideLogin(){document.getElementById('loginScreen').style.display='none';}
+
+async function sbFetch(path, method='GET', body=null){
+  const token=accessToken||SB_KEY;
+  const opts={method,headers:{'apikey':SB_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':''}};
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(SB_URL+'/rest/v1/'+path,opts);
+  if(r.status===401){clearSession();showLogin();return null;}
+  if(!r.ok){console.error('SB',await r.text());return null;}
+  // PATCH/DELETE return 204 with no body; only POST (return=representation) has JSON
+  if(method==='DELETE'||r.status===204) return true;
+  const text=await r.text();
+  return text?JSON.parse(text):true;
+}
+const db={
+  get:(t,q='')=>sbFetch(t+'?order=created_at.asc'+(q?'&'+q:'')),
+  insert:(t,row)=>sbFetch(t,'POST',row),
+  update:(t,id,row)=>sbFetch(t+'?id=eq.'+id,'PATCH',row),
+  delete:(t,id)=>sbFetch(t+'?id=eq.'+id,'DELETE'),
+};
+
+// ── CONSTANTS ────────────────────────────────────────────
+const PRODUCTS=['Box','Pallet','Layer / Board','OE Layer','Corner Pad'];
+const PLYS=['2','3','5','7'];
+const STATUSES=['Pending','In Production','Partial Dispatch','Ready','Dispatched'];
+const TSTATS=['Pending','In progress','Done'];
+const MEMBERS=['Mahesh','Kondal','Pravin'];
+const JOINTS=['double','single'];
+const SUNITS=['in','cm'];
+const PLY_LAYERS={
+  '3':[{l:'Top Paper',t:'liner'},{l:'Flute 1',t:'flute'},{l:'Base 1',t:'liner'}],
+  '5':[{l:'Top Paper',t:'liner'},{l:'Flute 1',t:'flute'},{l:'Base 1',t:'liner'},{l:'Flute 2',t:'flute'},{l:'Base 2',t:'liner'}],
+  '7':[{l:'Top Paper',t:'liner'},{l:'Flute 1',t:'flute'},{l:'Base 1',t:'liner'},{l:'Flute 2',t:'flute'},{l:'Base 2',t:'liner'},{l:'Flute 3',t:'flute'},{l:'Base 3',t:'liner'}]
+};
+const DEF_GSM={'Top Paper':150,'Flute 1':120,'Base 1':150,'Flute 2':120,'Base 2':150,'Flute 3':120,'Base 3':150};
+
+// ── STATE ────────────────────────────────────────────────
+let parties=[], orders=[], tasks=[];
+let pf='all', oSF='Pending', tSF='All', tMF='All', woF='Pending';
+let editId=null;
+let wReelEdited=false, wCutEdited=false, wTotalGsmEdited=false;
+
+// ── HELPERS ──────────────────────────────────────────────
+const fmt=n=>(n||0).toLocaleString('en-IN');
+const ddmm=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const today=()=>new Date().toISOString().slice(0,10);
+const TODAY=today();
+
+function skCls(s){return s==='Pending'?'pn':s==='In Production'?'ip':s==='Partial Dispatch'?'pd':s==='Ready'?'rd':'ds';}
+function badge(s){return '<span class="bdg '+skCls(s)+'">'+esc(s)+'</span>';}
+
+function dispMeta(disp,status){
+  if(status==='Dispatched') return {label:'Dispatched',cls:'done'};
+  if(!disp) return {label:'No date set',cls:'ok'};
+  if(disp<TODAY) return {label:'Overdue',cls:'overdue'};
+  if(disp===TODAY) return {label:'Due today',cls:'today'};
+  const d=Math.round((new Date(disp)-new Date(TODAY))/864e5);
+  return {label:d+'d away',cls:d<=3?'today':'ok'};
+}
+function boardSizes(ord){
+  const f=(ord.su||'in')==='cm'?1/2.54:1;
+  const L=(ord.l||0)*f,W=(ord.w||0)*f,H=(ord.h||0)*f;
+  return {reel:(W+H+1).toFixed(2),cut:((ord.joint||'double')==='double'?(L+W+2):(L*2+W*2+2)).toFixed(2)};
+}
+function updateCustList(){
+  // Suggest every known customer — from the parties list AND any name seen in orders (case-insensitive, deduped)
+  const names=new Map();
+  parties.filter(p=>p.type==='Customer').forEach(p=>{if(p.name){const k=p.name.toLowerCase();if(!names.has(k))names.set(k,p.name);}});
+  orders.forEach(o=>{if(o.cust){const k=o.cust.toLowerCase();if(!names.has(k))names.set(k,o.cust);}});
+  const list=[...names.values()].sort((a,b)=>a.localeCompare(b));
+  document.getElementById('custList').innerHTML=list.map(n=>'<option value="'+esc(n)+'">').join('');
+}
+function setVal(id,v){const el=document.getElementById(id);if(el)el.value=v||'';}
+function getVal(id){return(document.getElementById(id)?.value||'').trim();}
+
+// ── ORDERS ───────────────────────────────────────────────
+function showNewOrderForm(){
+  document.getElementById('new-order-form').style.display='block';
+  document.getElementById('no-date').value=today();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function hideNewOrderForm(){document.getElementById('new-order-form').style.display='none';}
+
+async function saveNewOrder(){
+  const cust=getVal('no-cust'), prod=getVal('no-prod'), ply=getVal('no-ply');
+  const L=parseFloat(getVal('no-L'))||0, W=parseFloat(getVal('no-W'))||0;
+  const H=parseFloat(getVal('no-H'))||0, qty=parseFloat(getVal('no-qty'))||0;
+  const disp=getVal('no-disp'), date=getVal('no-date');
+
+  // Validate
+  const errs=[];
+  if(!cust) errs.push('no-cust');
+  if(!prod) errs.push('no-prod');
+  if(!ply)  errs.push('no-ply');
+  if(!L)    errs.push('no-L');
+  if(!W)    errs.push('no-W');
+  if(prod==='Box'&&!H) errs.push('no-H');
+  if(!qty)  errs.push('no-qty');
+  if(!disp) errs.push('no-disp');
+
+  document.querySelectorAll('.inp.err,.sel.err').forEach(el=>el.classList.remove('err'));
+  errs.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('err');});
+  if(errs.length) return;
+
+  // Date warning — block save so the message is seen and the date can be corrected
+  const warnEl=document.getElementById('no-warn');
+  if(disp&&date&&disp<date){warnEl.style.display='block';return;}
+  warnEl.style.display='none';
+
+  // Auto-create customer if new
+  if(!parties.find(p=>p.name.toLowerCase()===cust.toLowerCase())){
+    const res=await db.insert('parties',{name:cust,type:'Customer'});
+    if(res) parties.push(res[0]);
+    renderParties();
+  }
+
+  const row={date,no:getVal('no-no'),cust,prod,ply,l:L,w:W,h:H,su:getVal('no-su'),qty,joint:getVal('no-joint'),disp,status:getVal('no-status')};
+  const res=await db.insert('orders',row);
+  if(res){
+    orders.unshift(res[0]);
+    hideNewOrderForm();
+    // Reset form
+    ['no-no','no-cust','no-L','no-W','no-H','no-qty','no-disp'].forEach(id=>setVal(id,''));
+    document.getElementById('no-prod').value='';
+    document.getElementById('no-ply').value='';
+    document.getElementById('no-status').value='Pending';
+    renderOrders();
+  }
+}
+
+function renderOrders(){
+  const q=(document.getElementById('ol-search')?.value||'').toLowerCase().trim();
+  let list=orders.filter(x=>x.status===oSF);
+  if(q) list=list.filter(x=>(x.cust||'').toLowerCase().includes(q)||(x.no||'').toLowerCase().includes(q)||(String(x.l||0)+'×'+String(x.w||0)+(x.prod==='Box'?'×'+String(x.h||0):'')).includes(q));
+
+  // Most recently moved (status updated) first — same rule for every pill
+  const mv=o=>o.updated_at||o.created_at||'';
+  list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
+
+  const counts={All:orders.length};
+  STATUSES.forEach(s=>counts[s]=orders.filter(x=>x.status===s).length);
+  document.getElementById('ol-filters').innerHTML=
+    STATUSES.map(s=>{const pc=' pill-'+skCls(s);return '<button class="pill'+pc+(oSF===s?' active':'')+'" onclick="olFilter(\''+s+'\')">'+s+' <span class="pill-count">'+counts[s]+'</span></button>';}).join('');
+
+  if(!list.length){
+    const msg=q?'No orders match your search.':orders.length?'No '+oSF+' orders.':'No orders yet. Tap + New to add one.';
+    document.getElementById('ol-cards').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+'</div>';
+    return;
+  }
+
+  document.getElementById('ol-cards').innerHTML=list.map(ord=>{
+    const dm=dispMeta(ord.disp,ord.status);
+    const sk=skCls(ord.status);
+    return '<div class="ocard '+sk+'" onclick="openDrawer('+ord.id+')">'
+      +'<div class="ostripe '+sk+'"></div>'
+      +'<div class="obody">'
+        +'<div class="orow1">'
+          +'<div style="display:flex;align-items:center"><span class="ocust">'+esc(ord.cust||'—')+'</span><span class="ono">'+esc(ord.no)+'</span></div>'
+          +badge(ord.status)
+        +'</div>'
+        +'<div class="orow2">'
+          +'<span class="wo-detail">'+esc(ord.ply)+'PLY <span>-</span> '+esc(ord.prod)+' <span>-</span> '
+          +esc(String(ord.l||0))+'×'+esc(String(ord.w||0))+(ord.prod==='Box'?'×'+esc(String(ord.h||0)):'')+' '+(ord.su||'in')+' <span>-</span> '
+          +fmt(ord.qty)+' nos.</span>'
+          +'<span class="odisp '+dm.cls+'">'+(ord.disp?ddmm(ord.disp):'No date')+' - '+dm.label+'</span>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+function olFilter(s){oSF=s;renderOrders();}
+
+// ── DRAWER ───────────────────────────────────────────────
+function toggleH(prefix){
+  const prod=getVal(prefix+'-prod');
+  const isBox=prod==='Box';
+  if(prefix==='no'){
+    document.getElementById('no-H-wrap').style.display=isBox?'':'none';
+    if(!isBox) setVal('no-H','');
+  } else {
+    document.getElementById('ed-H').style.display=isBox?'':'none';
+    document.getElementById('ed-size-lbl').textContent=isBox?'Size L × W × H *':'Size L × W *';
+    if(!isBox) setVal('ed-H','0');
+  }
+}
+function openDrawer(id){
+  const ord=orders.find(o=>o.id===id);
+  if(!ord) return;
+  editId=id;
+  document.getElementById('ed-title').textContent='Edit · '+(ord.no||ord.cust||'Order');
+  setVal('ed-date',ord.date); setVal('ed-no',ord.no); setVal('ed-cust',ord.cust);
+  setVal('ed-prod',ord.prod); setVal('ed-ply',ord.ply);
+  setVal('ed-L',ord.l); setVal('ed-W',ord.w); setVal('ed-H',ord.h||0);
+  toggleH('ed');
+  setVal('ed-su',ord.su||'in'); setVal('ed-qty',ord.qty);
+  setVal('ed-joint',ord.joint||'double'); setVal('ed-disp',ord.disp);
+  setVal('ed-status',ord.status);
+  document.getElementById('ed-warn').style.display='none';
+  document.querySelectorAll('#edit-drawer .inp.err,#edit-drawer .sel.err').forEach(el=>el.classList.remove('err'));
+  document.getElementById('ed-backdrop').classList.add('open');
+  document.getElementById('edit-drawer').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDrawer(){
+  document.getElementById('ed-backdrop').classList.remove('open');
+  document.getElementById('edit-drawer').classList.remove('open');
+  document.body.style.overflow='';
+  editId=null;
+}
+async function saveDrawer(){
+  if(!editId) return;
+  const row={
+    date:getVal('ed-date'),no:getVal('ed-no'),cust:getVal('ed-cust'),
+    prod:getVal('ed-prod'),ply:getVal('ed-ply'),
+    l:parseFloat(getVal('ed-L'))||0,w:parseFloat(getVal('ed-W'))||0,h:parseFloat(getVal('ed-H'))||0,
+    su:getVal('ed-su'),qty:parseFloat(getVal('ed-qty'))||0,
+    joint:getVal('ed-joint'),disp:getVal('ed-disp'),status:getVal('ed-status')
+  };
+  // Required-field validation (mirrors the New Order form)
+  const errs=[];
+  if(!row.cust) errs.push('ed-cust');
+  if(!row.l)    errs.push('ed-L');
+  if(!row.w)    errs.push('ed-W');
+  if(row.prod==='Box'&&!row.h) errs.push('ed-H');
+  if(!row.qty)  errs.push('ed-qty');
+  if(!row.disp) errs.push('ed-disp');
+  document.querySelectorAll('#edit-drawer .inp.err,#edit-drawer .sel.err').forEach(el=>el.classList.remove('err'));
+  errs.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('err');});
+  if(errs.length) return;
+  const warnEl=document.getElementById('ed-warn');
+  if(row.disp&&row.date&&row.disp<row.date){warnEl.style.display='block';return;}
+  warnEl.style.display='none';
+  const x=orders.find(o=>o.id===editId);
+  if(x && row.status!==x.status) row.updated_at=new Date().toISOString();
+  if(x) Object.assign(x,row);
+  await db.update('orders',editId,row);
+  closeDrawer();
+  renderOrders(); renderWorkStatus(); renderProductData();
+}
+async function deleteFromDrawer(){
+  if(!editId||!confirm('Delete this order?')) return;
+  await db.delete('orders',editId);
+  orders=orders.filter(o=>o.id!==editId);
+  closeDrawer();
+  renderOrders(); renderWorkStatus(); renderProductData();
+}
+async function duplicateOrder(){
+  if(!editId) return;
+  const src=orders.find(o=>o.id===editId);
+  if(!src) return;
+  const row={date:today(),no:'',cust:src.cust,prod:src.prod,ply:src.ply,l:src.l,w:src.w,h:src.h,su:src.su||'in',qty:src.qty,joint:src.joint||'double',disp:'',status:'Pending'};
+  const res=await db.insert('orders',row);
+  if(res){orders.unshift(res[0]);closeDrawer();renderOrders();renderWorkStatus();renderProductData();}
+}
+
+// ── WORK STATUS ──────────────────────────────────────────
+function renderWorkStatus(){
+  let list=orders.filter(x=>x.status===woF);
+  // Most recently moved (status updated) first — same rule for every pill
+  const mv=o=>o.updated_at||o.created_at||'';
+  list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
+  const counts={};STATUSES.forEach(s=>counts[s]=orders.filter(x=>x.status===s).length);
+  document.getElementById('wo-filters').innerHTML=
+    STATUSES.map(s=>{const pc=' pill-'+skCls(s);return '<button class="pill'+pc+(woF===s?' active':'')+'" onclick="woFilter(\''+s+'\')">'+s+' <span class="pill-count">'+counts[s]+'</span></button>';}).join('');
+  if(!list.length){document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc('No '+woF+' orders.')+'</div>';return;}
+  document.getElementById('wo-list').innerHTML=list.map(ord=>{
+    const dm=dispMeta(ord.disp,ord.status);
+    return '<div class="wo-card '+skCls(ord.status)+'">'
+      +'<div class="wo-stripe '+skCls(ord.status)+'"></div>'
+      +'<div class="wo-body">'
+        +'<div class="wo-row1">'
+          +'<div style="display:flex;align-items:center"><span class="wo-cust">'+esc(ord.cust||'—')+'</span><span class="wo-no">'+esc(ord.no)+'</span></div>'
+          +'<select class="wo-sel" onchange="woStatusChange('+ord.id+',this.value)">'+STATUSES.map(s=>'<option'+(s===ord.status?' selected':'')+'>'+s+'</option>').join('')+'</select>'
+        +'</div>'
+        +'<div class="wo-row2">'
+          +'<span class="wo-detail">'+esc(ord.ply)+'PLY <span>-</span> '+esc(ord.prod)+' <span>-</span> '
+          +esc(String(ord.l||0))+'×'+esc(String(ord.w||0))+(ord.prod==='Box'?'×'+esc(String(ord.h||0)):'')+' '+(ord.su||'in')+' <span>-</span> '
+          +fmt(ord.qty)+' nos.</span>'
+          +'<span class="wo-disp '+dm.cls+'">'+(ord.disp?ddmm(ord.disp):'No date')+' - '+dm.label+'</span>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+function woFilter(f){woF=f;renderWorkStatus();}
+async function woStatusChange(id,s){
+  const x=orders.find(o=>o.id===id);
+  if(x){const ts=new Date().toISOString();x.status=s;x.updated_at=ts;await db.update('orders',id,{status:s,updated_at:ts});renderOrders();renderWorkStatus();}
+}
+
+// ── TASKS ────────────────────────────────────────────────
+function renderTasks(){
+  let list=tSF==='All'?[...tasks]:tasks.filter(t=>t.status===tSF);
+  if(tMF!=='All') list=list.filter(t=>t.assigned===tMF);
+  const counts={All:tasks.length};TSTATS.forEach(s=>counts[s]=tasks.filter(t=>t.status===s).length);
+  document.getElementById('t-filters').innerHTML=
+    ['All',...TSTATS].map(s=>{
+      const clsMap={'Pending':'','In progress':' pill-ip','Done':' pill-rd'};
+      const cls=s==='All'?'':clsMap[s]||'';
+      return '<button class="pill'+cls+(tSF===s?' active':'')+'" onclick="tFilter(\''+s+'\')">'+s+' <span class="pill-count">'+(counts[s]||0)+'</span></button>';
+    }).join('');
+  const mCounts={All:tasks.length};MEMBERS.forEach(m=>mCounts[m]=tasks.filter(t=>t.assigned===m).length);
+  document.getElementById('t-member-filters').innerHTML='<span class="mbar-label">By</span>'+
+    ['All',...MEMBERS].map(m=>{
+      const ini=m==='All'?'':'<span class="mchip-avatar">'+m.charAt(0)+'</span>';
+      return '<button class="mchip'+(tMF===m?' active':'')+'" onclick="tMFilter(\''+m+'\')">'+ini+esc(m)+(m!=='All'?' <span class="pill-count">'+mCounts[m]+'</span>':'')+'</button>';
+    }).join('');
+  if(!list.length){document.getElementById('t-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No tasks found.</div>';return;}
+  document.getElementById('t-list').innerHTML=list.map(t=>{
+    const clsName=(t.status||'Pending').replace(/ /g,'-');
+    return '<div class="tcard '+clsName+'">'
+      +'<div class="tdot '+clsName+'"></div>'
+      +'<div style="flex:1;min-width:0;cursor:pointer" onclick="editTaskName('+t.id+')">'
+        +'<div class="tname">'+esc(t.task||'—')+'</div>'
+        +'<div class="tmeta">'+esc(t.assigned||'—')+' · '+esc(t.date||'')+'</div>'
+      +'</div>'
+      +'<select class="tstatus-sel" onchange="uT('+t.id+',\'status\',this.value)">'
+        +TSTATS.map(s=>'<option'+(s===t.status?' selected':'')+'>'+s+'</option>').join('')
+      +'</select>'
+      +'<button class="btn-del-task" onclick="confirmDelTask('+t.id+')" aria-label="Delete task">🗑</button>'
+    +'</div>';
+  }).join('');
+}
+function confirmDelTask(id){
+  const t=tasks.find(x=>x.id===id);
+  if(!t) return;
+  const name=t.task||'this task';
+  if(confirm('Delete this task?  "'+name+'"  This action cannot be undone.')){
+    delT(id);
+  }
+}
+function addTask(){
+  if(document.getElementById('t-new-row')) return;
+  const row=document.createElement('div');
+  row.className='tcard Pending';row.id='t-new-row';
+  row.innerHTML='<div class="tdot Pending"></div>'
+    +'<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">'
+      +'<input class="inp" id="t-new-name" placeholder="Task name" style="height:32px;font-size:13px">'
+      +'<select class="tstatus-sel" id="t-new-assign" style="height:28px;font-size:12px;width:100%"><option value="">Unassigned</option>'+MEMBERS.map(m=>'<option>'+m+'</option>').join('')+'</select>'
+    +'</div>'
+    +'<button class="btn btn-p btn-sm" onclick="saveNewTask()">Add</button>'
+    +'<button class="btn-del-task" onclick="cancelNewTask()">✕</button>';
+  document.getElementById('t-list').prepend(row);
+  document.getElementById('t-new-name').focus();
+}
+async function saveNewTask(){
+  const name=(document.getElementById('t-new-name').value||'').trim();
+  const assigned=(document.getElementById('t-new-assign').value||'').trim();
+  if(!name){document.getElementById('t-new-name').focus();return;}
+  const row={date:today(),task:name,assigned:assigned,status:'Pending'};
+  const res=await db.insert('tasks',row);
+  if(res){tasks.unshift(res[0]);renderTasks();}
+}
+function cancelNewTask(){const r=document.getElementById('t-new-row');if(r)r.remove();}
+async function uT(id,f,v){const x=tasks.find(t=>t.id===id);if(x){x[f]=v;await db.update('tasks',id,{[f]:v});renderTasks();}}
+async function delT(id){await db.delete('tasks',id);tasks=tasks.filter(t=>t.id!==id);renderTasks();}
+function tFilter(s){tSF=s;renderTasks();}
+function tMFilter(m){tMF=m;renderTasks();}
+function editTaskName(id){
+  const t=tasks.find(x=>x.id===id);if(!t)return;
+  const v=prompt('Edit task name:',t.task||'');
+  if(v!==null&&v.trim())uT(id,'task',v.trim());
+}
+
+// ── WEIGHT ───────────────────────────────────────────────
+function wPlyChange(){
+  wTotalGsmEdited=false;
+  const ply=document.getElementById('w-ply').value;
+  document.getElementById('w-gsm-fields').innerHTML=PLY_LAYERS[ply].map((l,i)=>
+    '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">'
+    +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<div style="width:7px;height:7px;border-radius:50%;background:'+(l.t==='flute'?'var(--amber)':'var(--ink)')+'"></div>'
+      +'<span style="font-size:12px;color:'+(l.t==='flute'?'var(--amber)':'var(--ink2)')+'">'+l.l+'</span>'
+      +(l.t==='flute'?'<span style="font-size:10px;color:var(--amber);font-family:Manrope,sans-serif">×1.45</span>':'')
+    +'</div>'
+    +'<input class="inp num" type="number" inputmode="decimal" id="wg'+i+'" value="'+(DEF_GSM[l.l]||120)+'" min="0" oninput="wTotalGsmEdited=false;wCalcFromBoard()" style="width:75px;text-align:right;height:32px">'
+    +'</div>'
+  ).join('');
+  wCalc();
+}
+function wCalc(){
+  const unit=document.getElementById('w-unit').value;
+  const joint=document.getElementById('w-joint').value;
+  const f=unit==='cm'?1/2.54:1;
+  const L=(parseFloat(document.getElementById('w-L').value)||0)*f;
+  const W=(parseFloat(document.getElementById('w-W').value)||0)*f;
+  const H=(parseFloat(document.getElementById('w-H').value)||0)*f;
+  const reel=W+H+1, cut=joint==='double'?(L+W+2):(L*2+W*2+2);
+  if(!wReelEdited){const el=document.getElementById('w-reel');if(el)el.value=reel.toFixed(2);}
+  if(!wCutEdited){const el=document.getElementById('w-cut');if(el)el.value=cut.toFixed(2);}
+  document.getElementById('w-unit-lbl').textContent=unit==='in'?'inches':'cm → inches';
+  document.getElementById('w-reel-hint').textContent=wReelEdited?'Formula: '+reel.toFixed(2)+' in':'';
+  document.getElementById('w-cut-hint').textContent=wCutEdited?'Formula: '+cut.toFixed(2)+' in':'';
+  document.getElementById('w-cut-lbl').textContent=joint==='double'?'Cut Size (L+W+2)':'Cut Size (L×2+W×2+2)';
+  document.getElementById('w-board-reset').style.display=(wReelEdited||wCutEdited)?'inline-flex':'none';
+  wCalcFromBoard();
+}
+function wBoardReset(){wReelEdited=false;wCutEdited=false;document.getElementById('w-board-reset').style.display='none';wCalc();}
+function wCalcFromBoard(){
+  const ply=document.getElementById('w-ply').value;
+  const joint=document.getElementById('w-joint').value;
+  const reel=parseFloat(document.getElementById('w-reel')?.value)||0;
+  const cut=parseFloat(document.getElementById('w-cut')?.value)||0;
+  let gsm=0;
+  PLY_LAYERS[ply].forEach((l,i)=>{const v=parseFloat(document.getElementById('wg'+i)?.value)||0;gsm+=l.t==='flute'?v*1.45:v;});
+  const gsmEl=document.getElementById('w-total-gsm');
+  if(gsmEl&&!wTotalGsmEdited) gsmEl.value=Math.round(gsm);
+  const g=gsmEl?parseFloat(gsmEl.value)||0:gsm;
+  const sheets=joint==='double'?2:1;
+  const wt=(reel*cut/1550)*g*sheets/1000;
+  const res=document.getElementById('w-result');
+  if(res) res.textContent=wt>0?wt.toFixed(3):'—';
+  const fm=document.getElementById('w-formula');
+  if(fm) fm.textContent=reel.toFixed(2)+'″ × '+cut.toFixed(2)+'″ = '+(reel*cut/1550).toFixed(4)+' m² × '+Math.round(g)+' GSM × '+sheets+' = '+wt.toFixed(3)+' kg';
+}
+
+// ── PRODUCT DATA ─────────────────────────────────────────
+function renderProductData(){
+  const eligible=orders.filter(o=>o.status==='Dispatched'||o.status==='Partial Dispatch');
+  const custSel=document.getElementById('pdf-cust');
+  const reelSel=document.getElementById('pdf-reel');
+  const prevC=custSel.value, prevR=reelSel.value.replace('″','');
+  const custs=[...new Set(eligible.map(o=>o.cust).filter(Boolean))].sort();
+  const reels=[...new Set(eligible.map(o=>boardSizes(o).reel))].sort((a,b)=>+a-+b);
+  custSel.innerHTML='<option value="">All customers</option>'+custs.map(c=>'<option'+(c===prevC?' selected':'')+'>'+c+'</option>').join('');
+  reelSel.innerHTML='<option value="">All sizes</option>'+reels.map(r=>'<option'+(r===prevR?' selected':'')+'>'+r+'″</option>').join('');
+  let list=eligible;
+  if(custSel.value) list=list.filter(o=>o.cust===custSel.value);
+  if(reelSel.value) list=list.filter(o=>boardSizes(o).reel===reelSel.value.replace('″',''));
+  document.getElementById('pd-note').textContent=(custSel.value||reelSel.value)?list.length+' filtered result'+(list.length!==1?'s':''):'';
+  document.getElementById('pd-foot-l').textContent=list.length+' of '+eligible.length;
+  document.getElementById('pd-foot-r').textContent=list.length?'Total qty · '+fmt(list.reduce((s,o)=>s+o.qty,0))+' pcs':'';
+  if(!list.length){document.getElementById('pd-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No matching entries</div>';return;}
+  const mob=window.innerWidth<=720;
+  if(mob){
+    document.getElementById('pd-list').innerHTML='<div style="display:flex;flex-direction:column;gap:5px">'+list.map(ord=>{
+      const {reel,cut}=boardSizes(ord);
+      return '<div class="pd-m-card">'
+        +'<div class="pd-m-row"><span style="font-size:13px;font-weight:600">'+esc(ord.cust||'—')+'</span>'+badge(ord.status)+'</div>'
+        +'<div class="pd-m-detail">'+esc(ord.ply)+'PLY <span>·</span> '+esc(ord.prod)+'</div>'
+        +'<div class="pd-m-nums"><span>Reel <b>'+reel+'″</b></span><span>Cut <b>'+cut+'″</b></span><span>Qty <b>'+fmt(ord.qty)+' nos.</b></span></div>'
+      +'</div>';
+    }).join('')+'</div>';
+  } else {
+    document.getElementById('pd-list').innerHTML='<div class="ovx"><table class="t"><thead><tr><th>Customer</th><th>Product</th><th>Ply</th><th class="r">Reel</th><th class="r">Cut</th><th class="r">Qty</th><th>Status</th></tr></thead><tbody>'
+      +list.map(ord=>{
+        const {reel,cut}=boardSizes(ord);
+        return '<tr>'
+          +'<td style="font-weight:500">'+esc(ord.cust||'—')+'</td>'
+          +'<td>'+esc(ord.prod)+'</td>'
+          +'<td class="num">'+esc(ord.ply)+'</td>'
+          +'<td class="num r">'+reel+'″</td>'
+          +'<td class="num r">'+cut+'″</td>'
+          +'<td class="num r">'+fmt(ord.qty)+'</td>'
+          +'<td>'+badge(ord.status)+'</td>'
+        +'</tr>';
+      }).join('')
+      +'</tbody></table></div>';
+  }
+}
+function pdClear(){document.getElementById('pdf-cust').value='';document.getElementById('pdf-reel').value='';renderProductData();}
+
+// ── PARTIES ──────────────────────────────────────────────
+function renderParties(){
+  const list=pf==='all'?parties:parties.filter(p=>p.type===pf);
+  document.getElementById('p-list').innerHTML=list.map(p=>'<div class="tcard">'
+    +'<div style="flex:1;font-size:13px;font-weight:500">'+esc(p.name)+'</div>'
+    +'<span class="bdg '+(p.type==='Customer'?'rd':'ip')+'">'+esc(p.type)+'</span>'
+    +'<button class="btn-del" onclick="delP('+p.id+')">✕</button>'
+  +'</div>').join('');
+  document.getElementById('pf-all').classList.toggle('active',pf==='all');
+  document.getElementById('pf-c').classList.toggle('active',pf==='Customer');
+  document.getElementById('pf-s').classList.toggle('active',pf==='Supplier');
+  updateCustList();
+}
+async function addParty(){
+  const name=document.getElementById('p-name').value.trim();
+  const type=document.getElementById('p-type').value;
+  if(!name) return;
+  if(parties.find(p=>p.name.toLowerCase()===name.toLowerCase())){alert('Already exists.');return;}
+  const res=await db.insert('parties',{name,type});
+  if(res) parties.push(res[0]);
+  document.getElementById('p-name').value='';
+  renderParties();
+}
+async function delP(id){
+  if(!confirm('Delete?')) return;
+  await db.delete('parties',id);
+  parties=parties.filter(p=>p.id!==id);
+  renderParties();
+}
+function pFilter(f){pf=f;renderParties();}
+
+// ── NAV ──────────────────────────────────────────────────
+function nav(v){
+  document.querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
+  document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='view-'+v));
+  if(v==='workstatus') renderWorkStatus();
+  if(v==='productdata') renderProductData();
+}
+
+// ── INIT ─────────────────────────────────────────────────
+async function init(){
+  document.getElementById('ol-cards').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Loading…</div>';
+  const [p,o,t]=await Promise.all([db.get('parties'),db.get('orders'),db.get('tasks')]);
+  // orders & tasks show newest-first (matches unshift on add); parties stay oldest-first (append on add)
+  parties=p||[]; orders=(o||[]).reverse(); tasks=(t||[]).reverse();
+  renderOrders(); renderTasks(); renderParties(); wPlyChange();
+}
+checkAuth();
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkAuth();});
+</script>
+</body>
+</html>
