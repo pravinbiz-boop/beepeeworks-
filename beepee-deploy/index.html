@@ -88,6 +88,24 @@ body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-appl
   .pd-m-detail span{color:var(--ink3);font-weight:400}
   .pd-m-nums{display:flex;gap:12px;margin-top:5px;font-size:11px;color:var(--ink3)}
   .pd-m-nums b{color:var(--ink);font-weight:600}
+
+  /* ── iOS: prevent auto-zoom on input focus (font-size must be ≥ 16px) ── */
+  .inp,.sel{font-size:16px;height:44px}
+  .login-input{font-size:16px}
+  .wo-sel{font-size:16px;height:38px}
+  .tstatus-sel{font-size:16px;height:38px}
+  /* ── Form grids on mobile (aligns with 720px nav breakpoint) ── */
+  .fg2{grid-template-columns:1fr}
+  .fg3{grid-template-columns:1fr 1fr}
+  /* ── Drawer: tighten padding, stack footer buttons ── */
+  .drawer-body{padding:14px}
+  .drawer-foot{flex-direction:column;gap:8px}
+  .drawer-foot .btn{width:100%;justify-content:center}
+  /* ── Data table: compact cells on narrow screens ── */
+  .pd-tbl th{padding:6px 8px;font-size:9.5px}
+  .pd-tbl td{padding:7px 8px;font-size:11.5px}
+  /* ── Weight page: stack board size inputs ── */
+  .w-board-row{flex-direction:column;gap:8px}
 }
 
 /* ── SHELL ── */
@@ -183,6 +201,25 @@ table.t{width:100%;border-collapse:collapse}
 .odisp.ok{color:var(--ink3)}
 .odisp.done{color:var(--muted)}
 
+/* ── ORDER CARD v2 (Option C) ── */
+.ocard{background:var(--surface)}
+.ocard.ip,.ocard.pd,.ocard.rd,.ocard.ds{background:var(--surface);border-color:var(--line)}
+.obody-c{flex:1;padding:9px 11px;min-width:0;display:flex;flex-direction:column;gap:5px}
+.orow-c1{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.orow-c2{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.orow-c3{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.c-chip{font-size:11.5px;font-weight:700;border-radius:6px;padding:3px 9px;white-space:nowrap;line-height:1.4}
+.c-chip-ply{background:var(--amber-bg);color:var(--amber)}
+.c-chip-prod{background:var(--accent-bg);color:var(--accent2)}
+.c-chip-size{background:var(--s2);color:var(--ink2);border:var(--bw) solid var(--line2);font-weight:600}
+.c-disp{font-size:11px;font-weight:700;border-radius:6px;padding:3px 9px;white-space:nowrap;flex-shrink:0;line-height:1.4}
+.c-disp.overdue{background:var(--red-bg);color:var(--red)}
+.c-disp.today{background:var(--amber-bg);color:var(--amber)}
+.c-disp.ok{background:var(--green-bg);color:var(--green)}
+.c-disp.done{background:var(--s2);color:var(--muted)}
+.c-disp.nodate{background:var(--s2);color:var(--muted)}
+.c-qty{font-size:12.5px;font-weight:700;color:var(--ink)}
+
 /* ── FILTER BAR ── */
 .fbar{display:flex;gap:6px;padding:8px 0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .fbar::-webkit-scrollbar{display:none}
@@ -190,11 +227,7 @@ table.t{width:100%;border-collapse:collapse}
 /* ── WORK STATUS CARDS ── */
 .wo-list{display:flex;flex-direction:column;gap:6px}
 .wo-card{background:var(--surface);border-radius:var(--r2);display:flex;overflow:hidden;border:var(--bw) solid var(--line);transition:box-shadow .15s}
-.wo-card.pn{background:var(--surface)}
-.wo-card.ip{background:var(--amber-bg);border-color:rgba(180,83,9,.1)}
-.wo-card.pd{background:var(--blue-bg);border-color:rgba(29,78,216,.08)}
-.wo-card.rd{background:var(--green-bg);border-color:rgba(21,128,61,.08)}
-.wo-card.ds{background:var(--s2);border-color:var(--line)}
+.wo-card.pn,.wo-card.ip,.wo-card.pd,.wo-card.rd,.wo-card.ds{background:var(--surface);border-color:var(--line)}
 .wo-stripe{width:3px;flex-shrink:0}
 .wo-stripe.pn{background:var(--muted)}.wo-stripe.ip{background:var(--amber)}
 .wo-stripe.pd{background:var(--blue)}.wo-stripe.rd{background:var(--green)}
@@ -296,9 +329,27 @@ table.t{width:100%;border-collapse:collapse}
 .drawer-body{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
 .drawer-foot{padding:14px 20px;border-top:var(--bw) solid var(--line);display:flex;gap:10px;flex-shrink:0;background:var(--surface)}
 
-/* ── PRODUCT DATA ── */
-.pdcard{background:var(--surface);border-radius:var(--r2);padding:12px 14px;display:flex;flex-direction:column;gap:6px;border:var(--bw) solid var(--line)}
-.pd-list{display:flex;flex-direction:column;gap:8px}
+/* ── DATA TABLE ── */
+.pd-list{margin-top:0}
+.pd-tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r2)}
+.pd-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.pd-tbl thead tr{background:var(--s2);border-bottom:var(--bw) solid var(--line)}
+.pd-tbl th{padding:7px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--ink3);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.pd-tbl th.r{text-align:right}
+.pd-tbl tbody tr{border-bottom:0.5px solid var(--line)}
+.pd-tbl tbody tr:last-child{border-bottom:none}
+.pd-tbl tbody tr:hover{background:var(--s2)}
+.pd-tbl td{padding:8px 10px;color:var(--ink);white-space:nowrap;vertical-align:middle}
+.pd-tbl td.muted{color:var(--ink3);font-size:11.5px}
+.pd-tbl td.r{text-align:right;font-weight:600}
+.pd-date{font-size:11.5px;font-weight:600;color:var(--ink2)}
+.pd-summary{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:11px}
+.pd-summary-qty{font-size:12px;font-weight:700;color:var(--accent)}
+.pd-pagination{display:flex;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap;gap:6px}
+.pd-pg-btns{display:flex;gap:4px;flex-wrap:wrap}
+.pd-pg-btn{height:26px;padding:0 10px;border-radius:6px;border:var(--bw) solid var(--line);background:var(--surface);color:var(--ink3);font-size:11px;font-weight:600;cursor:pointer;font-family:'Manrope',sans-serif;transition:all .15s}
+.pd-pg-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.pd-pg-btn:disabled{opacity:.35;cursor:default}
 
 /* ── WARN ── */
 .warn-txt{font-size:10.5px;color:var(--amber);font-family:'Manrope',sans-serif;margin-top:4px}
@@ -315,8 +366,8 @@ table.t{width:100%;border-collapse:collapse}
   .pill{height:36px;padding:0 14px;font-size:12px}
   .btn{height:42px;padding:0 18px;font-size:13.5px}
   .btn-sm{height:36px;padding:0 14px}
-  .tstatus-sel{height:36px;font-size:12px}
-  .wo-sel{height:32px;font-size:12px}
+  .tstatus-sel{height:38px;font-size:16px}
+  .wo-sel{height:38px;font-size:16px}
   .btn-del-task{height:38px;width:38px}
   .mchip{height:34px;padding:0 12px 0 5px}
   .btn-del{height:32px;width:32px;font-size:16px}
@@ -386,52 +437,50 @@ table.t{width:100%;border-collapse:collapse}
       <button class="btn btn-p" onclick="showNewOrderForm()">+ New</button>
     </div>
 
-    <!-- New order input table (hidden by default) -->
+    <!-- New order form (hidden by default) -->
     <div id="new-order-form" class="card" style="display:none;margin-bottom:14px">
+      <input type="hidden" id="no-date">
       <div class="ch"><span class="ctitle">New Order</span><button class="btn-del" onclick="hideNewOrderForm()">✕</button></div>
-      <div class="cb">
-        <div class="fg2" style="margin-bottom:10px">
-          <div class="frow"><label class="flbl">Date</label><input type="date" class="inp" id="no-date"></div>
-          <div class="frow"><label class="flbl">Order No</label><input class="inp" id="no-no"></div>
-        </div>
-        <div class="frow" style="margin-bottom:10px">
+      <div class="cb" style="padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+        <div class="frow">
           <label class="flbl">Customer *</label>
           <input class="inp" id="no-cust" list="custList" placeholder="Type customer name">
         </div>
-        <div class="fg2" style="margin-bottom:10px">
+        <div class="frow">
+          <label class="flbl">Order No</label>
+          <input class="inp" id="no-no">
+        </div>
+        <div class="fg2">
           <div class="frow"><label class="flbl">Product *</label>
             <select class="sel" id="no-prod" onchange="toggleH('no')">
               <option value="">Select…</option>
-              <option>Box</option><option>Pallet</option><option>Layer / Board</option><option>OE Layer</option><option>Corner Pad</option>
+              <option>Box</option><option>Pallet</option><option>Layer / Board</option><option>OE Layer</option><option>Corner Pad</option><option>Paper</option>
             </select>
           </div>
-          <div class="frow"><label class="flbl">Ply *</label>
-            <select class="sel" id="no-ply"><option value="">Select…</option><option>2</option><option>3</option><option>5</option><option>7</option></select>
+          <div class="frow"><label class="flbl">PLY *</label>
+            <select class="sel" id="no-ply"><option value="">Select…</option><option>2</option><option>3</option><option>5</option><option>7</option><option>9</option></select>
           </div>
         </div>
-        <div class="fg3" style="margin-bottom:10px">
+        <div class="fg3">
           <div class="frow"><label class="flbl">L *</label><input class="inp num" type="number" inputmode="decimal" id="no-L" min="0" placeholder="0"></div>
           <div class="frow"><label class="flbl">W *</label><input class="inp num" type="number" inputmode="decimal" id="no-W" min="0" placeholder="0"></div>
           <div class="frow" id="no-H-wrap" style="display:none"><label class="flbl">H *</label><input class="inp num" type="number" inputmode="decimal" id="no-H" min="0" placeholder="0"></div>
         </div>
-        <div class="fg3" style="margin-bottom:10px">
+        <div class="fg2">
           <div class="frow"><label class="flbl">Unit</label>
             <select class="sel" id="no-su"><option value="in">Inches</option><option value="cm">CM</option></select>
           </div>
           <div class="frow"><label class="flbl">Qty *</label><input class="inp num" type="number" inputmode="decimal" id="no-qty" min="0" placeholder="0"></div>
-          <div class="frow"><label class="flbl">Joint</label>
-            <select class="sel" id="no-joint"><option value="double">Double</option><option value="single">Single</option></select>
-          </div>
         </div>
-        <div class="fg2" style="margin-bottom:14px">
-          <div class="frow"><label class="flbl">Dispatch Date *</label><input type="date" class="inp" id="no-disp"></div>
+        <div class="fg2">
           <div class="frow"><label class="flbl">Status</label>
             <select class="sel" id="no-status">
               <option>Pending</option><option>In Production</option><option>Partial Dispatch</option><option>Ready</option><option>Dispatched</option>
             </select>
           </div>
+          <div class="frow"><label class="flbl">Dispatch Date *</label><input type="date" class="inp" id="no-disp" style="border-color:#C7D2FE;background:#EEF2FF;color:#4338CA;font-weight:600"></div>
         </div>
-        <div id="no-warn" class="warn-txt" style="display:none;margin-bottom:8px">⚠ Dispatch date is before order date</div>
+        <div id="no-warn" class="warn-txt" style="display:none">⚠ Dispatch date is before order date</div>
         <button class="btn btn-p btn-full" onclick="saveNewOrder()">Save Order</button>
       </div>
     </div>
@@ -538,7 +587,7 @@ table.t{width:100%;border-collapse:collapse}
               <span class="w-sec-badge">editable · in</span>
               <button class="btn btn-g btn-sm" id="w-board-reset" style="display:none;height:22px;padding:0 8px;font-size:10px;margin-left:auto" onclick="wBoardReset()">↺ Auto</button>
             </div>
-            <div style="display:flex;gap:12px;align-items:flex-start">
+            <div class="w-board-row" style="display:flex;gap:12px;align-items:flex-start">
               <div class="frow" style="flex:1">
                 <label class="wlbl">Reel (W+H+1)</label>
                 <div style="display:flex;align-items:center;gap:6px">
@@ -610,17 +659,36 @@ table.t{width:100%;border-collapse:collapse}
 
   <!-- PRODUCT DATA -->
   <section id="view-productdata" class="view">
-    <div class="ph"><div><div class="ptitle">Product Data</div></div></div>
+    <div class="ph">
+      <div><div class="ptitle">Data</div></div>
+      <button class="btn btn-g btn-sm" onclick="pdClear()">↺ Clear</button>
+    </div>
     <div class="card" style="margin-bottom:12px">
-      <div class="addform">
-        <div style="flex:1;min-width:140px"><label class="flbl">Customer</label><select class="sel" id="pdf-cust" onchange="renderProductData()"><option value="">All customers</option></select></div>
-        <div style="flex:1;min-width:120px"><label class="flbl">Reel Size</label><select class="sel" id="pdf-reel" onchange="renderProductData()"><option value="">All sizes</option></select></div>
-        <button class="btn btn-g btn-sm" style="align-self:flex-end" onclick="pdClear()">↺ Clear</button>
+      <div class="cb" style="padding:10px 14px;display:flex;flex-direction:column;gap:8px">
+        <div class="frow">
+          <label class="flbl">Customer</label>
+          <select class="sel" id="pdf-cust" onchange="pdGoPage(1)"></select>
+        </div>
+        <div class="fg2">
+          <div class="frow">
+            <label class="flbl">Product</label>
+            <select class="sel" id="pdf-prod" onchange="pdGoPage(1)">
+              <option value="">All products</option>
+              <option>Box</option><option>Pallet</option><option>Layer / Board</option><option>OE Layer</option><option>Corner Pad</option><option>Paper</option>
+            </select>
+          </div>
+          <div class="frow">
+            <label class="flbl">Month</label>
+            <select class="sel" id="pdf-month" onchange="pdGoPage(1)"><option value="">All months</option></select>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="psub" id="pd-note" style="margin-bottom:10px"></div>
-    <div class="pd-list" id="pd-list"></div>
-    <div style="font-size:11px;color:var(--ink3);margin-top:10px;display:flex;justify-content:space-between"><span id="pd-foot-l"></span><span id="pd-foot-r"></span></div>
+    <div class="pd-summary"><span class="pd-summary-txt" id="pd-summary-txt" style="color:var(--ink3)"></span><span class="pd-summary-qty" id="pd-summary-qty"></span></div>
+    <div class="card" style="overflow:hidden;padding:0;margin-bottom:0">
+      <div class="pd-list" id="pd-list"></div>
+    </div>
+    <div class="pd-pagination" id="pd-pagination"></div>
   </section>
 
   <!-- PARTIES -->
@@ -681,22 +749,28 @@ table.t{width:100%;border-collapse:collapse}
     <span class="drawer-title" id="ed-title">Edit Order</span>
     <button class="btn-del" onclick="closeDrawer()">✕</button>
   </div>
-  <div class="drawer-body">
-    <div class="fg2">
-      <div class="frow"><label class="flbl">Date</label><input type="date" class="inp" id="ed-date"></div>
-      <div class="frow"><label class="flbl">Order No</label><input class="inp" id="ed-no"></div>
+  <div class="drawer-body" style="display:flex;flex-direction:column;gap:9px">
+    <input type="hidden" id="ed-date">
+    <div class="frow">
+      <label class="flbl">Customer *</label>
+      <input class="inp" id="ed-cust" list="custList">
     </div>
-    <div class="frow"><label class="flbl">Customer *</label><input class="inp" id="ed-cust" list="custList"></div>
+    <div class="frow">
+      <label class="flbl">Order No</label>
+      <input class="inp" id="ed-no">
+    </div>
     <div class="fg2">
       <div class="frow"><label class="flbl">Product *</label>
         <select class="sel" id="ed-prod" onchange="toggleH('ed')">
-          <option>Box</option><option>Pallet</option><option>Layer / Board</option><option>OE Layer</option><option>Corner Pad</option>
+          <option>Box</option><option>Pallet</option><option>Layer / Board</option><option>OE Layer</option><option>Corner Pad</option><option>Paper</option>
         </select>
       </div>
-      <div class="frow"><label class="flbl">Ply *</label><select class="sel" id="ed-ply"><option>2</option><option>3</option><option>5</option><option>7</option></select></div>
+      <div class="frow"><label class="flbl">PLY *</label>
+        <select class="sel" id="ed-ply"><option>2</option><option>3</option><option>5</option><option>7</option><option>9</option></select>
+      </div>
     </div>
-    <div>
-      <label class="flbl" id="ed-size-lbl">Size L × W × H *</label>
+    <div class="frow">
+      <label class="flbl" id="ed-size-lbl">Size L × W *</label>
       <div class="fg3">
         <input class="inp num" type="number" inputmode="decimal" id="ed-L" placeholder="L" min="0">
         <input class="inp num" type="number" inputmode="decimal" id="ed-W" placeholder="W" min="0">
@@ -708,13 +782,14 @@ table.t{width:100%;border-collapse:collapse}
       <div class="frow"><label class="flbl">Qty *</label><input class="inp num" type="number" inputmode="decimal" id="ed-qty" min="0"></div>
     </div>
     <div class="fg2">
-      <div class="frow"><label class="flbl">Joint</label><select class="sel" id="ed-joint"><option value="double">Double</option><option value="single">Single</option></select></div>
-      <div class="frow"><label class="flbl">Dispatch Date *</label><input type="date" class="inp" id="ed-disp"></div>
-    </div>
-    <div class="frow"><label class="flbl">Status</label>
-      <select class="sel" id="ed-status">
-        <option>Pending</option><option>In Production</option><option>Partial Dispatch</option><option>Ready</option><option>Dispatched</option>
-      </select>
+      <div class="frow"><label class="flbl">Status</label>
+        <select class="sel" id="ed-status">
+          <option>Pending</option><option>In Production</option><option>Partial Dispatch</option><option>Ready</option><option>Dispatched</option>
+        </select>
+      </div>
+      <div class="frow"><label class="flbl">Dispatch Date *</label>
+        <input type="date" class="inp" id="ed-disp" style="border-color:#C7D2FE;background:#EEF2FF;color:#4338CA;font-weight:600">
+      </div>
     </div>
     <div class="warn-txt" id="ed-warn" style="display:none">⚠ Dispatch date is before order date</div>
   </div>
@@ -813,7 +888,8 @@ const DEF_GSM={'Top Paper':150,'Flute 1':120,'Base 1':150,'Flute 2':120,'Base 2'
 
 // ── STATE ────────────────────────────────────────────────
 let parties=[], orders=[], tasks=[];
-let pf='all', oSF='Pending', tSF='All', tMF='All', woF='Pending';
+let pf='all', oSF='Pending', tSF='All', tMF='All', woF='Pending', pdPage=1;
+const PD_PAGE_SIZE=50;
 let editId=null;
 let wReelEdited=false, wCutEdited=false, wTotalGsmEdited=false;
 
@@ -892,7 +968,7 @@ async function saveNewOrder(){
     renderParties();
   }
 
-  const row={date,no:getVal('no-no'),cust,prod,ply,l:L,w:W,h:H,su:getVal('no-su'),qty,joint:getVal('no-joint'),disp,status:getVal('no-status')};
+  const row={date,no:getVal('no-no'),cust,prod,ply,l:L,w:W,h:H,su:getVal('no-su'),qty,joint:'double',disp,status:getVal('no-status')};
   const res=await db.insert('orders',row);
   if(res){
     orders.unshift(res[0]);
@@ -929,18 +1005,24 @@ function renderOrders(){
   document.getElementById('ol-cards').innerHTML=list.map(ord=>{
     const dm=dispMeta(ord.disp,ord.status);
     const sk=skCls(ord.status);
+    const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' · '+dm.label:'No date set';
+    const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
+    const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
     return '<div class="ocard '+sk+'" onclick="openDrawer('+ord.id+')">'
       +'<div class="ostripe '+sk+'"></div>'
-      +'<div class="obody">'
-        +'<div class="orow1">'
-          +'<div style="display:flex;align-items:center"><span class="ocust">'+esc(ord.cust||'—')+'</span><span class="ono">'+esc(ord.no)+'</span></div>'
-          +badge(ord.status)
+      +'<div class="obody-c">'
+        +'<div class="orow-c1">'
+          +'<div style="min-width:0"><span class="ocust">'+esc(ord.cust||'—')+'</span>'+(ord.no?' <span class="ono">#'+esc(ord.no)+'</span>':'')+'</div>'
+          +'<span class="'+dispCls+'">'+esc(dispTxt)+'</span>'
         +'</div>'
-        +'<div class="orow2">'
-          +'<span class="wo-detail">'+esc(ord.ply)+'PLY <span>-</span> '+esc(ord.prod)+' <span>-</span> '
-          +esc(String(ord.l||0))+'×'+esc(String(ord.w||0))+(ord.prod==='Box'?'×'+esc(String(ord.h||0)):'')+' '+(ord.su||'in')+' <span>-</span> '
-          +fmt(ord.qty)+' nos.</span>'
-          +'<span class="odisp '+dm.cls+'">'+(ord.disp?ddmm(ord.disp):'No date')+' - '+dm.label+'</span>'
+        +'<div class="orow-c2">'
+          +'<span class="c-chip c-chip-ply">'+esc(String(ord.ply||'?'))+' PLY</span>'
+          +'<span class="c-chip c-chip-prod">'+esc(ord.prod||'—')+'</span>'
+        +'</div>'
+        +'<div class="orow-c2" style="padding-left:2px"><span style="font-size:12px;color:var(--ink3);font-weight:500">'+size+'</span></div>'
+        +'<div class="orow-c3">'
+          +'<span class="c-qty">'+fmt(ord.qty)+' nos.</span>'
+          +badge(ord.status)
         +'</div>'
       +'</div>'
     +'</div>';
@@ -971,7 +1053,7 @@ function openDrawer(id){
   setVal('ed-L',ord.l); setVal('ed-W',ord.w); setVal('ed-H',ord.h||0);
   toggleH('ed');
   setVal('ed-su',ord.su||'in'); setVal('ed-qty',ord.qty);
-  setVal('ed-joint',ord.joint||'double'); setVal('ed-disp',ord.disp);
+  setVal('ed-disp',ord.disp);
   setVal('ed-status',ord.status);
   document.getElementById('ed-warn').style.display='none';
   document.querySelectorAll('#edit-drawer .inp.err,#edit-drawer .sel.err').forEach(el=>el.classList.remove('err'));
@@ -992,7 +1074,7 @@ async function saveDrawer(){
     prod:getVal('ed-prod'),ply:getVal('ed-ply'),
     l:parseFloat(getVal('ed-L'))||0,w:parseFloat(getVal('ed-W'))||0,h:parseFloat(getVal('ed-H'))||0,
     su:getVal('ed-su'),qty:parseFloat(getVal('ed-qty'))||0,
-    joint:getVal('ed-joint'),disp:getVal('ed-disp'),status:getVal('ed-status')
+    joint:'double',disp:getVal('ed-disp'),status:getVal('ed-status')
   };
   // Required-field validation (mirrors the New Order form)
   const errs=[];
@@ -1043,18 +1125,25 @@ function renderWorkStatus(){
   if(!list.length){document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc('No '+woF+' orders.')+'</div>';return;}
   document.getElementById('wo-list').innerHTML=list.map(ord=>{
     const dm=dispMeta(ord.disp,ord.status);
-    return '<div class="wo-card '+skCls(ord.status)+'">'
-      +'<div class="wo-stripe '+skCls(ord.status)+'"></div>'
-      +'<div class="wo-body">'
-        +'<div class="wo-row1">'
-          +'<div style="display:flex;align-items:center"><span class="wo-cust">'+esc(ord.cust||'—')+'</span><span class="wo-no">'+esc(ord.no)+'</span></div>'
-          +'<select class="wo-sel" onchange="woStatusChange('+ord.id+',this.value)">'+STATUSES.map(s=>'<option'+(s===ord.status?' selected':'')+'>'+s+'</option>').join('')+'</select>'
+    const sk=skCls(ord.status);
+    const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' · '+dm.label:'No date set';
+    const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
+    const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
+    return '<div class="wo-card '+sk+'">'
+      +'<div class="wo-stripe '+sk+'"></div>'
+      +'<div class="obody-c">'
+        +'<div class="orow-c1">'
+          +'<div style="min-width:0"><span class="ocust">'+esc(ord.cust||'—')+'</span>'+(ord.no?' <span class="ono">#'+esc(ord.no)+'</span>':'')+'</div>'
+          +'<span class="'+dispCls+'">'+esc(dispTxt)+'</span>'
         +'</div>'
-        +'<div class="wo-row2">'
-          +'<span class="wo-detail">'+esc(ord.ply)+'PLY <span>-</span> '+esc(ord.prod)+' <span>-</span> '
-          +esc(String(ord.l||0))+'×'+esc(String(ord.w||0))+(ord.prod==='Box'?'×'+esc(String(ord.h||0)):'')+' '+(ord.su||'in')+' <span>-</span> '
-          +fmt(ord.qty)+' nos.</span>'
-          +'<span class="wo-disp '+dm.cls+'">'+(ord.disp?ddmm(ord.disp):'No date')+' - '+dm.label+'</span>'
+        +'<div class="orow-c2">'
+          +'<span class="c-chip c-chip-ply">'+esc(String(ord.ply||'?'))+' PLY</span>'
+          +'<span class="c-chip c-chip-prod">'+esc(ord.prod||'—')+'</span>'
+        +'</div>'
+        +'<div class="orow-c2" style="padding-left:2px"><span style="font-size:12px;color:var(--ink3);font-weight:500">'+size+'</span></div>'
+        +'<div class="orow-c3">'
+          +'<span class="c-qty">'+fmt(ord.qty)+' nos.</span>'
+          +'<select class="wo-sel" onchange="woStatusChange('+ord.id+',this.value)">'+STATUSES.map(s=>'<option'+(s===ord.status?' selected':'')+'>'+s+'</option>').join('')+'</select>'
         +'</div>'
       +'</div>'
     +'</div>';
@@ -1193,50 +1282,98 @@ function wCalcFromBoard(){
 }
 
 // ── PRODUCT DATA ─────────────────────────────────────────
+function pdGoPage(p){pdPage=p;renderProductData();}
 function renderProductData(){
   const eligible=orders.filter(o=>o.status==='Dispatched'||o.status==='Partial Dispatch');
   const custSel=document.getElementById('pdf-cust');
-  const reelSel=document.getElementById('pdf-reel');
-  const prevC=custSel.value, prevR=reelSel.value.replace('″','');
+  const prodSel=document.getElementById('pdf-prod');
+  const monthSel=document.getElementById('pdf-month');
+  if(!custSel||!prodSel||!monthSel) return;
+
+  // Populate customer dropdown
+  const prevC=custSel.value;
   const custs=[...new Set(eligible.map(o=>o.cust).filter(Boolean))].sort();
-  const reels=[...new Set(eligible.map(o=>boardSizes(o).reel))].sort((a,b)=>+a-+b);
-  custSel.innerHTML='<option value="">All customers</option>'+custs.map(c=>'<option'+(c===prevC?' selected':'')+'>'+c+'</option>').join('');
-  reelSel.innerHTML='<option value="">All sizes</option>'+reels.map(r=>'<option'+(r===prevR?' selected':'')+'>'+r+'″</option>').join('');
+  custSel.innerHTML='<option value="">All customers</option>'+custs.map(c=>'<option'+(c===prevC?' selected':'')+'>'+esc(c)+'</option>').join('');
+
+  // Populate month dropdown from actual dispatch dates
+  const prevM=monthSel.value;
+  const months=[...new Set(eligible.map(o=>o.disp?o.disp.slice(0,7):null).filter(Boolean))].sort().reverse();
+  monthSel.innerHTML='<option value="">All months</option>'+months.map(m=>{
+    const [yr,mo]=m.split('-');
+    const lbl=new Date(yr,mo-1,1).toLocaleString('en-IN',{month:'short',year:'numeric'});
+    return '<option value="'+m+'"'+(m===prevM?' selected':'')+'>'+lbl+'</option>';
+  }).join('');
+
+  // Apply filters
   let list=eligible;
   if(custSel.value) list=list.filter(o=>o.cust===custSel.value);
-  if(reelSel.value) list=list.filter(o=>boardSizes(o).reel===reelSel.value.replace('″',''));
-  document.getElementById('pd-note').textContent=(custSel.value||reelSel.value)?list.length+' filtered result'+(list.length!==1?'s':''):'';
-  document.getElementById('pd-foot-l').textContent=list.length+' of '+eligible.length;
-  document.getElementById('pd-foot-r').textContent=list.length?'Total qty · '+fmt(list.reduce((s,o)=>s+o.qty,0))+' pcs':'';
-  if(!list.length){document.getElementById('pd-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No matching entries</div>';return;}
-  const mob=window.innerWidth<=720;
-  if(mob){
-    document.getElementById('pd-list').innerHTML='<div style="display:flex;flex-direction:column;gap:5px">'+list.map(ord=>{
-      const {reel,cut}=boardSizes(ord);
-      return '<div class="pd-m-card">'
-        +'<div class="pd-m-row"><span style="font-size:13px;font-weight:600">'+esc(ord.cust||'—')+'</span>'+badge(ord.status)+'</div>'
-        +'<div class="pd-m-detail">'+esc(ord.ply)+'PLY <span>·</span> '+esc(ord.prod)+'</div>'
-        +'<div class="pd-m-nums"><span>Reel <b>'+reel+'″</b></span><span>Cut <b>'+cut+'″</b></span><span>Qty <b>'+fmt(ord.qty)+' nos.</b></span></div>'
-      +'</div>';
-    }).join('')+'</div>';
-  } else {
-    document.getElementById('pd-list').innerHTML='<div class="ovx"><table class="t"><thead><tr><th>Customer</th><th>Product</th><th>Ply</th><th class="r">Reel</th><th class="r">Cut</th><th class="r">Qty</th><th>Status</th></tr></thead><tbody>'
-      +list.map(ord=>{
-        const {reel,cut}=boardSizes(ord);
-        return '<tr>'
-          +'<td style="font-weight:500">'+esc(ord.cust||'—')+'</td>'
-          +'<td>'+esc(ord.prod)+'</td>'
-          +'<td class="num">'+esc(ord.ply)+'</td>'
-          +'<td class="num r">'+reel+'″</td>'
-          +'<td class="num r">'+cut+'″</td>'
-          +'<td class="num r">'+fmt(ord.qty)+'</td>'
-          +'<td>'+badge(ord.status)+'</td>'
-        +'</tr>';
-      }).join('')
-      +'</tbody></table></div>';
+  if(prodSel.value) list=list.filter(o=>o.prod===prodSel.value);
+  if(monthSel.value) list=list.filter(o=>o.disp&&o.disp.slice(0,7)===monthSel.value);
+
+  // Sort by dispatch date descending — latest first
+  list.sort((a,b)=>(b.disp||'').localeCompare(a.disp||'')||(b.id-a.id));
+
+  // Summary — qty reflects filtered list only
+  const totalQty=list.reduce((s,o)=>s+(o.qty||0),0);
+  const parts=[];
+  if(custSel.value) parts.push(custSel.value);
+  if(monthSel.value){const [yr,mo]=monthSel.value.split('-');parts.push(new Date(yr,mo-1,1).toLocaleString('en-IN',{month:'short',year:'numeric'}));}
+  document.getElementById('pd-summary-txt').textContent=list.length+' order'+(list.length!==1?'s':'')+(parts.length?' · '+parts.join(' · '):'');
+  document.getElementById('pd-summary-qty').textContent=list.length?fmt(totalQty)+' nos.':'';
+
+  // Pagination
+  const total=list.length;
+  const totalPages=Math.ceil(total/PD_PAGE_SIZE)||1;
+  if(pdPage>totalPages) pdPage=totalPages;
+  const start=(pdPage-1)*PD_PAGE_SIZE;
+  const pageList=list.slice(start,start+PD_PAGE_SIZE);
+
+  if(!pageList.length){
+    document.getElementById('pd-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No dispatched orders found.</div>';
+    document.getElementById('pd-pagination').innerHTML='';
+    return;
   }
+
+  const fmtDate=d=>{if(!d)return '—';const dt=new Date(d+'T00:00:00');return dt.getDate()+' '+dt.toLocaleString('en-IN',{month:'short'})+' '+dt.getFullYear();};
+  const showCust=!custSel.value;
+
+  document.getElementById('pd-list').innerHTML=
+    '<div class="pd-tbl-wrap"><table class="pd-tbl">'
+    +'<thead><tr>'
+    +'<th>Dispatch date</th>'
+    +(showCust?'<th>Customer</th>':'')
+    +'<th>Product</th><th>PLY</th><th>Size</th><th class="r">Qty</th><th>Status</th>'
+    +'</tr></thead><tbody>'
+    +pageList.map(ord=>{
+      const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
+      return '<tr>'
+        +'<td class="pd-date">'+fmtDate(ord.disp)+'</td>'
+        +(showCust?'<td style="font-weight:500">'+esc(ord.cust||'—')+'</td>':'')
+        +'<td><span class="c-chip c-chip-prod">'+esc(ord.prod||'—')+'</span></td>'
+        +'<td><span class="c-chip c-chip-ply">'+esc(String(ord.ply||'?'))+' PLY</span></td>'
+        +'<td class="muted">'+size+'</td>'
+        +'<td class="r">'+fmt(ord.qty)+'</td>'
+        +'<td>'+badge(ord.status)+'</td>'
+        +'</tr>';
+    }).join('')
+    +'</tbody></table></div>';
+
+  // Pagination controls
+  document.getElementById('pd-pagination').innerHTML=
+    '<span style="font-size:11px;color:var(--ink3)">Showing '+(start+1)+'–'+Math.min(start+PD_PAGE_SIZE,total)+' of '+total+'</span>'
+    +'<div class="pd-pg-btns">'
+    +'<button class="pd-pg-btn" onclick="pdGoPage('+(pdPage-1)+')"'+(pdPage<=1?' disabled':'')+'>← Prev</button>'
+    +(totalPages>1?Array.from({length:totalPages},(_,i)=>'<button class="pd-pg-btn'+(i+1===pdPage?' active':'')+'" onclick="pdGoPage('+(i+1)+')">'+(i+1)+'</button>').join(''):'')
+    +'<button class="pd-pg-btn" onclick="pdGoPage('+(pdPage+1)+')"'+(pdPage>=totalPages?' disabled':'')+'>Next →</button>'
+    +'</div>';
 }
-function pdClear(){document.getElementById('pdf-cust').value='';document.getElementById('pdf-reel').value='';renderProductData();}
+function pdClear(){
+  document.getElementById('pdf-cust').value='';
+  document.getElementById('pdf-prod').value='';
+  document.getElementById('pdf-month').value='';
+  pdPage=1;
+  renderProductData();
+}
 
 // ── PARTIES ──────────────────────────────────────────────
 function renderParties(){
