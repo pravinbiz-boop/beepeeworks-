@@ -832,10 +832,10 @@ async function checkAuth(){
   if(!s||!s.access_token){showLogin();return;}
   const exp=s.expires_at||0;
   if(Date.now()/1000>exp-60){
-    if(s.refresh_token&&await refreshSession(s.refresh_token)){hideLogin();init();return;}
+    if(s.refresh_token&&await refreshSession(s.refresh_token)){hideLogin();if(!appInited)init();return;}
     showLogin();return;
   }
-  accessToken=s.access_token;hideLogin();init();
+  accessToken=s.access_token;hideLogin();if(!appInited)init();
 }
 
 async function doLogin(){
@@ -845,7 +845,7 @@ async function doLogin(){
   if(!pw){err.textContent='Enter the password';return;}
   btn.disabled=true;btn.textContent='Logging in…';err.textContent='';
   const d=await sbAuth('token?grant_type=password',{email:AUTH_EMAIL,password:pw});
-  if(d.access_token){saveSession(d);accessToken=d.access_token;hideLogin();init();}
+  if(d.access_token){saveSession(d);accessToken=d.access_token;hideLogin();appInited=false;init();}
   else{err.textContent='Wrong password';btn.disabled=false;btn.textContent='Enter';}
 }
 
@@ -876,7 +876,7 @@ const PRODUCTS=['Box','Pallet','Layer / Board','OE Layer','Corner Pad'];
 const PLYS=['2','3','5','7'];
 const STATUSES=['Pending','In Production','Partial Dispatch','Ready','Dispatched'];
 const TSTATS=['Pending','In progress','Done'];
-const MEMBERS=['Mahesh','Kondal','Pravin'];
+const MEMBERS=['Production','Accounts','Owner'];
 const JOINTS=['double','single'];
 const SUNITS=['in','cm'];
 const PLY_LAYERS={
@@ -891,6 +891,7 @@ let parties=[], orders=[], tasks=[];
 let pf='all', oSF='Pending', tSF='All', tMF='All', woF='Pending', pdPage=1;
 const PD_PAGE_SIZE=50;
 let editId=null;
+let appInited=false;
 let wReelEdited=false, wCutEdited=false, wTotalGsmEdited=false;
 
 // ── HELPERS ──────────────────────────────────────────────
@@ -1416,6 +1417,7 @@ function nav(v){
 
 // ── INIT ─────────────────────────────────────────────────
 async function init(){
+  appInited=true;
   document.getElementById('ol-cards').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Loading…</div>';
   const [p,o,t]=await Promise.all([db.get('parties'),db.get('orders'),db.get('tasks')]);
   // orders & tasks show newest-first (matches unshift on add); parties stay oldest-first (append on add)
