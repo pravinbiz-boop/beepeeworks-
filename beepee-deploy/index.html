@@ -192,6 +192,7 @@ table.t{width:100%;border-collapse:collapse}
 .ocard.ds{background:var(--s2);border-color:var(--line)}
 .ocard:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
 .ocard:active{transform:translateY(0)}
+.ocard:focus-visible,.wo-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .ostripe{width:3px;flex-shrink:0}
 .ostripe.pn{background:var(--muted)}.ostripe.ip{background:var(--amber)}
 .ostripe.pd{background:var(--blue)}.ostripe.rd{background:var(--green)}
@@ -232,7 +233,9 @@ table.t{width:100%;border-collapse:collapse}
 
 /* ── WORK STATUS CARDS ── */
 .wo-list{display:flex;flex-direction:column;gap:6px}
-.wo-card{background:var(--surface);border-radius:var(--r2);display:flex;overflow:hidden;border:var(--bw) solid var(--line);transition:box-shadow .15s}
+.wo-card{background:var(--surface);border-radius:var(--r2);display:flex;overflow:hidden;border:var(--bw) solid var(--line);transition:box-shadow .15s,transform .15s;cursor:pointer}
+.wo-card:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
+.wo-card:active{transform:translateY(0)}
 .wo-card.pn,.wo-card.ip,.wo-card.pd,.wo-card.rd,.wo-card.ds{background:var(--surface);border-color:var(--line)}
 .wo-stripe{width:3px;flex-shrink:0}
 .wo-stripe.pn{background:var(--muted)}.wo-stripe.ip{background:var(--amber)}
@@ -517,7 +520,7 @@ table.t{width:100%;border-collapse:collapse}
 
     <!-- Search -->
     <div style="margin-bottom:12px">
-      <input class="inp" id="ol-search" placeholder="Search customer or order no…" oninput="renderOrders()">
+      <input class="inp" id="ol-search" placeholder="Search customer, order no, size, product, PLY…" oninput="renderOrders()">
     </div>
 
     <!-- Saved order cards -->
@@ -530,6 +533,9 @@ table.t{width:100%;border-collapse:collapse}
       <div><div class="ptitle">Work Status</div></div>
     </div>
     <div class="fbar" id="wo-filters"></div>
+    <div style="margin-bottom:12px">
+      <input class="inp" id="wo-search" placeholder="Search customer, order no, size, product, PLY…" oninput="renderWorkStatus()">
+    </div>
     <div class="wo-list" id="wo-list"></div>
   </section>
 
@@ -699,7 +705,10 @@ table.t{width:100%;border-collapse:collapse}
   <section id="view-productdata" class="view">
     <div class="ph">
       <div><div class="ptitle">Data</div></div>
-      <button class="btn btn-g btn-sm" onclick="pdClear()">↺ Clear</button>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-g btn-sm" onclick="pdExportCsv()">↓ CSV</button>
+        <button class="btn btn-g btn-sm" onclick="pdClear()">↺ Clear</button>
+      </div>
     </div>
     <div class="card" style="margin-bottom:12px">
       <div class="cb" style="padding:10px 14px;display:flex;flex-direction:column;gap:8px">
@@ -716,12 +725,51 @@ table.t{width:100%;border-collapse:collapse}
             </select>
           </div>
           <div class="frow">
-            <label class="flbl">Month</label>
-            <select class="sel" id="pdf-month" onchange="pdGoPage(1)"><option value="">All months</option></select>
+            <label class="flbl">Range</label>
+            <select class="sel" id="pdf-range" onchange="pdRangeChange()">
+              <option value="all">All time</option>
+              <option value="month">Single month</option>
+              <option value="custom">Custom range</option>
+            </select>
+          </div>
+        </div>
+        <div class="frow" id="pdf-month-row" style="display:none">
+          <label class="flbl">Month</label>
+          <select class="sel" id="pdf-month" onchange="pdGoPage(1)"><option value="">All months</option></select>
+        </div>
+        <div class="fg2" id="pdf-custom-row" style="display:none">
+          <div class="frow">
+            <label class="flbl">From</label>
+            <input type="date" class="inp" id="pdf-from" onchange="pdGoPage(1)">
+          </div>
+          <div class="frow">
+            <label class="flbl">To</label>
+            <input type="date" class="inp" id="pdf-to" onchange="pdGoPage(1)">
+          </div>
+        </div>
+        <div class="fg2">
+          <div class="frow">
+            <label class="flbl">Sort by</label>
+            <select class="sel" id="pdf-sort" onchange="pdGoPage(1)">
+              <option value="disp-desc">Date · latest first</option>
+              <option value="disp-asc">Date · oldest first</option>
+              <option value="qty-desc">Qty · high → low</option>
+              <option value="qty-asc">Qty · low → high</option>
+              <option value="cust">Customer A → Z</option>
+            </select>
+          </div>
+          <div class="frow">
+            <label class="flbl">Include</label>
+            <select class="sel" id="pdf-scope" onchange="pdGoPage(1)">
+              <option value="both">Dispatched + Partial</option>
+              <option value="dispatched">Dispatched only</option>
+              <option value="partial">Partial only</option>
+            </select>
           </div>
         </div>
       </div>
     </div>
+    <div class="fbar" id="pd-chips"></div>
     <div class="pd-summary"><span class="pd-summary-txt" id="pd-summary-txt" style="color:var(--ink3)"></span><span class="pd-summary-qty" id="pd-summary-qty"></span></div>
     <div class="card" style="overflow:hidden;padding:0;margin-bottom:0">
       <div class="pd-list" id="pd-list"></div>
@@ -939,7 +987,9 @@ async function sbFetch(path, method='GET', body=null){
   return text?JSON.parse(text):true;
 }
 const db={
-  get:(t,q='')=>sbFetch(t+'?order=created_at.asc'+(q?'&'+q:'')),
+  // Ask Supabase for newest-first directly so we don't need to reverse() on the client.
+  // limit=2000 is a safety ceiling; well above realistic short-term row counts.
+  get:(t,q='')=>sbFetch(t+'?order=created_at.desc&limit=2000'+(q?'&'+q:'')),
   insert:(t,row)=>sbFetch(t,'POST',row),
   update:(t,id,row)=>sbFetch(t+'?id=eq.'+id,'PATCH',row),
   delete:(t,id)=>sbFetch(t+'?id=eq.'+id,'DELETE'),
@@ -993,12 +1043,27 @@ function showToast(msg,kind){
 // ── HELPERS ──────────────────────────────────────────────
 const fmt=n=>(n||0).toLocaleString('en-IN');
 const ddmm=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
-const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const today=()=>new Date().toISOString().slice(0,10);
 const TODAY=today();
 
 function skCls(s){return s==='Pending'?'pn':s==='In Production'?'ip':s==='Partial Dispatch'?'pd':s==='Ready'?'rd':'ds';}
 function badge(s){return '<span class="bdg '+skCls(s)+'">'+esc(s)+'</span>';}
+// Compact "time since" label — for the Work Status "recently moved" sort key.
+function timeAgo(ts){
+  if(!ts) return '';
+  const t=Date.parse(ts); if(isNaN(t)) return '';
+  const s=Math.round((Date.now()-t)/1000);
+  if(s<45) return 'just now';
+  if(s<90) return '1 min ago';
+  const m=Math.round(s/60); if(m<45) return m+' min ago';
+  if(m<90) return '1 hr ago';
+  const h=Math.round(m/60); if(h<22) return h+' hr ago';
+  const d=Math.round(h/24); if(d<7) return d+'d ago';
+  if(d<30) return Math.round(d/7)+'w ago';
+  if(d<365) return Math.round(d/30)+'mo ago';
+  return Math.round(d/365)+'y ago';
+}
 
 function dispMeta(disp,status){
   if(status==='Dispatched') return {label:'Dispatched',cls:'done'};
@@ -1058,16 +1123,17 @@ async function saveNewOrder(){
   if(disp&&date&&disp<date){warnEl.style.display='block';return;}
   warnEl.style.display='none';
 
-  // Auto-create customer if new
-  if(!parties.find(p=>p.name.toLowerCase()===cust.toLowerCase())){
+  // Auto-create customer if new (case- and whitespace-insensitive)
+  if(!parties.find(p=>(p.name||'').trim().toLowerCase()===cust.toLowerCase())){
     const res=await db.insert('parties',{name:cust,type:'Customer'});
     if(res) parties.push(res[0]);
     renderParties();
   }
 
   const row={date,no:getVal('no-no'),cust,prod,ply,l:L,w:W,h:H,su:getVal('no-su'),qty,joint:'double',disp,status:getVal('no-status')};
-  const res=await db.insert('orders',row);
-  if(res){
+  try{
+    const res=await db.insert('orders',row);
+    if(!res || !res[0]) throw new Error('Insert failed');
     orders.unshift(res[0]);
     hideNewOrderForm();
     // Reset form
@@ -1075,55 +1141,97 @@ async function saveNewOrder(){
     document.getElementById('no-prod').value='';
     document.getElementById('no-ply').value='';
     document.getElementById('no-status').value='Pending';
-    renderOrders();
+    showToast('Order added','ok');
+    renderOrders(); renderWorkStatus(); renderProductData();
+  }catch(e){
+    showToast('Save failed — try again','err');
   }
 }
 
+// Shared card renderer — used by both Orders and Work Status pages.
+// edit=true renders the Work Status variant (adds inline status dropdown).
+function orderCardHTML(ord, opts){
+  const edit=!!(opts && opts.edit);
+  const dm=dispMeta(ord.disp,ord.status);
+  const sk=skCls(ord.status);
+  const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' · '+dm.label:'No date set';
+  const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
+  const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
+  const cardCls=edit?'wo-card':'ocard';
+  const stripeCls=edit?'wo-stripe':'ostripe';
+  const trailing=edit
+    ? '<select class="wo-sel" onclick="event.stopPropagation()" onchange="woStatusChange('+ord.id+',this.value)">'+STATUSES.map(s=>'<option'+(s===ord.status?' selected':'')+'>'+s+'</option>').join('')+'</select>'
+    : badge(ord.status);
+  const moved=edit?timeAgo(ord.updated_at||ord.created_at):'';
+  const movedHTML=moved?' <span style="font-size:10.5px;color:var(--ink3);font-weight:500">· '+esc(moved)+'</span>':'';
+  return '<div class="'+cardCls+' '+sk+'" data-oid="'+ord.id+'" tabindex="0" role="button" aria-label="Open order '+esc(ord.no||ord.cust||'')+'" onclick="openDrawer('+ord.id+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openDrawer('+ord.id+');}">'
+    +'<div class="'+stripeCls+' '+sk+'"></div>'
+    +'<div class="obody-c">'
+      +'<div class="orow-c1">'
+        +'<div style="min-width:0"><span class="ocust">'+esc(ord.cust||'—')+'</span>'+(ord.no?' <span class="ono">#'+esc(ord.no)+'</span>':'')+movedHTML+'</div>'
+        +'<span class="'+dispCls+'">'+esc(dispTxt)+'</span>'
+      +'</div>'
+      +'<div class="orow-c2">'
+        +'<span class="c-chip c-chip-ply">'+esc(String(ord.ply||'?'))+' PLY</span>'
+        +'<span class="c-chip c-chip-prod">'+esc(ord.prod||'—')+'</span>'
+      +'</div>'
+      +'<div class="orow-c2" style="padding-left:2px"><span style="font-size:12px;color:var(--ink3);font-weight:500">'+size+'</span></div>'
+      +'<div class="orow-c3">'
+        +'<span class="c-qty">'+fmt(ord.qty)+' nos.</span>'
+        +trailing
+      +'</div>'
+    +'</div>'
+  +'</div>';
+}
+// In-place refresh for a single order card DOM node — updates both Orders and Work Status
+// instances if the same order is currently rendered on both pages.
+function updateOrderCardDom(id){
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  document.querySelectorAll('[data-oid="'+id+'"]').forEach(el=>{
+    const edit=el.classList.contains('wo-card');
+    const wrap=document.createElement('div');
+    wrap.innerHTML=orderCardHTML(o,{edit:edit});
+    el.replaceWith(wrap.firstElementChild);
+  });
+}
+
+// Wider order-search predicate — matches customer name, order no, size, product, and PLY
+function orderMatchesQuery(o,q){
+  if(!q) return true;
+  const size=String(o.l||0)+'×'+String(o.w||0)+(o.prod==='Box'?'×'+String(o.h||0):'');
+  return (o.cust||'').toLowerCase().includes(q)
+      || (o.no||'').toLowerCase().includes(q)
+      || size.includes(q)
+      || (o.prod||'').toLowerCase().includes(q)
+      || String(o.ply||'').toLowerCase().includes(q);
+}
 function renderOrders(){
   const q=(document.getElementById('ol-search')?.value||'').toLowerCase().trim();
-  let list=orders.filter(x=>x.status===oSF);
-  if(q) list=list.filter(x=>(x.cust||'').toLowerCase().includes(q)||(x.no||'').toLowerCase().includes(q)||(String(x.l||0)+'×'+String(x.w||0)+(x.prod==='Box'?'×'+String(x.h||0):'')).includes(q));
+  // Pool the search applies to — respects the active status filter (unless 'All')
+  const pool=oSF==='All'?orders:orders.filter(x=>x.status===oSF);
+  let list=q?pool.filter(x=>orderMatchesQuery(x,q)):pool;
 
   // Most recently moved (status updated) first — same rule for every pill
   const mv=o=>o.updated_at||o.created_at||'';
   list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
 
-  const counts={All:orders.length};
-  STATUSES.forEach(s=>counts[s]=orders.filter(x=>x.status===s).length);
+  // Counts reflect the current search — so pill numbers agree with what you see
+  const searchPool=q?orders.filter(x=>orderMatchesQuery(x,q)):orders;
+  const counts={All:searchPool.length};
+  STATUSES.forEach(s=>counts[s]=searchPool.filter(x=>x.status===s).length);
   document.getElementById('ol-filters').innerHTML=
-    STATUSES.map(s=>{const pc=' pill-'+skCls(s);return '<button class="pill'+pc+(oSF===s?' active':'')+'" onclick="olFilter(\''+s+'\')">'+s+' <span class="pill-count">'+counts[s]+'</span></button>';}).join('');
+    ['All',...STATUSES].map(s=>{
+      const pc=s==='All'?'':' pill-'+skCls(s);
+      return '<button class="pill'+pc+(oSF===s?' active':'')+'" onclick="olFilter(\''+s+'\')">'+s+' <span class="pill-count">'+(counts[s]||0)+'</span></button>';
+    }).join('');
 
   if(!list.length){
-    const msg=q?'No orders match your search.':orders.length?'No '+oSF+' orders.':'No orders yet. Tap + New to add one.';
+    const msg=q?'No orders match your search.':orders.length?(oSF==='All'?'No orders.':'No '+oSF+' orders.'):'No orders yet. Tap + New to add one.';
     document.getElementById('ol-cards').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+'</div>';
     return;
   }
 
-  document.getElementById('ol-cards').innerHTML=list.map(ord=>{
-    const dm=dispMeta(ord.disp,ord.status);
-    const sk=skCls(ord.status);
-    const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' · '+dm.label:'No date set';
-    const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
-    const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
-    return '<div class="ocard '+sk+'" onclick="openDrawer('+ord.id+')">'
-      +'<div class="ostripe '+sk+'"></div>'
-      +'<div class="obody-c">'
-        +'<div class="orow-c1">'
-          +'<div style="min-width:0"><span class="ocust">'+esc(ord.cust||'—')+'</span>'+(ord.no?' <span class="ono">#'+esc(ord.no)+'</span>':'')+'</div>'
-          +'<span class="'+dispCls+'">'+esc(dispTxt)+'</span>'
-        +'</div>'
-        +'<div class="orow-c2">'
-          +'<span class="c-chip c-chip-ply">'+esc(String(ord.ply||'?'))+' PLY</span>'
-          +'<span class="c-chip c-chip-prod">'+esc(ord.prod||'—')+'</span>'
-        +'</div>'
-        +'<div class="orow-c2" style="padding-left:2px"><span style="font-size:12px;color:var(--ink3);font-weight:500">'+size+'</span></div>'
-        +'<div class="orow-c3">'
-          +'<span class="c-qty">'+fmt(ord.qty)+' nos.</span>'
-          +badge(ord.status)
-        +'</div>'
-      +'</div>'
-    +'</div>';
-  }).join('');
+  document.getElementById('ol-cards').innerHTML=list.map(o=>orderCardHTML(o,{edit:false})).join('');
 }
 function olFilter(s){oSF=s;renderOrders();}
 
@@ -1187,69 +1295,101 @@ async function saveDrawer(){
   const warnEl=document.getElementById('ed-warn');
   if(row.disp&&row.date&&row.disp<row.date){warnEl.style.display='block';return;}
   warnEl.style.display='none';
-  const x=orders.find(o=>o.id===editId);
-  if(x && row.status!==x.status) row.updated_at=new Date().toISOString();
-  if(x) Object.assign(x,row);
-  await db.update('orders',editId,row);
-  closeDrawer();
-  renderOrders(); renderWorkStatus(); renderProductData();
+  const x=orders.find(o=>o.id===editId); if(!x){closeDrawer();return;}
+  if(row.status!==x.status) row.updated_at=new Date().toISOString();
+  // Snapshot only the fields we're about to mutate, for rollback
+  const snapshot={}; Object.keys(row).forEach(k=>snapshot[k]=x[k]);
+  Object.assign(x,row);
+  const id=editId; closeDrawer();
+  renderOrders(); renderWorkStatus();
+  try{
+    const ok=await db.update('orders',id,row);
+    if(ok===null) throw new Error('Save failed');
+    showToast('Order saved','ok');
+    renderProductData();
+  }catch(e){
+    Object.assign(x,snapshot);
+    renderOrders(); renderWorkStatus();
+    showToast('Save failed — reverted','err');
+  }
 }
 async function deleteFromDrawer(){
-  if(!editId||!confirm('Delete this order?')) return;
-  await db.delete('orders',editId);
-  orders=orders.filter(o=>o.id!==editId);
+  if(!editId) return;
+  const src=orders.find(o=>o.id===editId); if(!src){closeDrawer();return;}
+  if(!confirm('Delete this order?\n\n"'+(src.cust||'')+(src.no?' #'+src.no:'')+'"\n\nThis action cannot be undone.')) return;
+  const id=editId;
+  const idx=orders.findIndex(o=>o.id===id);
+  const snapshot=orders[idx];
+  orders.splice(idx,1);
   closeDrawer();
-  renderOrders(); renderWorkStatus(); renderProductData();
+  renderOrders(); renderWorkStatus();
+  try{
+    const ok=await db.delete('orders',id);
+    if(ok===null) throw new Error('Delete failed');
+    showToast('Order deleted','ok');
+    renderProductData();
+  }catch(e){
+    orders.splice(idx,0,snapshot);
+    renderOrders(); renderWorkStatus();
+    showToast('Delete failed — order restored','err');
+  }
 }
 async function duplicateOrder(){
   if(!editId) return;
-  const src=orders.find(o=>o.id===editId);
-  if(!src) return;
+  const src=orders.find(o=>o.id===editId); if(!src) return;
   const row={date:today(),no:'',cust:src.cust,prod:src.prod,ply:src.ply,l:src.l,w:src.w,h:src.h,su:src.su||'in',qty:src.qty,joint:src.joint||'double',disp:'',status:'Pending'};
-  const res=await db.insert('orders',row);
-  if(res){orders.unshift(res[0]);closeDrawer();renderOrders();renderWorkStatus();renderProductData();}
+  try{
+    const res=await db.insert('orders',row);
+    if(!res || !res[0]) throw new Error('Insert failed');
+    orders.unshift(res[0]);
+    closeDrawer();
+    showToast('Order duplicated — set dispatch date on the new copy','ok');
+    renderOrders(); renderWorkStatus(); renderProductData();
+  }catch(e){
+    showToast('Duplicate failed — try again','err');
+  }
 }
 
 // ── WORK STATUS ──────────────────────────────────────────
 function renderWorkStatus(){
-  let list=orders.filter(x=>x.status===woF);
+  const q=(document.getElementById('wo-search')?.value||'').toLowerCase().trim();
+  const pool=orders.filter(x=>x.status===woF);
+  let list=q?pool.filter(x=>orderMatchesQuery(x,q)):pool;
   // Most recently moved (status updated) first — same rule for every pill
   const mv=o=>o.updated_at||o.created_at||'';
   list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
-  const counts={};STATUSES.forEach(s=>counts[s]=orders.filter(x=>x.status===s).length);
+  // Counts reflect the current search — so pill numbers match what you see
+  const searchPool=q?orders.filter(x=>orderMatchesQuery(x,q)):orders;
+  const counts={};STATUSES.forEach(s=>counts[s]=searchPool.filter(x=>x.status===s).length);
   document.getElementById('wo-filters').innerHTML=
     STATUSES.map(s=>{const pc=' pill-'+skCls(s);return '<button class="pill'+pc+(woF===s?' active':'')+'" onclick="woFilter(\''+s+'\')">'+s+' <span class="pill-count">'+counts[s]+'</span></button>';}).join('');
-  if(!list.length){document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc('No '+woF+' orders.')+'</div>';return;}
-  document.getElementById('wo-list').innerHTML=list.map(ord=>{
-    const dm=dispMeta(ord.disp,ord.status);
-    const sk=skCls(ord.status);
-    const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' · '+dm.label:'No date set';
-    const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
-    const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
-    return '<div class="wo-card '+sk+'">'
-      +'<div class="wo-stripe '+sk+'"></div>'
-      +'<div class="obody-c">'
-        +'<div class="orow-c1">'
-          +'<div style="min-width:0"><span class="ocust">'+esc(ord.cust||'—')+'</span>'+(ord.no?' <span class="ono">#'+esc(ord.no)+'</span>':'')+'</div>'
-          +'<span class="'+dispCls+'">'+esc(dispTxt)+'</span>'
-        +'</div>'
-        +'<div class="orow-c2">'
-          +'<span class="c-chip c-chip-ply">'+esc(String(ord.ply||'?'))+' PLY</span>'
-          +'<span class="c-chip c-chip-prod">'+esc(ord.prod||'—')+'</span>'
-        +'</div>'
-        +'<div class="orow-c2" style="padding-left:2px"><span style="font-size:12px;color:var(--ink3);font-weight:500">'+size+'</span></div>'
-        +'<div class="orow-c3">'
-          +'<span class="c-qty">'+fmt(ord.qty)+' nos.</span>'
-          +'<select class="wo-sel" onchange="woStatusChange('+ord.id+',this.value)">'+STATUSES.map(s=>'<option'+(s===ord.status?' selected':'')+'>'+s+'</option>').join('')+'</select>'
-        +'</div>'
-      +'</div>'
-    +'</div>';
-  }).join('');
+  if(!list.length){
+    const msg=q?'No orders match your search.':'No '+woF+' orders.';
+    document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+'</div>';
+    return;
+  }
+  document.getElementById('wo-list').innerHTML=list.map(o=>orderCardHTML(o,{edit:true})).join('');
 }
 function woFilter(f){woF=f;renderWorkStatus();}
 async function woStatusChange(id,s){
-  const x=orders.find(o=>o.id===id);
-  if(x){const ts=new Date().toISOString();x.status=s;x.updated_at=ts;await db.update('orders',id,{status:s,updated_at:ts});renderOrders();renderWorkStatus();}
+  const x=orders.find(o=>o.id===id); if(!x) return;
+  if(x.status===s) return;
+  const prev={status:x.status,updated_at:x.updated_at};
+  const ts=new Date().toISOString();
+  x.status=s; x.updated_at=ts;
+  // Optimistic: update both pages' pills + lists in place
+  renderOrders(); renderWorkStatus();
+  try{
+    const ok=await db.update('orders',id,{status:s,updated_at:ts});
+    if(ok===null) throw new Error('Save failed');
+    showToast('Status → '+s,'ok');
+    // Data page's dropdowns depend on eligible orders — refresh if visible
+    renderProductData();
+  }catch(e){
+    x.status=prev.status; x.updated_at=prev.updated_at;
+    renderOrders(); renderWorkStatus();
+    showToast('Update failed — reverted','err');
+  }
 }
 
 // ── TASKS ────────────────────────────────────────────────
@@ -1581,59 +1721,136 @@ function wCalcFromBoard(){
 
 // ── PRODUCT DATA ─────────────────────────────────────────
 function pdGoPage(p){pdPage=p;renderProductData();}
+function pdRangeChange(){
+  const r=document.getElementById('pdf-range').value;
+  document.getElementById('pdf-month-row').style.display=r==='month'?'':'none';
+  document.getElementById('pdf-custom-row').style.display=r==='custom'?'':'none';
+  if(r!=='month') document.getElementById('pdf-month').value='';
+  if(r!=='custom'){document.getElementById('pdf-from').value='';document.getElementById('pdf-to').value='';}
+  pdGoPage(1);
+}
+// Build a truncated page-number strip: [1] … [n-1] [n] [n+1] … [total]
+function pdPagerHTML(page,totalPages){
+  if(totalPages<=1) return '';
+  const btn=(n,label,active,disabled)=>'<button class="pd-pg-btn'+(active?' active':'')+'" '+(disabled?'disabled ':'')+'onclick="pdGoPage('+n+')">'+label+'</button>';
+  const dots='<span class="pd-pg-btn" style="border:none;background:transparent;cursor:default">…</span>';
+  const nums=new Set([1,totalPages,page-1,page,page+1]);
+  const shown=[...nums].filter(n=>n>=1&&n<=totalPages).sort((a,b)=>a-b);
+  const parts=[btn(page-1,'‹ Prev',false,page===1)];
+  let prev=0;
+  for(const n of shown){
+    if(prev && n-prev>1) parts.push(dots);
+    parts.push(btn(n,String(n),n===page,false));
+    prev=n;
+  }
+  parts.push(btn(page+1,'Next ›',false,page===totalPages));
+  return parts.join('');
+}
+// Shared filter+sort pipeline (used by both render and CSV export)
+function pdComputeList(){
+  const scope=document.getElementById('pdf-scope')?.value||'both';
+  const eligible=orders.filter(o=>{
+    if(scope==='dispatched') return o.status==='Dispatched';
+    if(scope==='partial')    return o.status==='Partial Dispatch';
+    return o.status==='Dispatched'||o.status==='Partial Dispatch';
+  });
+  const custSel=document.getElementById('pdf-cust');
+  const prodSel=document.getElementById('pdf-prod');
+  const rangeSel=document.getElementById('pdf-range');
+  const sortSel=document.getElementById('pdf-sort');
+  let list=eligible;
+  if(custSel?.value) list=list.filter(o=>o.cust===custSel.value);
+  if(prodSel?.value) list=list.filter(o=>o.prod===prodSel.value);
+  const r=rangeSel?.value||'all';
+  if(r==='month'){const m=document.getElementById('pdf-month').value;if(m) list=list.filter(o=>o.disp&&o.disp.slice(0,7)===m);}
+  if(r==='custom'){
+    const f=document.getElementById('pdf-from').value, t=document.getElementById('pdf-to').value;
+    if(f) list=list.filter(o=>o.disp&&o.disp>=f);
+    if(t) list=list.filter(o=>o.disp&&o.disp<=t);
+  }
+  const s=sortSel?.value||'disp-desc';
+  const cmpDate=(a,b)=>(a.disp||'').localeCompare(b.disp||'');
+  if(s==='disp-desc') list.sort((a,b)=>cmpDate(b,a)||(b.id-a.id));
+  else if(s==='disp-asc')  list.sort((a,b)=>cmpDate(a,b)||(a.id-b.id));
+  else if(s==='qty-desc')  list.sort((a,b)=>(b.qty||0)-(a.qty||0));
+  else if(s==='qty-asc')   list.sort((a,b)=>(a.qty||0)-(b.qty||0));
+  else if(s==='cust')      list.sort((a,b)=>(a.cust||'').localeCompare(b.cust||'')||cmpDate(b,a));
+  return list;
+}
 function renderProductData(){
-  const eligible=orders.filter(o=>o.status==='Dispatched'||o.status==='Partial Dispatch');
   const custSel=document.getElementById('pdf-cust');
   const prodSel=document.getElementById('pdf-prod');
   const monthSel=document.getElementById('pdf-month');
   if(!custSel||!prodSel||!monthSel) return;
 
-  // Populate customer dropdown
+  const scope=document.getElementById('pdf-scope')?.value||'both';
+  const eligible=orders.filter(o=>{
+    if(scope==='dispatched') return o.status==='Dispatched';
+    if(scope==='partial')    return o.status==='Partial Dispatch';
+    return o.status==='Dispatched'||o.status==='Partial Dispatch';
+  });
+
+  // Populate customer dropdown — preserve prev selection even if it no longer has orders
   const prevC=custSel.value;
-  const custs=[...new Set(eligible.map(o=>o.cust).filter(Boolean))].sort();
+  const custSet=new Set(eligible.map(o=>o.cust).filter(Boolean));
+  if(prevC) custSet.add(prevC);
+  const custs=[...custSet].sort();
   custSel.innerHTML='<option value="">All customers</option>'+custs.map(c=>'<option'+(c===prevC?' selected':'')+'>'+esc(c)+'</option>').join('');
 
   // Populate month dropdown from actual dispatch dates
   const prevM=monthSel.value;
-  const months=[...new Set(eligible.map(o=>o.disp?o.disp.slice(0,7):null).filter(Boolean))].sort().reverse();
+  const monthSet=new Set(eligible.map(o=>o.disp?o.disp.slice(0,7):null).filter(Boolean));
+  if(prevM) monthSet.add(prevM);
+  const months=[...monthSet].sort().reverse();
   monthSel.innerHTML='<option value="">All months</option>'+months.map(m=>{
     const [yr,mo]=m.split('-');
     const lbl=new Date(yr,mo-1,1).toLocaleString('en-IN',{month:'short',year:'numeric'});
     return '<option value="'+m+'"'+(m===prevM?' selected':'')+'>'+lbl+'</option>';
   }).join('');
 
-  // Apply filters
-  let list=eligible;
-  if(custSel.value) list=list.filter(o=>o.cust===custSel.value);
-  if(prodSel.value) list=list.filter(o=>o.prod===prodSel.value);
-  if(monthSel.value) list=list.filter(o=>o.disp&&o.disp.slice(0,7)===monthSel.value);
+  // Compute the filtered+sorted list
+  const list=pdComputeList();
 
-  // Sort by dispatch date descending — latest first
-  list.sort((a,b)=>(b.disp||'').localeCompare(a.disp||'')||(b.id-a.id));
+  // Active-filter chips
+  const chips=[];
+  if(custSel.value) chips.push({lbl:'Customer: '+custSel.value, clear:'pdChipClear(\'cust\')'});
+  if(prodSel.value) chips.push({lbl:'Product: '+prodSel.value, clear:'pdChipClear(\'prod\')'});
+  const r=document.getElementById('pdf-range').value;
+  if(r==='month' && monthSel.value){const [yr,mo]=monthSel.value.split('-');chips.push({lbl:new Date(yr,mo-1,1).toLocaleString('en-IN',{month:'short',year:'numeric'}), clear:'pdChipClear(\'month\')'});}
+  if(r==='custom'){
+    const f=document.getElementById('pdf-from').value, t=document.getElementById('pdf-to').value;
+    if(f||t) chips.push({lbl:(f||'…')+' → '+(t||'…'), clear:'pdChipClear(\'custom\')'});
+  }
+  if(scope!=='both') chips.push({lbl:scope==='dispatched'?'Dispatched only':'Partial only', clear:'pdChipClear(\'scope\')'});
+  document.getElementById('pd-chips').innerHTML=chips.length
+    ? chips.map(c=>'<button class="pill" onclick="'+c.clear+'">'+esc(c.lbl)+' ✕</button>').join('')
+      +'<button class="pill" style="border-style:dashed" onclick="pdClear()">Clear all</button>'
+    : '';
 
   // Summary — qty reflects filtered list only
   const totalQty=list.reduce((s,o)=>s+(o.qty||0),0);
-  const parts=[];
-  if(custSel.value) parts.push(custSel.value);
-  if(monthSel.value){const [yr,mo]=monthSel.value.split('-');parts.push(new Date(yr,mo-1,1).toLocaleString('en-IN',{month:'short',year:'numeric'}));}
-  document.getElementById('pd-summary-txt').textContent=list.length+' order'+(list.length!==1?'s':'')+(parts.length?' · '+parts.join(' · '):'');
+  document.getElementById('pd-summary-txt').textContent=list.length+' order'+(list.length!==1?'s':'');
   document.getElementById('pd-summary-qty').textContent=list.length?fmt(totalQty)+' nos.':'';
 
   // Pagination
   const total=list.length;
-  const totalPages=Math.ceil(total/PD_PAGE_SIZE)||1;
+  const totalPages=Math.max(1,Math.ceil(total/PD_PAGE_SIZE));
   if(pdPage>totalPages) pdPage=totalPages;
   const start=(pdPage-1)*PD_PAGE_SIZE;
   const pageList=list.slice(start,start+PD_PAGE_SIZE);
 
   if(!pageList.length){
-    document.getElementById('pd-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No dispatched orders found.</div>';
+    const anyFilter=chips.length>0;
+    document.getElementById('pd-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:10px;align-items:center"><div>No orders match the current filters.</div>'
+      +(anyFilter?'<button class="t-empty-clear" onclick="pdClear()">Clear filters</button>':'')
+    +'</div>';
     document.getElementById('pd-pagination').innerHTML='';
     return;
   }
 
   const fmtDate=d=>{if(!d)return '—';const dt=new Date(d+'T00:00:00');return dt.getDate()+' '+dt.toLocaleString('en-IN',{month:'short'})+' '+dt.getFullYear();};
   const showCust=!custSel.value;
+  const pageQty=pageList.reduce((s,o)=>s+(o.qty||0),0);
 
   document.getElementById('pd-list').innerHTML=
     '<div class="pd-tbl-wrap"><table class="pd-tbl">'
@@ -1654,23 +1871,64 @@ function renderProductData(){
         +'<td>'+badge(ord.status)+'</td>'
         +'</tr>';
     }).join('')
-    +'</tbody></table></div>';
+    // Footer with page total (and grand total when more than one page)
+    +'<tfoot><tr style="background:var(--s2);border-top:var(--bw) solid var(--line);font-weight:700">'
+      +'<td colspan="'+(showCust?5:4)+'" style="text-align:right;color:var(--ink3);font-size:11px;text-transform:uppercase;letter-spacing:.04em">'
+        +(totalPages>1?'Page total':'Total')
+      +'</td>'
+      +'<td class="r">'+fmt(pageQty)+'</td>'
+      +'<td></td>'
+    +'</tr>'
+    +(totalPages>1?'<tr style="background:var(--s2);font-weight:700">'
+      +'<td colspan="'+(showCust?5:4)+'" style="text-align:right;color:var(--ink3);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Grand total</td>'
+      +'<td class="r">'+fmt(totalQty)+'</td>'
+      +'<td></td>'
+    +'</tr>':'')
+    +'</tfoot>'
+    +'</table></div>';
 
-  // Pagination controls
+  // Pagination controls (truncated pager)
   document.getElementById('pd-pagination').innerHTML=
     '<span style="font-size:11px;color:var(--ink3)">Showing '+(start+1)+'–'+Math.min(start+PD_PAGE_SIZE,total)+' of '+total+'</span>'
-    +'<div class="pd-pg-btns">'
-    +'<button class="pd-pg-btn" onclick="pdGoPage('+(pdPage-1)+')"'+(pdPage<=1?' disabled':'')+'>← Prev</button>'
-    +(totalPages>1?Array.from({length:totalPages},(_,i)=>'<button class="pd-pg-btn'+(i+1===pdPage?' active':'')+'" onclick="pdGoPage('+(i+1)+')">'+(i+1)+'</button>').join(''):'')
-    +'<button class="pd-pg-btn" onclick="pdGoPage('+(pdPage+1)+')"'+(pdPage>=totalPages?' disabled':'')+'>Next →</button>'
-    +'</div>';
+    +'<div class="pd-pg-btns">'+pdPagerHTML(pdPage,totalPages)+'</div>';
+}
+function pdChipClear(kind){
+  if(kind==='cust') document.getElementById('pdf-cust').value='';
+  else if(kind==='prod') document.getElementById('pdf-prod').value='';
+  else if(kind==='month') document.getElementById('pdf-month').value='';
+  else if(kind==='custom'){document.getElementById('pdf-from').value='';document.getElementById('pdf-to').value='';}
+  else if(kind==='scope') document.getElementById('pdf-scope').value='both';
+  pdGoPage(1);
 }
 function pdClear(){
   document.getElementById('pdf-cust').value='';
   document.getElementById('pdf-prod').value='';
   document.getElementById('pdf-month').value='';
+  document.getElementById('pdf-from').value='';
+  document.getElementById('pdf-to').value='';
+  document.getElementById('pdf-range').value='all';
+  document.getElementById('pdf-sort').value='disp-desc';
+  document.getElementById('pdf-scope').value='both';
+  document.getElementById('pdf-month-row').style.display='none';
+  document.getElementById('pdf-custom-row').style.display='none';
   pdPage=1;
   renderProductData();
+}
+function pdExportCsv(){
+  const list=pdComputeList();
+  if(!list.length){showToast('Nothing to export — apply filters that return orders','err');return;}
+  const head=['Dispatch date','Order date','Customer','Order no','Product','PLY','L','W','H','Unit','Qty','Status'];
+  const q=v=>{const s=(v==null?'':String(v));return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+  const rows=list.map(o=>[o.disp,o.date,o.cust,o.no,o.prod,o.ply,o.l,o.w,o.h,o.su,o.qty,o.status].map(q).join(','));
+  // Excel-friendly: UTF-8 BOM + CRLF
+  const csv='﻿'+[head.join(','),...rows].join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='beepee-dispatched-'+today()+'.csv';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1000);
+  showToast('Exported '+list.length+' rows','ok');
 }
 
 // ── PARTIES ──────────────────────────────────────────────
@@ -1716,9 +1974,13 @@ function nav(v){
 async function init(){
   appInited=true;
   document.getElementById('ol-cards').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">Loading…</div>';
-  const [p,o,t]=await Promise.all([db.get('parties'),db.get('orders'),db.get('tasks')]);
-  // orders & tasks show newest-first (matches unshift on add); parties stay oldest-first (append on add)
-  parties=p||[]; orders=(o||[]).reverse(); tasks=(t||[]).reverse();
+  // parties come oldest-first (append on add); orders & tasks come newest-first from the server
+  const [p,o,t]=await Promise.all([
+    sbFetch('parties?order=created_at.asc&limit=2000'),
+    db.get('orders'),
+    db.get('tasks')
+  ]);
+  parties=p||[]; orders=o||[]; tasks=t||[];
   renderOrders(); renderTasks(); renderParties(); wPlyChange();
 }
 checkAuth();
