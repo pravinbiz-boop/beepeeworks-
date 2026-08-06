@@ -106,6 +106,12 @@ body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-appl
   .pd-tbl td{padding:7px 8px;font-size:11.5px}
   /* ── Weight page: stack board size inputs ── */
   .w-board-row{flex-direction:column;gap:8px}
+  /* ── Task new-row: stack Add/✕ buttons under fields on narrow phones ── */
+  #t-new-row{flex-wrap:wrap}
+  #t-new-row .taskcard-body{flex:1 1 100%;order:1}
+  #t-new-row .taskcard-actions{flex:1 1 100%;order:2;justify-content:flex-end}
+  /* ── Task cards: shrink status select width to make room ── */
+  .taskcard .tstatus-sel{max-width:130px}
 }
 
 /* ── SHELL ── */
@@ -254,25 +260,46 @@ table.t{width:100%;border-collapse:collapse}
 
 /* ── TASKS ── */
 .tcard{background:var(--surface);border-left:3px solid var(--line2);border-radius:var(--r2);display:flex;align-items:center;gap:8px;padding:10px 12px;transition:all .15s ease;border:var(--bw) solid var(--line);border-left-width:3px}
-.tcard.Pending{border-left-color:var(--muted);background:var(--surface)}
-.tcard.In-progress{border-left-color:var(--amber);background:var(--amber-bg);border-color:rgba(180,83,9,.1)}
-.tcard.Done{border-left-color:var(--green);background:var(--green-bg);border-color:rgba(21,128,61,.08)}
-.tcard.Done .tname{color:var(--ink3);text-decoration:line-through}
+.taskcard{background:var(--surface);border-left:3px solid var(--line2);border-radius:var(--r2);display:flex;align-items:center;gap:8px;padding:10px 12px;transition:background .15s ease,border-color .15s ease;border:var(--bw) solid var(--line);border-left-width:3px;cursor:pointer}
+.taskcard:hover{background:var(--s2)}
+.taskcard.Pending{border-left-color:var(--muted);background:var(--surface)}
+.taskcard.In-progress{border-left-color:var(--amber);background:var(--amber-bg);border-color:rgba(180,83,9,.1)}
+.taskcard.Done{border-left-color:var(--green);background:var(--green-bg);border-color:rgba(21,128,61,.08)}
+.taskcard.Done .tname,.taskcard.Done .tmeta{color:var(--ink3);text-decoration:line-through;text-decoration-thickness:1px}
+.taskcard.pending-save{opacity:.6;pointer-events:none}
 .task-list{display:flex;flex-direction:column;gap:6px}
+.taskcard-body{flex:1;min-width:0;display:flex;flex-direction:column}
+.taskcard-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.taskcard-actions .tstatus-sel,.taskcard-actions .btn-del-task{pointer-events:auto}
 .tdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid transparent}
 .tdot.Pending{border-color:var(--muted);background:transparent}
 .tdot.In-progress{background:var(--amber);border-color:var(--amber)}
 .tdot.Done{background:var(--green);border-color:var(--green)}
-.tname{font-size:13px;font-weight:500;color:var(--ink);line-height:1.3}
+.tname{font-size:13px;font-weight:500;color:var(--ink);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tmeta{font-size:10.5px;color:var(--ink3);margin-top:1px}
 .tstatus-sel{font-family:'Manrope',sans-serif;font-size:11px;border:var(--bw) solid var(--line);border-radius:var(--r3);background:var(--surface);height:30px;padding:0 8px;color:var(--ink);cursor:pointer;font-weight:500;transition:border-color .15s}
 .tstatus-sel:focus{border-color:var(--accent)}
 .btn-del-task{
   height:32px;width:32px;padding:0;border-radius:var(--r3);color:var(--red);background:transparent;
-  border:var(--bw) solid var(--line);cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;
+  border:var(--bw) solid var(--line);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;
   opacity:.5;transition:all .15s ease;
 }
 .btn-del-task:hover{opacity:1;background:var(--red-bg);border-color:var(--red)}
+.btn-del-task svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Tasks toolbar row: sort + count */
+.t-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 8px}
+.t-toolbar-left{font-size:11px;color:var(--ink3);font-weight:600}
+.t-sort-sel{font-family:'Manrope',sans-serif;font-size:12px;height:32px;padding:0 8px;border-radius:var(--r3);border:var(--bw) solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+/* Empty state */
+.t-empty{text-align:center;padding:40px 16px;color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:10px;align-items:center}
+.t-empty-clear{background:transparent;border:var(--bw) solid var(--line);border-radius:var(--r3);padding:6px 12px;font-size:12px;color:var(--accent);cursor:pointer;font-family:'Manrope',sans-serif;font-weight:600}
+.t-empty-clear:hover{background:var(--s2)}
+/* Toast */
+.toast-wrap{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:6px;pointer-events:none;max-width:calc(100% - 24px)}
+.toast{background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:12.5px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s;pointer-events:auto}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.err{background:#B91C1C}
+.toast.ok{background:#15803D}
 
 /* ── SOP ── */
 .sop-section{margin-bottom:20px;background:var(--surface);border-radius:var(--r2);border:var(--bw) solid var(--line);overflow:hidden;box-shadow:var(--shadow-sm)}.sop-section.sop-blue{border-left:3px solid var(--blue)}.sop-section.sop-green{border-left:3px solid var(--green)}
@@ -514,7 +541,18 @@ table.t{width:100%;border-collapse:collapse}
     </div>
     <div class="fbar" id="t-filters"></div>
     <div class="mbar" id="t-member-filters"></div>
+    <div class="t-toolbar">
+      <div class="t-toolbar-left" id="t-count-lbl">0 tasks</div>
+      <select class="t-sort-sel" id="t-sort" onchange="tSortChange(this.value)">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="assigned">By assignee</option>
+        <option value="status">By status</option>
+        <option value="alpha">A → Z</option>
+      </select>
+    </div>
     <div class="task-list" id="t-list"></div>
+    <div class="pd-pagination" id="t-pagination" style="display:none"></div>
   </section>
 
   <!-- WEIGHT -->
@@ -800,6 +838,42 @@ table.t{width:100%;border-collapse:collapse}
   </div>
 </div>
 
+<!-- TASK DRAWER -->
+<div class="drawer-backdrop" id="td-backdrop" onclick="closeTaskDrawer()"></div>
+<div class="drawer" id="task-drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-head">
+    <span class="drawer-title" id="td-title">Edit Task</span>
+    <button class="btn-del" onclick="closeTaskDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" style="display:flex;flex-direction:column;gap:12px">
+    <div class="frow">
+      <label class="flbl">Task *</label>
+      <input class="inp" id="td-task" placeholder="What needs to be done?">
+    </div>
+    <div class="fg2">
+      <div class="frow"><label class="flbl">Assigned to</label>
+        <select class="sel" id="td-assigned"></select>
+      </div>
+      <div class="frow"><label class="flbl">Status</label>
+        <select class="sel" id="td-status">
+          <option>Pending</option><option>In progress</option><option>Done</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow"><label class="flbl">Created</label>
+      <input class="inp" id="td-date" readonly style="opacity:.7">
+    </div>
+  </div>
+  <div class="drawer-foot">
+    <button class="btn btn-g btn-full" onclick="deleteFromTaskDrawer()" style="flex:0 0 auto;width:auto;padding:0 16px;color:var(--red);border-color:var(--red)">Delete</button>
+    <button class="btn btn-p btn-full" onclick="saveTaskDrawer()">Save</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
 <datalist id="custList"></datalist>
 
 <script>
@@ -891,8 +965,30 @@ let parties=[], orders=[], tasks=[];
 let pf='all', oSF='Pending', tSF='All', tMF='All', woF='Pending', pdPage=1;
 const PD_PAGE_SIZE=50;
 let editId=null;
+let editTaskId=null;
 let appInited=false;
 let wReelEdited=false, wCutEdited=false, wTotalGsmEdited=false;
+let tSort='newest', tPage=1;
+const T_PAGE_SIZE=50;
+const T_LS_KEY='beepee.tasks.filters.v1';
+// Load persisted filters from localStorage on module init (before first render)
+try{
+  const p=JSON.parse(localStorage.getItem(T_LS_KEY)||'{}');
+  if(p.tSF) tSF=p.tSF; if(p.tMF) tMF=p.tMF; if(p.tSort) tSort=p.tSort;
+}catch(e){}
+function saveTaskFilters(){
+  try{localStorage.setItem(T_LS_KEY,JSON.stringify({tSF,tMF,tSort}));}catch(e){}
+}
+// Toast
+function showToast(msg,kind){
+  const wrap=document.getElementById('toast-wrap'); if(!wrap) return;
+  const el=document.createElement('div');
+  el.className='toast '+(kind||'');
+  el.textContent=msg;
+  wrap.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),250);},2600);
+}
 
 // ── HELPERS ──────────────────────────────────────────────
 const fmt=n=>(n||0).toLocaleString('en-IN');
@@ -1157,9 +1253,61 @@ async function woStatusChange(id,s){
 }
 
 // ── TASKS ────────────────────────────────────────────────
-function renderTasks(){
+// SVG delete icon markup (reused)
+const TRASH_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+// Return the list of member chip labels: canonical MEMBERS + Unassigned (if any) + Other (if any unknown assignees)
+function tMemberChips(){
+  const known=new Set(MEMBERS);
+  let hasUnassigned=false, hasOther=false;
+  for(const t of tasks){
+    const a=(t.assigned||'').trim();
+    if(!a) hasUnassigned=true;
+    else if(!known.has(a)) hasOther=true;
+  }
+  const chips=[...MEMBERS];
+  if(hasUnassigned) chips.push('Unassigned');
+  if(hasOther) chips.push('Other');
+  return chips;
+}
+// Matches a task against a member chip
+function tMemberMatch(t,m){
+  const a=(t.assigned||'').trim();
+  if(m==='Unassigned') return !a;
+  if(m==='Other') return !!a && !MEMBERS.includes(a);
+  return a===m;
+}
+// Filter + sort + return the visible list
+function tVisibleList(){
   let list=tSF==='All'?[...tasks]:tasks.filter(t=>t.status===tSF);
-  if(tMF!=='All') list=list.filter(t=>t.assigned===tMF);
+  if(tMF!=='All') list=list.filter(t=>tMemberMatch(t,tMF));
+  const order={Pending:0,'In progress':1,Done:2};
+  if(tSort==='oldest') list.reverse();
+  else if(tSort==='assigned') list.sort((a,b)=>(a.assigned||'~').localeCompare(b.assigned||'~'));
+  else if(tSort==='status') list.sort((a,b)=>(order[a.status]??9)-(order[b.status]??9));
+  else if(tSort==='alpha') list.sort((a,b)=>(a.task||'').localeCompare(b.task||''));
+  // 'newest' is the natural order (tasks stored newest-first)
+  return list;
+}
+// Build one task card element (returns an HTMLElement for in-place updates)
+function tCardHTML(t){
+  const cls=(t.status||'Pending').replace(/ /g,'-');
+  const displayAssigned=(t.assigned||'').trim()||'Unassigned';
+  return '<div class="taskcard '+cls+'" data-tid="'+t.id+'" onclick="openTaskDrawer('+t.id+')">'
+    +'<div class="tdot '+cls+'"></div>'
+    +'<div class="taskcard-body">'
+      +'<div class="tname">'+esc(t.task||'—')+'</div>'
+      +'<div class="tmeta">'+esc(displayAssigned)+' · '+esc(t.date||'')+'</div>'
+    +'</div>'
+    +'<div class="taskcard-actions" onclick="event.stopPropagation()">'
+      +'<select class="tstatus-sel" onchange="uT('+t.id+',\'status\',this.value)">'
+        +TSTATS.map(s=>'<option'+(s===t.status?' selected':'')+'>'+s+'</option>').join('')
+      +'</select>'
+      +'<button class="btn-del-task" onclick="confirmDelTask('+t.id+')" aria-label="Delete task">'+TRASH_SVG+'</button>'
+    +'</div>'
+  +'</div>';
+}
+function renderTasks(){
+  // Status filter pills
   const counts={All:tasks.length};TSTATS.forEach(s=>counts[s]=tasks.filter(t=>t.status===s).length);
   document.getElementById('t-filters').innerHTML=
     ['All',...TSTATS].map(s=>{
@@ -1167,67 +1315,216 @@ function renderTasks(){
       const cls=s==='All'?'':clsMap[s]||'';
       return '<button class="pill'+cls+(tSF===s?' active':'')+'" onclick="tFilter(\''+s+'\')">'+s+' <span class="pill-count">'+(counts[s]||0)+'</span></button>';
     }).join('');
-  const mCounts={All:tasks.length};MEMBERS.forEach(m=>mCounts[m]=tasks.filter(t=>t.assigned===m).length);
+  // Member filter chips (canonical + Unassigned + Other as needed)
+  const chips=tMemberChips();
+  const mCounts={All:tasks.length};chips.forEach(m=>mCounts[m]=tasks.filter(t=>tMemberMatch(t,m)).length);
   document.getElementById('t-member-filters').innerHTML='<span class="mbar-label">By</span>'+
-    ['All',...MEMBERS].map(m=>{
+    ['All',...chips].map(m=>{
       const ini=m==='All'?'':'<span class="mchip-avatar">'+m.charAt(0)+'</span>';
-      return '<button class="mchip'+(tMF===m?' active':'')+'" onclick="tMFilter(\''+m+'\')">'+ini+esc(m)+(m!=='All'?' <span class="pill-count">'+mCounts[m]+'</span>':'')+'</button>';
+      return '<button class="mchip'+(tMF===m?' active':'')+'" onclick="tMFilter(\''+m+'\')">'+ini+esc(m)+(m!=='All'?' <span class="pill-count">'+(mCounts[m]||0)+'</span>':'')+'</button>';
     }).join('');
-  if(!list.length){document.getElementById('t-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">No tasks found.</div>';return;}
-  document.getElementById('t-list').innerHTML=list.map(t=>{
-    const clsName=(t.status||'Pending').replace(/ /g,'-');
-    return '<div class="tcard '+clsName+'">'
-      +'<div class="tdot '+clsName+'"></div>'
-      +'<div style="flex:1;min-width:0;cursor:pointer" onclick="editTaskName('+t.id+')">'
-        +'<div class="tname">'+esc(t.task||'—')+'</div>'
-        +'<div class="tmeta">'+esc(t.assigned||'—')+' · '+esc(t.date||'')+'</div>'
-      +'</div>'
-      +'<select class="tstatus-sel" onchange="uT('+t.id+',\'status\',this.value)">'
-        +TSTATS.map(s=>'<option'+(s===t.status?' selected':'')+'>'+s+'</option>').join('')
-      +'</select>'
-      +'<button class="btn-del-task" onclick="confirmDelTask('+t.id+')" aria-label="Delete task">🗑</button>'
+  // Reflect persisted sort
+  const sortSel=document.getElementById('t-sort'); if(sortSel&&sortSel.value!==tSort) sortSel.value=tSort;
+  // Compute the visible list, clamp pagination, then render
+  const list=tVisibleList();
+  const totalPages=Math.max(1,Math.ceil(list.length/T_PAGE_SIZE));
+  if(tPage>totalPages) tPage=totalPages;
+  document.getElementById('t-count-lbl').textContent=list.length+(list.length===1?' task':' tasks');
+  const listEl=document.getElementById('t-list');
+  if(!list.length){
+    const anyFilter=(tSF!=='All'||tMF!=='All');
+    listEl.innerHTML='<div class="t-empty"><div>No tasks match the current filters.</div>'
+      +(anyFilter?'<button class="t-empty-clear" onclick="tClearFilters()">Clear filters</button>':'<div style="font-size:11.5px;color:var(--ink3)">Click <b>+ New</b> above to add one.</div>')
     +'</div>';
-  }).join('');
-}
-function confirmDelTask(id){
-  const t=tasks.find(x=>x.id===id);
-  if(!t) return;
-  const name=t.task||'this task';
-  if(confirm('Delete this task?  "'+name+'"  This action cannot be undone.')){
-    delT(id);
+    document.getElementById('t-pagination').style.display='none';
+    return;
   }
+  const start=(tPage-1)*T_PAGE_SIZE, page=list.slice(start,start+T_PAGE_SIZE);
+  listEl.innerHTML=page.map(tCardHTML).join('');
+  // Pagination controls
+  const pgEl=document.getElementById('t-pagination');
+  if(totalPages>1){
+    pgEl.style.display='flex';
+    const btns=[];
+    btns.push('<button class="pd-pg-btn" onclick="tGoPage('+(tPage-1)+')"'+(tPage===1?' disabled':'')+'>‹ Prev</button>');
+    for(let i=1;i<=totalPages;i++) btns.push('<button class="pd-pg-btn'+(i===tPage?' active':'')+'" onclick="tGoPage('+i+')">'+i+'</button>');
+    btns.push('<button class="pd-pg-btn" onclick="tGoPage('+(tPage+1)+')"'+(tPage===totalPages?' disabled':'')+'>Next ›</button>');
+    pgEl.innerHTML='<span style="font-size:11px;color:var(--ink3)">Page '+tPage+' of '+totalPages+'</span><div class="pd-pg-btns">'+btns.join('')+'</div>';
+  } else pgEl.style.display='none';
 }
+// In-place card update — no full re-render, keeps scroll position
+function updateTaskCardDom(id){
+  const t=tasks.find(x=>x.id===id); if(!t) return;
+  const el=document.querySelector('.taskcard[data-tid="'+id+'"]'); if(!el) return;
+  const wrap=document.createElement('div');
+  wrap.innerHTML=tCardHTML(t);
+  el.replaceWith(wrap.firstElementChild);
+}
+function tGoPage(p){tPage=p;renderTasks();window.scrollTo({top:0,behavior:'smooth'});}
+function tSortChange(v){tSort=v;tPage=1;saveTaskFilters();renderTasks();}
+function tClearFilters(){tSF='All';tMF='All';tPage=1;saveTaskFilters();renderTasks();}
+function tFilter(s){tSF=s;tPage=1;saveTaskFilters();renderTasks();}
+function tMFilter(m){tMF=m;tPage=1;saveTaskFilters();renderTasks();}
+
+function confirmDelTask(id){
+  const t=tasks.find(x=>x.id===id); if(!t) return;
+  if(confirm('Delete this task?\n\n"'+(t.task||'this task')+'"\n\nThis action cannot be undone.')) delT(id);
+}
+
 function addTask(){
-  if(document.getElementById('t-new-row')) return;
+  // If a new-row already exists, refocus its input instead of silently no-op
+  const existing=document.getElementById('t-new-row');
+  if(existing){
+    const inp=existing.querySelector('#t-new-name');
+    if(inp){inp.focus();existing.scrollIntoView({behavior:'smooth',block:'center'});}
+    return;
+  }
+  // If viewing a non-Pending filter, switch to Pending so the new row is visible after save
+  if(tSF!=='All' && tSF!=='Pending'){tSF='Pending';tPage=1;saveTaskFilters();renderTasks();}
   const row=document.createElement('div');
-  row.className='tcard Pending';row.id='t-new-row';
+  row.className='taskcard Pending';row.id='t-new-row';
   row.innerHTML='<div class="tdot Pending"></div>'
-    +'<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">'
-      +'<input class="inp" id="t-new-name" placeholder="Task name" style="height:32px;font-size:13px">'
-      +'<select class="tstatus-sel" id="t-new-assign" style="height:28px;font-size:12px;width:100%"><option value="">Unassigned</option>'+MEMBERS.map(m=>'<option>'+m+'</option>').join('')+'</select>'
+    +'<div class="taskcard-body" style="gap:6px">'
+      +'<input class="inp" id="t-new-name" placeholder="Task name" style="height:36px;font-size:16px" onkeydown="if(event.key===\'Enter\')saveNewTask();if(event.key===\'Escape\')cancelNewTask()">'
+      +'<select class="tstatus-sel" id="t-new-assign" style="height:34px;font-size:14px;width:100%"><option value="">Unassigned</option>'+MEMBERS.map(m=>'<option>'+m+'</option>').join('')+'</select>'
     +'</div>'
-    +'<button class="btn btn-p btn-sm" onclick="saveNewTask()">Add</button>'
-    +'<button class="btn-del-task" onclick="cancelNewTask()">✕</button>';
-  document.getElementById('t-list').prepend(row);
+    +'<div class="taskcard-actions">'
+      +'<button class="btn btn-p btn-sm" onclick="saveNewTask()">Add</button>'
+      +'<button class="btn-del-task" onclick="cancelNewTask()" aria-label="Cancel">'+TRASH_SVG+'</button>'
+    +'</div>';
+  const listEl=document.getElementById('t-list');
+  // Remove any empty-state placeholder before prepending
+  const empty=listEl.querySelector('.t-empty'); if(empty) empty.remove();
+  listEl.prepend(row);
+  row.scrollIntoView({behavior:'smooth',block:'nearest'});
   document.getElementById('t-new-name').focus();
 }
+
 async function saveNewTask(){
-  const name=(document.getElementById('t-new-name').value||'').trim();
+  const rowEl=document.getElementById('t-new-row'); if(!rowEl) return;
+  const nameInp=document.getElementById('t-new-name');
+  const name=(nameInp.value||'').trim();
   const assigned=(document.getElementById('t-new-assign').value||'').trim();
-  if(!name){document.getElementById('t-new-name').focus();return;}
+  if(!name){nameInp.focus();showToast('Task name is required','err');return;}
+  rowEl.classList.add('pending-save');
   const row={date:today(),task:name,assigned:assigned,status:'Pending'};
-  const res=await db.insert('tasks',row);
-  if(res){tasks.unshift(res[0]);renderTasks();}
+  try{
+    const res=await db.insert('tasks',row);
+    if(res && res[0]){
+      tasks.unshift(res[0]);
+      showToast('Task added','ok');
+      renderTasks();
+    } else {
+      rowEl.classList.remove('pending-save');
+      showToast('Could not save — check your connection','err');
+    }
+  }catch(e){
+    rowEl.classList.remove('pending-save');
+    showToast('Save failed: '+(e.message||'unknown error'),'err');
+  }
 }
-function cancelNewTask(){const r=document.getElementById('t-new-row');if(r)r.remove();}
-async function uT(id,f,v){const x=tasks.find(t=>t.id===id);if(x){x[f]=v;await db.update('tasks',id,{[f]:v});renderTasks();}}
-async function delT(id){await db.delete('tasks',id);tasks=tasks.filter(t=>t.id!==id);renderTasks();}
-function tFilter(s){tSF=s;renderTasks();}
-function tMFilter(m){tMF=m;renderTasks();}
-function editTaskName(id){
-  const t=tasks.find(x=>x.id===id);if(!t)return;
-  const v=prompt('Edit task name:',t.task||'');
-  if(v!==null&&v.trim())uT(id,'task',v.trim());
+function cancelNewTask(){const r=document.getElementById('t-new-row');if(r)r.remove();renderTasks();}
+
+// Optimistic update: apply locally + patch card DOM in place, roll back on failure
+async function uT(id,f,v){
+  const x=tasks.find(t=>t.id===id); if(!x) return;
+  const prev=x[f];
+  if(prev===v) return;
+  x[f]=v;
+  updateTaskCardDom(id);
+  // Status changes may affect filter counts / pagination — refresh chips silently
+  if(f==='status'||f==='assigned'){
+    // Only refresh the chip bars, not the whole list
+    const counts={All:tasks.length};TSTATS.forEach(s=>counts[s]=tasks.filter(t=>t.status===s).length);
+    document.querySelectorAll('#t-filters .pill').forEach(btn=>{
+      const label=btn.textContent.trim().split(' ')[0];
+      const key=label==='In'?'In progress':label; // handle "In progress"
+      const c=btn.querySelector('.pill-count');
+      if(c && counts[key]!=null) c.textContent=counts[key];
+    });
+  }
+  try{
+    const ok=await db.update('tasks',id,{[f]:v});
+    if(ok===null){throw new Error('Save failed');}
+  }catch(e){
+    x[f]=prev; updateTaskCardDom(id);
+    showToast('Update failed — reverted','err');
+  }
+}
+
+async function delT(id){
+  const idx=tasks.findIndex(t=>t.id===id); if(idx<0) return;
+  const snapshot=tasks[idx];
+  tasks.splice(idx,1);
+  renderTasks();
+  try{
+    const ok=await db.delete('tasks',id);
+    if(ok===null){throw new Error('Delete failed');}
+    showToast('Task deleted','ok');
+  }catch(e){
+    tasks.splice(idx,0,snapshot); renderTasks();
+    showToast('Delete failed — task restored','err');
+  }
+}
+
+// ── TASK DRAWER (replaces prompt/confirm) ──
+function openTaskDrawer(id){
+  const t=tasks.find(x=>x.id===id); if(!t) return;
+  editTaskId=id;
+  document.getElementById('td-title').textContent='Edit Task';
+  document.getElementById('td-task').value=t.task||'';
+  document.getElementById('td-date').value=t.date||'';
+  document.getElementById('td-status').value=t.status||'Pending';
+  // Populate assignee dropdown with canonical members + preserve any legacy value
+  const cur=(t.assigned||'').trim();
+  const opts=['<option value="">Unassigned</option>']
+    .concat(MEMBERS.map(m=>'<option'+(m===cur?' selected':'')+'>'+m+'</option>'));
+  if(cur && !MEMBERS.includes(cur)) opts.push('<option selected>'+esc(cur)+'</option>');
+  document.getElementById('td-assigned').innerHTML=opts.join('');
+  if(!cur) document.getElementById('td-assigned').value='';
+  document.getElementById('td-backdrop').classList.add('open');
+  document.getElementById('task-drawer').classList.add('open');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('td-task').focus(),200);
+}
+function closeTaskDrawer(){
+  document.getElementById('td-backdrop').classList.remove('open');
+  document.getElementById('task-drawer').classList.remove('open');
+  document.body.style.overflow='';
+  editTaskId=null;
+}
+async function saveTaskDrawer(){
+  if(!editTaskId) return;
+  const t=tasks.find(x=>x.id===editTaskId); if(!t){closeTaskDrawer();return;}
+  const newTask=(document.getElementById('td-task').value||'').trim();
+  const newAssigned=(document.getElementById('td-assigned').value||'').trim();
+  const newStatus=document.getElementById('td-status').value;
+  if(!newTask){showToast('Task name is required','err');document.getElementById('td-task').focus();return;}
+  const patch={};
+  if(newTask!==t.task) patch.task=newTask;
+  if(newAssigned!==(t.assigned||'')) patch.assigned=newAssigned;
+  if(newStatus!==t.status) patch.status=newStatus;
+  if(!Object.keys(patch).length){closeTaskDrawer();return;}
+  const snapshot={task:t.task,assigned:t.assigned,status:t.status};
+  Object.assign(t,patch);
+  updateTaskCardDom(editTaskId);
+  const id=editTaskId; closeTaskDrawer();
+  try{
+    const ok=await db.update('tasks',id,patch);
+    if(ok===null){throw new Error('Save failed');}
+    showToast('Task saved','ok');
+    // Rerender to reflect any filter/count changes
+    renderTasks();
+  }catch(e){
+    Object.assign(t,snapshot); updateTaskCardDom(id);
+    showToast('Save failed — reverted','err');
+  }
+}
+function deleteFromTaskDrawer(){
+  if(!editTaskId) return;
+  const t=tasks.find(x=>x.id===editTaskId); if(!t){closeTaskDrawer();return;}
+  if(!confirm('Delete this task?\n\n"'+(t.task||'')+'"\n\nThis action cannot be undone.')) return;
+  const id=editTaskId; closeTaskDrawer(); delT(id);
 }
 
 // ── WEIGHT ───────────────────────────────────────────────
@@ -1426,6 +1723,9 @@ async function init(){
 }
 checkAuth();
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkAuth();});
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='Escape' && editTaskId!==null) closeTaskDrawer();
+});
 </script>
 </body>
 </html>
