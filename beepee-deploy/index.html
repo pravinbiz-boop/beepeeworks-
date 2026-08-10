@@ -110,8 +110,21 @@ body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-appl
   #t-new-row{flex-wrap:wrap}
   #t-new-row .taskcard-body{flex:1 1 100%;order:1}
   #t-new-row .taskcard-actions{flex:1 1 100%;order:2;justify-content:flex-end}
-  /* ── Task cards: shrink status select width to make room ── */
-  .taskcard .tstatus-sel{max-width:130px}
+  /* ── Task cards: give the task text the space it deserves ── */
+  .taskcard{flex-wrap:wrap;align-items:flex-start;padding:10px 12px;column-gap:8px;row-gap:6px}
+  .taskcard .tdot{margin-top:6px}
+  .taskcard-body{flex:1 1 100%;order:1}
+  .taskcard .tname{white-space:normal;font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .taskcard .tmeta{font-size:10.5px;opacity:.75}
+  .taskcard-actions{flex:1 1 100%;order:2;justify-content:flex-end;padding-left:22px}
+  /* Compact status select on mobile — still 16px to block iOS zoom */
+  .taskcard-actions .tstatus-sel{max-width:130px;height:30px;padding:0 6px}
+  /* Trash becomes a subtle icon, no border box, low opacity until touched */
+  .taskcard .btn-del-task{width:28px;height:28px;border:none;background:transparent;opacity:.35}
+  .taskcard .btn-del-task:active,.taskcard .btn-del-task:hover{opacity:1;background:var(--red-bg)}
+  .taskcard .btn-del-task svg{width:14px;height:14px}
+  /* Keep the +New inline row compact and single-row */
+  #t-new-row .taskcard-actions{padding-left:0}
 }
 
 /* ── SHELL ── */
@@ -236,7 +249,13 @@ table.t{width:100%;border-collapse:collapse}
 .wo-card{background:var(--surface);border-radius:var(--r2);display:flex;overflow:hidden;border:var(--bw) solid var(--line);transition:box-shadow .15s,transform .15s;cursor:pointer}
 .wo-card:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
 .wo-card:active{transform:translateY(0)}
-.wo-card.pn,.wo-card.ip,.wo-card.pd,.wo-card.rd,.wo-card.ds{background:var(--surface);border-color:var(--line)}
+.wo-card.pn{background:var(--surface);border-color:var(--line)}
+.wo-card.ip{background:var(--amber-bg);border-color:rgba(180,83,9,.18)}
+.wo-card.pd{background:var(--blue-bg);border-color:rgba(29,78,216,.15)}
+.wo-card.rd{background:var(--green-bg);border-color:rgba(21,128,61,.15)}
+.wo-card.ds{background:var(--s2);border-color:var(--line2)}
+/* Bump the left stripe for a clearer status signal */
+.wo-stripe{width:4px}
 .wo-stripe{width:3px;flex-shrink:0}
 .wo-stripe.pn{background:var(--muted)}.wo-stripe.ip{background:var(--amber)}
 .wo-stripe.pd{background:var(--blue)}.wo-stripe.rd{background:var(--green)}
@@ -1000,7 +1019,7 @@ const PRODUCTS=['Box','Pallet','Layer / Board','OE Layer','Corner Pad'];
 const PLYS=['2','3','5','7'];
 const STATUSES=['Pending','In Production','Partial Dispatch','Ready','Dispatched'];
 const TSTATS=['Pending','In progress','Done'];
-const MEMBERS=['Production','Accounts','Owner'];
+const MEMBERS=['Mahesh','Kondal','Pravin'];
 const JOINTS=['double','single'];
 const SUNITS=['in','cm'];
 const PLY_LAYERS={
