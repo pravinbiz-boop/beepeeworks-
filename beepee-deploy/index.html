@@ -125,6 +125,22 @@ body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-appl
   .taskcard .btn-del-task svg{width:14px;height:14px}
   /* Keep the +New inline row compact and single-row */
   #t-new-row .taskcard-actions{padding-left:0}
+
+  /* ── Partial Dispatch: keep qty + balance chip readable on 350–390px phones ── */
+  .orow-c3{gap:6px}
+  .orow-c3>.c-qty{flex-wrap:wrap;font-size:12px}
+  .qtag{font-size:10px;padding:2px 6px}
+
+  /* Data page: keep the new columns from crowding — the wrapper already scrolls X */
+  .pd-tbl th,.pd-tbl td{white-space:nowrap}
+
+  /* Work Status inline Partial prompt: single-line becomes two lines gracefully on phones */
+  .wo-part-prompt{gap:6px}
+  .wo-part-inp{width:80px;height:38px;font-size:16px}
+  .wo-part-save,.wo-part-cancel{height:38px}
+
+  /* Drawer dispatched-so-far row: stack the two halves on very narrow screens */
+  #ed-dqty-row{grid-template-columns:1fr 1fr}
 }
 
 /* ── SHELL ── */
@@ -238,7 +254,19 @@ table.t{width:100%;border-collapse:collapse}
 .c-disp.ok{background:var(--green-bg);color:var(--green)}
 .c-disp.done{background:var(--s2);color:var(--muted)}
 .c-disp.nodate{background:var(--s2);color:var(--muted)}
-.c-qty{font-size:12.5px;font-weight:700;color:var(--ink)}
+.c-qty{font-size:12.5px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.c-qty-part{color:var(--amber)}
+.qtag{
+  display:inline-block;
+  font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:5px;
+  background:var(--amber-bg);color:var(--amber);
+  border:1px solid rgba(180,83,9,.2);
+  font-variant-numeric:tabular-nums;
+  vertical-align:middle;
+}
+/* Balance chip: allow the qty group to wrap on very narrow phones without pushing the badge off */
+.orow-c3{flex-wrap:wrap}
+.orow-c3>.c-qty{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0}
 
 /* ── FILTER BAR ── */
 .fbar{display:flex;gap:6px;padding:8px 0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -256,6 +284,22 @@ table.t{width:100%;border-collapse:collapse}
 .wo-card.ds{background:var(--s2);border-color:var(--line2)}
 /* Bump the left stripe for a clearer status signal */
 .wo-stripe{width:4px}
+
+/* Inline "how much just went out" prompt on Work Status cards when picking Partial Dispatch */
+.wo-part-prompt{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  padding:8px 10px;margin-top:6px;
+  background:var(--amber-bg);border:1px dashed rgba(180,83,9,.35);border-radius:8px;
+}
+.wo-part-inp{
+  width:90px;height:34px;padding:0 8px;border-radius:6px;
+  border:1px solid var(--amber);background:var(--surface);
+  color:var(--amber);font-weight:700;font-size:14px;font-family:inherit;
+  font-variant-numeric:tabular-nums;
+}
+.wo-part-of{font-size:12px;color:var(--amber);font-weight:600}
+.wo-part-save,.wo-part-cancel{height:34px}
+.wo-part-cancel{color:var(--ink3)}
 .wo-stripe{width:3px;flex-shrink:0}
 .wo-stripe.pn{background:var(--muted)}.wo-stripe.ip{background:var(--amber)}
 .wo-stripe.pd{background:var(--blue)}.wo-stripe.rd{background:var(--green)}
@@ -402,6 +446,14 @@ table.t{width:100%;border-collapse:collapse}
 
 /* ── WARN ── */
 .warn-txt{font-size:10.5px;color:var(--amber);font-family:'Manrope',sans-serif;margin-top:4px}
+
+/* Balance readout inside the drawer (matches .inp visual weight, but read-only) */
+.balance-readout{
+  display:flex;align-items:center;justify-content:flex-end;
+  background:var(--amber-bg);border-color:rgba(180,83,9,.25);
+  color:var(--amber);font-weight:700;font-variant-numeric:tabular-nums;
+}
+.balance-readout.zero{background:var(--green-bg);border-color:rgba(21,128,61,.25);color:var(--green)}
 
 /* ── MOBILE ── */
 @media(max-width:680px){
@@ -884,11 +936,11 @@ table.t{width:100%;border-collapse:collapse}
     </div>
     <div class="fg2">
       <div class="frow"><label class="flbl">Unit</label><select class="sel" id="ed-su"><option value="in">Inches</option><option value="cm">CM</option></select></div>
-      <div class="frow"><label class="flbl">Qty *</label><input class="inp num" type="number" inputmode="decimal" id="ed-qty" min="0"></div>
+      <div class="frow"><label class="flbl">Qty *</label><input class="inp num" type="number" inputmode="decimal" id="ed-qty" min="0" oninput="edRecalcBalance()"></div>
     </div>
     <div class="fg2">
       <div class="frow"><label class="flbl">Status</label>
-        <select class="sel" id="ed-status">
+        <select class="sel" id="ed-status" onchange="edStatusChange()">
           <option>Pending</option><option>In Production</option><option>Partial Dispatch</option><option>Ready</option><option>Dispatched</option>
         </select>
       </div>
@@ -896,7 +948,20 @@ table.t{width:100%;border-collapse:collapse}
         <input type="date" class="inp" id="ed-disp" style="border-color:#C7D2FE;background:#EEF2FF;color:#4338CA;font-weight:600">
       </div>
     </div>
+    <!-- Dispatched-so-far row: shown only when status is Partial Dispatch or Dispatched -->
+    <div class="fg2" id="ed-dqty-row" style="display:none">
+      <div class="frow">
+        <label class="flbl">Dispatched so far</label>
+        <input class="inp num" type="number" inputmode="decimal" id="ed-dqty" min="0" oninput="edRecalcBalance()">
+      </div>
+      <div class="frow">
+        <label class="flbl">Balance</label>
+        <div class="inp balance-readout" id="ed-balance-txt">— nos</div>
+      </div>
+    </div>
     <div class="warn-txt" id="ed-warn" style="display:none">⚠ Dispatch date is before order date</div>
+    <div class="warn-txt" id="ed-dqty-warn" style="display:none;color:var(--red)">⚠ Dispatched qty cannot exceed total qty</div>
+    <div class="warn-txt" id="ed-auto-hint" style="display:none;color:var(--green)">✓ Balance is zero — status will move to Dispatched on save</div>
   </div>
   <div class="drawer-foot">
     <button class="btn btn-g btn-full" onclick="deleteFromDrawer()" style="flex:0 0 auto;width:auto;padding:0 16px;color:var(--red);border-color:var(--red)">Delete</button>
@@ -1183,6 +1248,19 @@ function orderCardHTML(ord, opts){
     : badge(ord.status);
   const moved=edit?timeAgo(ord.updated_at||ord.created_at):'';
   const movedHTML=moved?' <span style="font-size:10.5px;color:var(--ink3);font-weight:500">· '+esc(moved)+'</span>':'';
+  // Qty display — for Partial Dispatch, show `dispatched / total` + a balance chip
+  const dq=Number(ord.dispatched_qty)||0;
+  const total=Number(ord.qty)||0;
+  const balance=Math.max(0,total-dq);
+  let qtyHTML;
+  if(ord.status==='Partial Dispatch'){
+    qtyHTML='<span class="c-qty c-qty-part">'+fmt(dq)+' / '+fmt(total)+' nos</span>'
+      +(balance>0?' <span class="qtag">'+fmt(balance)+' balance</span>':'');
+  } else if(ord.status==='Dispatched'){
+    qtyHTML='<span class="c-qty">'+fmt(total)+' nos</span>';
+  } else {
+    qtyHTML='<span class="c-qty">'+fmt(total)+' nos.</span>';
+  }
   return '<div class="'+cardCls+' '+sk+'" data-oid="'+ord.id+'" tabindex="0" role="button" aria-label="Open order '+esc(ord.no||ord.cust||'')+'" onclick="openDrawer('+ord.id+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openDrawer('+ord.id+');}">'
     +'<div class="'+stripeCls+' '+sk+'"></div>'
     +'<div class="obody-c">'
@@ -1196,7 +1274,7 @@ function orderCardHTML(ord, opts){
       +'</div>'
       +'<div class="orow-c2" style="padding-left:2px"><span style="font-size:12px;color:var(--ink3);font-weight:500">'+size+'</span></div>'
       +'<div class="orow-c3">'
-        +'<span class="c-qty">'+fmt(ord.qty)+' nos.</span>'
+        +qtyHTML
         +trailing
       +'</div>'
     +'</div>'
@@ -1277,13 +1355,44 @@ function openDrawer(id){
   setVal('ed-L',ord.l); setVal('ed-W',ord.w); setVal('ed-H',ord.h||0);
   toggleH('ed');
   setVal('ed-su',ord.su||'in'); setVal('ed-qty',ord.qty);
+  setVal('ed-dqty',Number(ord.dispatched_qty)||0);
   setVal('ed-disp',ord.disp);
   setVal('ed-status',ord.status);
   document.getElementById('ed-warn').style.display='none';
   document.querySelectorAll('#edit-drawer .inp.err,#edit-drawer .sel.err').forEach(el=>el.classList.remove('err'));
+  edStatusChange(); // shows/hides the dispatched-so-far row and recomputes balance
   document.getElementById('ed-backdrop').classList.add('open');
   document.getElementById('edit-drawer').classList.add('open');
   document.body.style.overflow='hidden';
+}
+// Show/hide the dispatched-so-far row based on status; also pre-fill sensible defaults.
+function edStatusChange(){
+  const status=getVal('ed-status');
+  const showRow=(status==='Partial Dispatch'||status==='Dispatched');
+  document.getElementById('ed-dqty-row').style.display=showRow?'':'none';
+  // On flipping to Dispatched, seed dqty=qty if the user hasn't set it
+  if(status==='Dispatched'){
+    const dq=parseFloat(getVal('ed-dqty'))||0;
+    const total=parseFloat(getVal('ed-qty'))||0;
+    if(!dq && total) setVal('ed-dqty',total);
+  }
+  edRecalcBalance();
+}
+// Live balance + validation for the drawer.
+function edRecalcBalance(){
+  const total=parseFloat(getVal('ed-qty'))||0;
+  const dq=parseFloat(getVal('ed-dqty'))||0;
+  const balance=Math.max(0,total-dq);
+  const el=document.getElementById('ed-balance-txt');
+  if(el){el.textContent=fmt(balance)+' nos';el.classList.toggle('zero',balance===0 && total>0);}
+  const over=dq>total && total>0;
+  document.getElementById('ed-dqty-warn').style.display=over?'block':'none';
+  const dqInp=document.getElementById('ed-dqty');
+  if(dqInp) dqInp.classList.toggle('err',over);
+  // Hint if balance would auto-transition on save
+  const status=getVal('ed-status');
+  const autoHint=status==='Partial Dispatch' && total>0 && dq>=total;
+  document.getElementById('ed-auto-hint').style.display=autoHint?'block':'none';
 }
 function closeDrawer(){
   document.getElementById('ed-backdrop').classList.remove('open');
@@ -1298,7 +1407,8 @@ async function saveDrawer(){
     prod:getVal('ed-prod'),ply:getVal('ed-ply'),
     l:parseFloat(getVal('ed-L'))||0,w:parseFloat(getVal('ed-W'))||0,h:parseFloat(getVal('ed-H'))||0,
     su:getVal('ed-su'),qty:parseFloat(getVal('ed-qty'))||0,
-    joint:'double',disp:getVal('ed-disp'),status:getVal('ed-status')
+    joint:'double',disp:getVal('ed-disp'),status:getVal('ed-status'),
+    dispatched_qty:parseFloat(getVal('ed-dqty'))||0
   };
   // Required-field validation (mirrors the New Order form)
   const errs=[];
@@ -1314,6 +1424,21 @@ async function saveDrawer(){
   const warnEl=document.getElementById('ed-warn');
   if(row.disp&&row.date&&row.disp<row.date){warnEl.style.display='block';return;}
   warnEl.style.display='none';
+  // Dispatched-qty validation
+  if(row.dispatched_qty>row.qty){
+    document.getElementById('ed-dqty-warn').style.display='block';
+    document.getElementById('ed-dqty').classList.add('err');
+    document.getElementById('ed-dqty').focus();
+    return;
+  }
+  // Auto-transitions:
+  //  - Partial Dispatch with balance = 0  →  Dispatched
+  //  - Statuses that logically imply zero dispatched (Pending/In Production/Ready) → zero the counter
+  if(row.status==='Partial Dispatch' && row.dispatched_qty>=row.qty && row.qty>0){
+    row.status='Dispatched';
+  }
+  if(row.status==='Dispatched' && !row.dispatched_qty) row.dispatched_qty=row.qty;
+  if(row.status==='Pending'||row.status==='In Production'||row.status==='Ready') row.dispatched_qty=0;
   const x=orders.find(o=>o.id===editId); if(!x){closeDrawer();return;}
   if(row.status!==x.status) row.updated_at=new Date().toISOString();
   // Snapshot only the fields we're about to mutate, for rollback
@@ -1393,22 +1518,82 @@ function woFilter(f){woF=f;renderWorkStatus();}
 async function woStatusChange(id,s){
   const x=orders.find(o=>o.id===id); if(!x) return;
   if(x.status===s) return;
-  const prev={status:x.status,updated_at:x.updated_at};
+  // Partial Dispatch needs a qty — show the inline prompt on the card and let user type
+  if(s==='Partial Dispatch'){
+    woPromptPartialQty(id, x);
+    return;
+  }
+  const prev={status:x.status,updated_at:x.updated_at,dispatched_qty:x.dispatched_qty};
   const ts=new Date().toISOString();
-  x.status=s; x.updated_at=ts;
+  const patch={status:s,updated_at:ts};
+  // Sensible auto-values for dispatched_qty when moving to non-partial statuses
+  if(s==='Dispatched'){ patch.dispatched_qty=Number(x.qty)||0; }
+  else if(s==='Pending'||s==='In Production'||s==='Ready'){ patch.dispatched_qty=0; }
+  Object.assign(x,patch);
   // Optimistic: update both pages' pills + lists in place
   renderOrders(); renderWorkStatus();
   try{
-    const ok=await db.update('orders',id,{status:s,updated_at:ts});
+    const ok=await db.update('orders',id,patch);
     if(ok===null) throw new Error('Save failed');
     showToast('Status → '+s,'ok');
-    // Data page's dropdowns depend on eligible orders — refresh if visible
     renderProductData();
   }catch(e){
-    x.status=prev.status; x.updated_at=prev.updated_at;
+    Object.assign(x,prev);
     renderOrders(); renderWorkStatus();
     showToast('Update failed — reverted','err');
   }
+}
+// Show an inline numeric input next to the dropdown so the user can enter this-batch qty.
+function woPromptPartialQty(id, ord){
+  const card=document.querySelector('.wo-card[data-oid="'+id+'"]'); if(!card) return;
+  const body=card.querySelector('.obody-c'); if(!body) return;
+  const total=Number(ord.qty)||0;
+  const cur=Number(ord.dispatched_qty)||0;
+  const suggested=cur>0?cur:Math.max(0,Math.floor(total/2));
+  // Reset the dropdown visually since we haven't committed yet
+  const sel=card.querySelector('.wo-sel'); if(sel) sel.value=ord.status;
+  // Remove any prior prompt on this card
+  card.querySelectorAll('.wo-part-prompt').forEach(el=>el.remove());
+  const wrap=document.createElement('div');
+  wrap.className='wo-part-prompt';
+  wrap.innerHTML='<input class="inp num wo-part-inp" type="number" inputmode="numeric" min="0" max="'+total+'" value="'+suggested+'" placeholder="dispatched" />'
+    +'<span class="wo-part-of">of '+fmt(total)+' nos</span>'
+    +'<button class="btn btn-p btn-sm wo-part-save" type="button">Save</button>'
+    +'<button class="btn btn-g btn-sm wo-part-cancel" type="button" aria-label="Cancel">✕</button>';
+  body.appendChild(wrap);
+  const inp=wrap.querySelector('input');
+  inp.focus(); inp.select();
+  const commit=async ()=>{
+    const dq=parseFloat(inp.value)||0;
+    if(dq<=0){showToast('Enter a qty greater than 0','err');inp.focus();return;}
+    if(dq>total){showToast('Cannot exceed total qty ('+fmt(total)+')','err');inp.focus();return;}
+    // Auto-transition to Dispatched if fully shipped
+    const newStatus=dq>=total?'Dispatched':'Partial Dispatch';
+    const ts=new Date().toISOString();
+    const prev={status:ord.status,updated_at:ord.updated_at,dispatched_qty:ord.dispatched_qty};
+    const patch={status:newStatus,updated_at:ts,dispatched_qty:dq};
+    Object.assign(ord,patch);
+    renderOrders(); renderWorkStatus();
+    try{
+      const ok=await db.update('orders',id,patch);
+      if(ok===null) throw new Error('Save failed');
+      showToast(newStatus==='Dispatched'?'Fully dispatched ('+fmt(dq)+' / '+fmt(total)+')':'Partial dispatched — '+fmt(dq)+' / '+fmt(total),'ok');
+      renderProductData();
+    }catch(e){
+      Object.assign(ord,prev);
+      renderOrders(); renderWorkStatus();
+      showToast('Update failed — reverted','err');
+    }
+  };
+  const cancel=()=>{wrap.remove();};
+  wrap.querySelector('.wo-part-save').addEventListener('click',commit);
+  wrap.querySelector('.wo-part-cancel').addEventListener('click',cancel);
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){e.preventDefault();commit();}
+    if(e.key==='Escape'){e.preventDefault();cancel();}
+  });
+  // Don't let clicks in the prompt bubble up to open the drawer
+  wrap.addEventListener('click',e=>e.stopPropagation());
 }
 
 // ── TASKS ────────────────────────────────────────────────
@@ -1869,38 +2054,57 @@ function renderProductData(){
 
   const fmtDate=d=>{if(!d)return '—';const dt=new Date(d+'T00:00:00');return dt.getDate()+' '+dt.toLocaleString('en-IN',{month:'short'})+' '+dt.getFullYear();};
   const showCust=!custSel.value;
+  const dqOf=o=>o.status==='Dispatched'?(Number(o.qty)||0):(Number(o.dispatched_qty)||0);
   const pageQty=pageList.reduce((s,o)=>s+(o.qty||0),0);
+  const pageDisp=pageList.reduce((s,o)=>s+dqOf(o),0);
+  const totalDisp=list.reduce((s,o)=>s+dqOf(o),0);
+  // Column count for the footer's leading blank span — data cols before Dispatched/Balance/Qty
+  const leadCols=(showCust?5:4);
 
   document.getElementById('pd-list').innerHTML=
     '<div class="pd-tbl-wrap"><table class="pd-tbl">'
     +'<thead><tr>'
     +'<th>Dispatch date</th>'
     +(showCust?'<th>Customer</th>':'')
-    +'<th>Product</th><th>PLY</th><th>Size</th><th class="r">Qty</th><th>Status</th>'
+    +'<th>Product</th><th>PLY</th><th>Size</th>'
+    +'<th class="r">Qty</th><th class="r">Dispatched</th><th class="r">Balance</th>'
+    +'<th>Status</th>'
     +'</tr></thead><tbody>'
     +pageList.map(ord=>{
       const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
+      const total=Number(ord.qty)||0;
+      const dq=dqOf(ord);
+      const bal=Math.max(0,total-dq);
+      const balCell=ord.status==='Partial Dispatch' && bal>0
+        ? '<td class="r" style="color:var(--amber);font-weight:700">'+fmt(bal)+'</td>'
+        : '<td class="r muted">'+(bal>0?fmt(bal):'—')+'</td>';
       return '<tr>'
         +'<td class="pd-date">'+fmtDate(ord.disp)+'</td>'
         +(showCust?'<td style="font-weight:500">'+esc(ord.cust||'—')+'</td>':'')
         +'<td><span class="c-chip c-chip-prod">'+esc(ord.prod||'—')+'</span></td>'
         +'<td><span class="c-chip c-chip-ply">'+esc(String(ord.ply||'?'))+' PLY</span></td>'
         +'<td class="muted">'+size+'</td>'
-        +'<td class="r">'+fmt(ord.qty)+'</td>'
+        +'<td class="r">'+fmt(total)+'</td>'
+        +'<td class="r">'+fmt(dq)+'</td>'
+        +balCell
         +'<td>'+badge(ord.status)+'</td>'
         +'</tr>';
     }).join('')
     // Footer with page total (and grand total when more than one page)
     +'<tfoot><tr style="background:var(--s2);border-top:var(--bw) solid var(--line);font-weight:700">'
-      +'<td colspan="'+(showCust?5:4)+'" style="text-align:right;color:var(--ink3);font-size:11px;text-transform:uppercase;letter-spacing:.04em">'
+      +'<td colspan="'+leadCols+'" style="text-align:right;color:var(--ink3);font-size:11px;text-transform:uppercase;letter-spacing:.04em">'
         +(totalPages>1?'Page total':'Total')
       +'</td>'
       +'<td class="r">'+fmt(pageQty)+'</td>'
+      +'<td class="r">'+fmt(pageDisp)+'</td>'
+      +'<td></td>'
       +'<td></td>'
     +'</tr>'
     +(totalPages>1?'<tr style="background:var(--s2);font-weight:700">'
-      +'<td colspan="'+(showCust?5:4)+'" style="text-align:right;color:var(--ink3);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Grand total</td>'
+      +'<td colspan="'+leadCols+'" style="text-align:right;color:var(--ink3);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Grand total</td>'
       +'<td class="r">'+fmt(totalQty)+'</td>'
+      +'<td class="r">'+fmt(totalDisp)+'</td>'
+      +'<td></td>'
       +'<td></td>'
     +'</tr>':'')
     +'</tfoot>'
@@ -1936,9 +2140,15 @@ function pdClear(){
 function pdExportCsv(){
   const list=pdComputeList();
   if(!list.length){showToast('Nothing to export — apply filters that return orders','err');return;}
-  const head=['Dispatch date','Order date','Customer','Order no','Product','PLY','L','W','H','Unit','Qty','Status'];
+  const head=['Dispatch date','Order date','Customer','Order no','Product','PLY','L','W','H','Unit','Qty','Dispatched','Balance','Status'];
   const q=v=>{const s=(v==null?'':String(v));return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
-  const rows=list.map(o=>[o.disp,o.date,o.cust,o.no,o.prod,o.ply,o.l,o.w,o.h,o.su,o.qty,o.status].map(q).join(','));
+  const dqOf=o=>o.status==='Dispatched'?(Number(o.qty)||0):(Number(o.dispatched_qty)||0);
+  const rows=list.map(o=>{
+    const total=Number(o.qty)||0;
+    const dq=dqOf(o);
+    const bal=Math.max(0,total-dq);
+    return [o.disp,o.date,o.cust,o.no,o.prod,o.ply,o.l,o.w,o.h,o.su,total,dq,bal,o.status].map(q).join(',');
+  });
   // Excel-friendly: UTF-8 BOM + CRLF
   const csv='﻿'+[head.join(','),...rows].join('\r\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
