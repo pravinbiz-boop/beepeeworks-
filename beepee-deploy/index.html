@@ -262,7 +262,7 @@ table.t{width:100%;border-collapse:collapse}
 
 /* ── ORDER CARD v2 (Option C) ── */
 .ocard{background:var(--surface)}
-.ocard.ip,.ocard.pd,.ocard.rd,.ocard.ds{background:var(--surface);border-color:var(--line)}
+.ocard.ip,.ocard.pd{background:var(--surface);border-color:var(--line)}
 .obody-c{flex:1;padding:9px 11px;min-width:0;display:flex;flex-direction:column;gap:5px}
 .orow-c1{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 .orow-c2{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
@@ -1366,8 +1366,9 @@ async function saveNewOrder(){
 // edit=true renders the Work Status variant (adds inline status dropdown).
 // Renders an Orders-page card. Work Status uses statusCardHTML (Toggle Card) instead.
 function orderCardHTML(ord){
-  const dm=dispMeta(ord.disp,ord.status);
-  const sk=skCls(ord.status);
+  const derived=deriveStatus(ord.qty,ord.ready_qty,ord.dispatched_qty);
+  const dm=dispMeta(ord.disp,derived);
+  const sk=skCls(derived);
   const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' · '+dm.label:'No date set';
   const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
   const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
@@ -1416,8 +1417,9 @@ function statusCardHTML(ord){
   const rq=Math.max(0,Number(ord.ready_qty)||0);
   const dq=Math.max(0,Number(ord.dispatched_qty)||0);
   const pending=Math.max(0,total-rq-dq);
-  const sk=skCls(ord.status);
-  const dm=dispMeta(ord.disp,ord.status);
+  const derived=deriveStatus(ord.qty,ord.ready_qty,ord.dispatched_qty);
+  const sk=skCls(derived);
+  const dm=dispMeta(ord.disp,derived);
   const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' · '+dm.label:'No date';
   const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
   const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
