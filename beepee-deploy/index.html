@@ -139,8 +139,24 @@ body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-appl
   .wo-part-inp{width:80px;height:38px;font-size:16px}
   .wo-part-save,.wo-part-cancel{height:38px}
 
-  /* Drawer dispatched-so-far row: stack the two halves on very narrow screens */
-  #ed-dqty-row{grid-template-columns:1fr 1fr}
+  /* Drawer bucket row: keep it as 3 columns on mobile too, since the readouts are compact */
+  #ed-dqty-row{grid-template-columns:1fr 1fr 1fr;gap:6px}
+
+  /* ── LEDGER card on phones: tighten the buckets so all three fit ── */
+  .led-head{padding:10px 12px 6px}
+  .led-cust{font-size:14px}
+  .led-spec{padding:5px 12px;font-size:11.5px}
+  .led-buckets{padding:8px 2px}
+  .led-bucket{padding:3px 4px;gap:3px}
+  .led-bucket-lbl{font-size:9px;letter-spacing:.08em}
+  .led-bucket-val{font-size:18px;padding:2px 6px;min-width:38px}
+  .led-bucket-val.editing{font-size:16px;width:64px;padding:2px 4px;
+    /* iOS: keep 16px to block auto-zoom on focus */
+    font-size:16px;
+  }
+  .led-foot{padding:8px 12px 10px;flex-wrap:wrap;gap:8px}
+  .led-tot{font-size:10.5px}
+  .led-sel{font-size:16px;height:36px;flex:1 1 100%;min-width:0}
 }
 
 /* ── SHELL ── */
@@ -285,21 +301,136 @@ table.t{width:100%;border-collapse:collapse}
 /* Bump the left stripe for a clearer status signal */
 .wo-stripe{width:4px}
 
-/* Inline "how much just went out" prompt on Work Status cards when picking Partial Dispatch */
-.wo-part-prompt{
-  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
-  padding:8px 10px;margin-top:6px;
-  background:var(--amber-bg);border:1px dashed rgba(180,83,9,.35);border-radius:8px;
+/* ── LEDGER · Status page bucket card (aged paper aesthetic) ── */
+.wo-card.ledger{
+  background:#F6F2E8;border:1px solid #C5BCA6;border-radius:2px;
+  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  color:#1A1614;
+  display:flex;flex-direction:column;padding:0;overflow:hidden;
+  cursor:default;transition:background .15s ease;
+  box-shadow:0 1px 0 rgba(107,88,50,.08);
 }
-.wo-part-inp{
-  width:90px;height:34px;padding:0 8px;border-radius:6px;
-  border:1px solid var(--amber);background:var(--surface);
-  color:var(--amber);font-weight:700;font-size:14px;font-family:inherit;
-  font-variant-numeric:tabular-nums;
+.wo-card.ledger:hover{background:#F0EBDA}
+.wo-card.ledger .wo-stripe{display:none}
+.led-head{
+  display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+  padding:12px 14px 8px;border-bottom:1px double #B7B0A2;cursor:pointer;
 }
-.wo-part-of{font-size:12px;color:var(--amber);font-weight:600}
-.wo-part-save,.wo-part-cancel{height:34px}
-.wo-part-cancel{color:var(--ink3)}
+.led-title{display:flex;align-items:baseline;gap:8px;min-width:0;flex:1}
+.led-glyph{
+  font-size:16px;line-height:1;flex-shrink:0;color:#1A1614;
+  font-family:"Iowan Old Style",Palatino,Georgia,serif;
+}
+.led-glyph.pn{color:#6A5F51}
+.led-glyph.ip,.led-glyph.pd{color:#A9832F}
+.led-glyph.rd,.led-glyph.ds{color:#2A4838}
+.led-cust{
+  font-family:"Rockwell","Roboto Slab","Bookman Old Style",Georgia,serif;
+  font-size:15px;font-weight:700;color:#1A1614;letter-spacing:-.005em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.led-no{
+  color:#6A5F51;font-size:11.5px;font-variant-numeric:tabular-nums;
+  font-family:"SF Mono","IBM Plex Mono",Menlo,Consolas,monospace;
+}
+.led-moved{color:#6A5F51;font-size:10.5px;font-family:-apple-system,"Segoe UI",sans-serif;font-weight:500;margin-left:6px}
+.led-due{
+  font-family:-apple-system,"Segoe UI",sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:#3A322B;flex-shrink:0;white-space:nowrap;
+}
+.led-due.overdue{color:#8E1A1A}
+.led-due.today{color:#A9832F}
+.led-due.done{color:#2A4838}
+.led-spec{
+  padding:6px 14px;font-size:12px;color:#3A322B;font-style:italic;
+  border-bottom:1px solid #C5BCA6;cursor:pointer;
+}
+.led-buckets{
+  display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 4px;
+  background:#F0E9D6;
+}
+.led-bucket{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:4px 8px;position:relative;
+}
+.led-bucket + .led-bucket::before{
+  content:"";position:absolute;left:0;top:20%;bottom:20%;width:1px;background:#B7B0A2;
+}
+.led-bucket-lbl{
+  font-family:-apple-system,"Segoe UI",sans-serif;
+  font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:#6A5F51;
+}
+.led-bucket-val{
+  font-family:"Rockwell","Roboto Slab",Georgia,serif;
+  font-size:22px;font-weight:400;line-height:1;
+  font-variant-numeric:tabular-nums oldstyle-nums;
+  color:#1A1614;padding:3px 8px;border-radius:3px;
+  border:1px dashed transparent;transition:border-color .15s,background .15s;
+  min-width:44px;text-align:center;
+}
+.led-bucket.pending .led-bucket-val{color:#6A5F51;cursor:default}
+.led-bucket.ready .led-bucket-val{color:#2A4838}
+.led-bucket.dispatched .led-bucket-val{color:#1A1614}
+.led-bucket-val.editable{cursor:text}
+.led-bucket-val.editable:hover,.led-bucket-val.editable:focus-visible{border-color:#6A5F51;background:rgba(107,88,50,.06);outline:none}
+.led-bucket-val.editing{
+  border:1px solid #8E1A1A;background:#FFF;outline:none;
+  padding:3px 8px;text-align:center;width:80px;
+  font-family:"Rockwell","Roboto Slab",Georgia,serif;
+  font-size:22px;font-weight:400;color:#1A1614;
+  font-variant-numeric:tabular-nums oldstyle-nums;
+}
+.led-warn{
+  padding:8px 14px;background:rgba(142,26,26,.08);border-top:1px solid #8E1A1A;
+  font-size:11px;color:#8E1A1A;font-weight:700;
+  font-family:-apple-system,"Segoe UI",sans-serif;letter-spacing:.03em;
+}
+.led-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 14px 12px;border-top:1px solid #C5BCA6;flex-wrap:wrap;
+}
+.led-tot{
+  font-family:-apple-system,"Segoe UI",sans-serif;
+  font-size:11px;color:#6A5F51;
+  display:flex;align-items:baseline;gap:6px;letter-spacing:.02em;
+}
+.led-tot b{
+  color:#1A1614;font-family:"Rockwell","Roboto Slab",Georgia,serif;
+  font-size:14px;font-weight:400;font-variant-numeric:tabular-nums oldstyle-nums;
+}
+.led-sel{
+  font-family:-apple-system,"Segoe UI",sans-serif;font-size:12px;font-weight:600;
+  background:#EEE9DD;border:1px solid #B7B0A2;color:#1A1614;
+  height:32px;padding:0 10px;border-radius:2px;cursor:pointer;
+}
+.led-sel:focus{outline:none;border-color:#8E1A1A}
+@media (prefers-color-scheme: dark){
+  .wo-card.ledger{background:#241D14;border-color:#4A3F2E;color:#EAE1CE;box-shadow:0 1px 0 rgba(0,0,0,.4)}
+  .wo-card.ledger:hover{background:#2D2519}
+  .led-head{border-bottom-color:#4A3F2E}
+  .led-glyph,.led-cust{color:#EAE1CE}
+  .led-glyph.pn{color:#B7A78F}
+  .led-glyph.ip,.led-glyph.pd{color:#D9B85A}
+  .led-glyph.rd,.led-glyph.ds{color:#7EA88F}
+  .led-no,.led-moved,.led-bucket-lbl,.led-tot{color:#9B8E77}
+  .led-due{color:#B7A78F}
+  .led-due.overdue{color:#E8776E}
+  .led-due.today{color:#D9B85A}
+  .led-due.done{color:#7EA88F}
+  .led-spec{color:#B7A78F;border-bottom-color:#3A3226}
+  .led-buckets{background:#1F1810}
+  .led-bucket + .led-bucket::before{background:#4A3F2E}
+  .led-bucket .led-bucket-val,.led-bucket.dispatched .led-bucket-val,.led-tot b{color:#EAE1CE}
+  .led-bucket.pending .led-bucket-val{color:#9B8E77}
+  .led-bucket.ready .led-bucket-val{color:#7EA88F}
+  .led-bucket-val.editable:hover,.led-bucket-val.editable:focus-visible{background:rgba(234,225,206,.05);border-color:#B7A78F}
+  .led-bucket-val.editing{background:#0F0A03;color:#EAE1CE;border-color:#E8776E}
+  .led-warn{background:rgba(232,119,110,.08);color:#E8776E;border-top-color:#E8776E}
+  .led-foot{border-top-color:#3A3226}
+  .led-sel{background:#241D14;border-color:#4A3F2E;color:#EAE1CE}
+}
 .wo-stripe{width:3px;flex-shrink:0}
 .wo-stripe.pn{background:var(--muted)}.wo-stripe.ip{background:var(--amber)}
 .wo-stripe.pd{background:var(--blue)}.wo-stripe.rd{background:var(--green)}
@@ -948,20 +1079,24 @@ table.t{width:100%;border-collapse:collapse}
         <input type="date" class="inp" id="ed-disp" style="border-color:#C7D2FE;background:#EEF2FF;color:#4338CA;font-weight:600">
       </div>
     </div>
-    <!-- Dispatched-so-far row: shown only when status is Partial Dispatch or Dispatched -->
-    <div class="fg2" id="ed-dqty-row" style="display:none">
+    <!-- Bucket row: Ready + Dispatched (editable), Pending is derived -->
+    <div class="fg3" id="ed-dqty-row">
       <div class="frow">
-        <label class="flbl">Dispatched so far</label>
+        <label class="flbl">Ready</label>
+        <input class="inp num" type="number" inputmode="decimal" id="ed-rqty" min="0" oninput="edRecalcBalance()">
+      </div>
+      <div class="frow">
+        <label class="flbl">Dispatched</label>
         <input class="inp num" type="number" inputmode="decimal" id="ed-dqty" min="0" oninput="edRecalcBalance()">
       </div>
       <div class="frow">
-        <label class="flbl">Balance</label>
+        <label class="flbl">Pending</label>
         <div class="inp balance-readout" id="ed-balance-txt">— nos</div>
       </div>
     </div>
     <div class="warn-txt" id="ed-warn" style="display:none">⚠ Dispatch date is before order date</div>
-    <div class="warn-txt" id="ed-dqty-warn" style="display:none;color:var(--red)">⚠ Dispatched qty cannot exceed total qty</div>
-    <div class="warn-txt" id="ed-auto-hint" style="display:none;color:var(--green)">✓ Balance is zero — status will move to Dispatched on save</div>
+    <div class="warn-txt" id="ed-dqty-warn" style="display:none;color:var(--red)">⚠ Ready + Dispatched cannot exceed Total qty</div>
+    <div class="warn-txt" id="ed-auto-hint" style="display:none;color:var(--green)">✓ Everything shipped — status will move to Dispatched on save</div>
   </div>
   <div class="drawer-foot">
     <button class="btn btn-g btn-full" onclick="deleteFromDrawer()" style="flex:0 0 auto;width:auto;padding:0 16px;color:var(--red);border-color:var(--red)">Delete</button>
@@ -1214,7 +1349,11 @@ async function saveNewOrder(){
     renderParties();
   }
 
-  const row={date,no:getVal('no-no'),cust,prod,ply,l:L,w:W,h:H,su:getVal('no-su'),qty,joint:'double',disp,status:getVal('no-status')};
+  // Seed bucket fields from the chosen status so a new order lands consistent with what the user picked
+  const newStatus=getVal('no-status');
+  const seedRq = newStatus==='Ready' ? qty : 0;
+  const seedDq = newStatus==='Dispatched' ? qty : 0;
+  const row={date,no:getVal('no-no'),cust,prod,ply,l:L,w:W,h:H,su:getVal('no-su'),qty,joint:'double',disp,status:newStatus,ready_qty:seedRq,dispatched_qty:seedDq};
   try{
     const res=await db.insert('orders',row);
     if(!res || !res[0]) throw new Error('Insert failed');
@@ -1280,14 +1419,142 @@ function orderCardHTML(ord, opts){
     +'</div>'
   +'</div>';
 }
-// In-place refresh for a single order card DOM node — updates both Orders and Work Status
-// instances if the same order is currently rendered on both pages.
+// ── LEDGER · Status page bucket card ───────────────────────────
+// Renders one order as a Pending / Ready / Dispatched triptych with
+// direct-edit on the Ready and Dispatched values.
+function statusCardHTML(ord){
+  const total=Number(ord.qty)||0;
+  const rq=Math.max(0,Number(ord.ready_qty)||0);
+  const dq=Math.max(0,Number(ord.dispatched_qty)||0);
+  const pending=Math.max(0,total-rq-dq);
+  const sk=skCls(ord.status);
+  const dm=dispMeta(ord.disp,ord.status);
+  const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' · '+dm.label:'No date';
+  const dispCls=dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':'ok';
+  const glyph=ord.status==='Dispatched'?'✓'
+    :ord.status==='Ready'?'●'
+    :(ord.status==='Partial Dispatch'||ord.status==='In Production')?'◐'
+    :'○';
+  const size=esc(String(ord.l||0))+' × '+esc(String(ord.w||0))+(ord.prod==='Box'?' × '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
+  const noHTML=ord.no?' <span class="led-no">#'+esc(ord.no)+'</span>':'';
+  const moved=timeAgo(ord.updated_at||ord.created_at);
+  const movedHTML=moved?'<span class="led-moved">· '+esc(moved)+'</span>':'';
+  const openHandler='onclick="openDrawer('+ord.id+')"';
+  const editSpan=(role,field,value)=>
+    '<span class="led-bucket-val editable" data-role="'+role+'" data-oid="'+ord.id+'" data-field="'+field+'" tabindex="0" role="button" aria-label="Edit '+role+'"'
+    +' onclick="event.stopPropagation();ledEditStart(this,'+ord.id+',\''+field+'\')"'
+    +' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();ledEditStart(this,'+ord.id+',\''+field+'\')}">'
+    +fmt(value)+'</span>';
+  return '<div class="wo-card ledger '+sk+'" data-oid="'+ord.id+'">'
+    +'<div class="led-head" '+openHandler+'>'
+      +'<div class="led-title">'
+        +'<span class="led-glyph '+sk+'" aria-hidden="true">'+glyph+'</span>'
+        +'<span class="led-cust">'+esc(ord.cust||'—')+'</span>'
+        +noHTML
+        +movedHTML
+      +'</div>'
+      +'<span class="led-due '+dispCls+'">'+esc(dispTxt)+'</span>'
+    +'</div>'
+    +'<div class="led-spec" '+openHandler+'>'
+      +esc(ord.prod||'—')+' · '+esc(String(ord.ply||'?'))+' PLY · '+size
+    +'</div>'
+    +'<div class="led-buckets">'
+      +'<div class="led-bucket pending" title="Derived: qty − ready − dispatched">'
+        +'<span class="led-bucket-lbl">Pending</span>'
+        +'<span class="led-bucket-val" data-role="pending">'+fmt(pending)+'</span>'
+      +'</div>'
+      +'<div class="led-bucket ready">'
+        +'<span class="led-bucket-lbl">Ready</span>'
+        +editSpan('ready','ready_qty',rq)
+      +'</div>'
+      +'<div class="led-bucket dispatched">'
+        +'<span class="led-bucket-lbl">Dispatched</span>'
+        +editSpan('dispatched','dispatched_qty',dq)
+      +'</div>'
+    +'</div>'
+    +'<div class="led-warn" data-role="warn" style="display:none"></div>'
+    +'<div class="led-foot">'
+      +'<span class="led-tot">Total ordered · <b>'+fmt(total)+' nos</b></span>'
+      +'<select class="led-sel" aria-label="Order status" onclick="event.stopPropagation()" onchange="woStatusChange('+ord.id+',this.value)">'
+        +STATUSES.map(s=>'<option'+(s===ord.status?' selected':'')+'>'+s+'</option>').join('')
+      +'</select>'
+    +'</div>'
+  +'</div>';
+}
+
+// Enter edit mode on a Ready or Dispatched value. Blur/Enter commits, Escape cancels.
+// Guards against ready + dispatched > total qty.
+function ledEditStart(el, id, field){
+  if(el.classList.contains('editing')) return;
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  const cur=Number(o[field])||0;
+  const inp=document.createElement('input');
+  inp.type='number';
+  inp.inputMode='numeric';
+  inp.min='0';
+  inp.value=cur;
+  inp.className='led-bucket-val editing';
+  inp.dataset.field=field;
+  inp.dataset.oid=id;
+  el.replaceWith(inp);
+  inp.focus();
+  inp.select();
+  let done=false;
+  const cancel=()=>{if(done) return;done=true;updateOrderCardDom(id);};
+  const commit=async ()=>{
+    if(done) return;done=true;
+    const raw=inp.value.trim();
+    const newVal=raw===''?0:parseInt(raw,10);
+    if(isNaN(newVal)||newVal<0){
+      showToast('Enter a whole number (0 or more)','err');
+      updateOrderCardDom(id);return;
+    }
+    const total=Number(o.qty)||0;
+    const otherField=field==='ready_qty'?'dispatched_qty':'ready_qty';
+    const otherVal=Number(o[otherField])||0;
+    if(newVal+otherVal>total){
+      showToast('Ready + Dispatched ('+fmt(newVal+otherVal)+') exceeds Total ('+fmt(total)+')','err');
+      updateOrderCardDom(id);return;
+    }
+    if(newVal===cur){updateOrderCardDom(id);return;}
+    // Optimistic
+    const prev=o[field], prevTs=o.updated_at;
+    o[field]=newVal;
+    o.updated_at=new Date().toISOString();
+    updateOrderCardDom(id);
+    try{
+      const ok=await db.update('orders',id,{[field]:newVal,updated_at:o.updated_at});
+      if(ok===null) throw new Error('Save failed');
+      showToast((field==='ready_qty'?'Ready → ':'Dispatched → ')+fmt(newVal)+' nos','ok');
+      renderProductData();
+    }catch(e){
+      o[field]=prev; o.updated_at=prevTs;
+      updateOrderCardDom(id);
+      showToast('Save failed — reverted','err');
+    }
+  };
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){e.preventDefault();commit();}
+    if(e.key==='Escape'){e.preventDefault();cancel();}
+  });
+  inp.addEventListener('blur',()=>commit());
+  inp.addEventListener('click',e=>e.stopPropagation());
+}
+
+// In-place refresh for a single order card DOM node — updates every instance
+// (Orders page uses .ocard; Work Status uses .wo-card.ledger).
 function updateOrderCardDom(id){
   const o=orders.find(x=>x.id===id); if(!o) return;
   document.querySelectorAll('[data-oid="'+id+'"]').forEach(el=>{
-    const edit=el.classList.contains('wo-card');
+    // Skip nested data-oid elements (e.g. the editable spans inside a ledger card)
+    if(!el.classList.contains('wo-card')&&!el.classList.contains('ocard')) return;
     const wrap=document.createElement('div');
-    wrap.innerHTML=orderCardHTML(o,{edit:edit});
+    if(el.classList.contains('ledger')){
+      wrap.innerHTML=statusCardHTML(o);
+    } else {
+      const edit=el.classList.contains('wo-card');
+      wrap.innerHTML=orderCardHTML(o,{edit:edit});
+    }
     el.replaceWith(wrap.firstElementChild);
   });
 }
@@ -1355,43 +1622,45 @@ function openDrawer(id){
   setVal('ed-L',ord.l); setVal('ed-W',ord.w); setVal('ed-H',ord.h||0);
   toggleH('ed');
   setVal('ed-su',ord.su||'in'); setVal('ed-qty',ord.qty);
+  setVal('ed-rqty',Number(ord.ready_qty)||0);
   setVal('ed-dqty',Number(ord.dispatched_qty)||0);
   setVal('ed-disp',ord.disp);
   setVal('ed-status',ord.status);
   document.getElementById('ed-warn').style.display='none';
   document.querySelectorAll('#edit-drawer .inp.err,#edit-drawer .sel.err').forEach(el=>el.classList.remove('err'));
-  edStatusChange(); // shows/hides the dispatched-so-far row and recomputes balance
+  edStatusChange();
   document.getElementById('ed-backdrop').classList.add('open');
   document.getElementById('edit-drawer').classList.add('open');
   document.body.style.overflow='hidden';
 }
-// Show/hide the dispatched-so-far row based on status; also pre-fill sensible defaults.
+// Pre-fill sensible bucket defaults for definitive statuses; recompute balance.
 function edStatusChange(){
   const status=getVal('ed-status');
-  const showRow=(status==='Partial Dispatch'||status==='Dispatched');
-  document.getElementById('ed-dqty-row').style.display=showRow?'':'none';
-  // On flipping to Dispatched, seed dqty=qty if the user hasn't set it
-  if(status==='Dispatched'){
-    const dq=parseFloat(getVal('ed-dqty'))||0;
-    const total=parseFloat(getVal('ed-qty'))||0;
-    if(!dq && total) setVal('ed-dqty',total);
-  }
+  const total=parseFloat(getVal('ed-qty'))||0;
+  const rq=parseFloat(getVal('ed-rqty'))||0;
+  const dq=parseFloat(getVal('ed-dqty'))||0;
+  if(status==='Dispatched' && total && !dq){ setVal('ed-dqty',total); setVal('ed-rqty',0); }
+  else if(status==='Ready' && total && !rq && !dq){ setVal('ed-rqty',total); }
+  else if((status==='Pending'||status==='In Production') && (rq||dq)){ /* leave alone; user may intend to blank via save */ }
   edRecalcBalance();
 }
 // Live balance + validation for the drawer.
+// Pending = qty − ready − dispatched (never negative). Guardrail: sum ≤ qty.
 function edRecalcBalance(){
   const total=parseFloat(getVal('ed-qty'))||0;
+  const rq=parseFloat(getVal('ed-rqty'))||0;
   const dq=parseFloat(getVal('ed-dqty'))||0;
-  const balance=Math.max(0,total-dq);
+  const sum=rq+dq;
+  const pending=Math.max(0,total-sum);
   const el=document.getElementById('ed-balance-txt');
-  if(el){el.textContent=fmt(balance)+' nos';el.classList.toggle('zero',balance===0 && total>0);}
-  const over=dq>total && total>0;
+  if(el){el.textContent=fmt(pending)+' nos';el.classList.toggle('zero',pending===0 && total>0);}
+  const over=sum>total && total>0;
   document.getElementById('ed-dqty-warn').style.display=over?'block':'none';
-  const dqInp=document.getElementById('ed-dqty');
-  if(dqInp) dqInp.classList.toggle('err',over);
-  // Hint if balance would auto-transition on save
+  document.getElementById('ed-rqty').classList.toggle('err',over);
+  document.getElementById('ed-dqty').classList.toggle('err',over);
+  // Hint if everything is shipped — status will auto-flip on save
   const status=getVal('ed-status');
-  const autoHint=status==='Partial Dispatch' && total>0 && dq>=total;
+  const autoHint=status!=='Dispatched' && total>0 && dq>=total;
   document.getElementById('ed-auto-hint').style.display=autoHint?'block':'none';
 }
 function closeDrawer(){
@@ -1408,6 +1677,7 @@ async function saveDrawer(){
     l:parseFloat(getVal('ed-L'))||0,w:parseFloat(getVal('ed-W'))||0,h:parseFloat(getVal('ed-H'))||0,
     su:getVal('ed-su'),qty:parseFloat(getVal('ed-qty'))||0,
     joint:'double',disp:getVal('ed-disp'),status:getVal('ed-status'),
+    ready_qty:parseFloat(getVal('ed-rqty'))||0,
     dispatched_qty:parseFloat(getVal('ed-dqty'))||0
   };
   // Required-field validation (mirrors the New Order form)
@@ -1424,21 +1694,28 @@ async function saveDrawer(){
   const warnEl=document.getElementById('ed-warn');
   if(row.disp&&row.date&&row.disp<row.date){warnEl.style.display='block';return;}
   warnEl.style.display='none';
-  // Dispatched-qty validation
-  if(row.dispatched_qty>row.qty){
+  // Bucket validation: ready + dispatched cannot exceed total qty
+  if(row.ready_qty + row.dispatched_qty > row.qty){
     document.getElementById('ed-dqty-warn').style.display='block';
+    document.getElementById('ed-rqty').classList.add('err');
     document.getElementById('ed-dqty').classList.add('err');
-    document.getElementById('ed-dqty').focus();
+    document.getElementById('ed-rqty').focus();
     return;
   }
-  // Auto-transitions:
-  //  - Partial Dispatch with balance = 0  →  Dispatched
-  //  - Statuses that logically imply zero dispatched (Pending/In Production/Ready) → zero the counter
-  if(row.status==='Partial Dispatch' && row.dispatched_qty>=row.qty && row.qty>0){
-    row.status='Dispatched';
+  // Auto-transitions on save (status ↔ buckets):
+  //   Everything shipped → Dispatched
+  //   Dispatched status → dispatched_qty = qty, ready_qty = 0
+  //   Pending / In Production → both zeroed
+  //   Ready → ready_qty = qty (unless partial already), dispatched_qty = 0
+  if(row.dispatched_qty>=row.qty && row.qty>0){
+    row.status='Dispatched'; row.dispatched_qty=row.qty; row.ready_qty=0;
+  } else if(row.status==='Dispatched'){
+    row.dispatched_qty=row.qty; row.ready_qty=0;
+  } else if(row.status==='Pending'||row.status==='In Production'){
+    row.ready_qty=0; row.dispatched_qty=0;
+  } else if(row.status==='Ready' && !row.ready_qty && !row.dispatched_qty){
+    row.ready_qty=row.qty;
   }
-  if(row.status==='Dispatched' && !row.dispatched_qty) row.dispatched_qty=row.qty;
-  if(row.status==='Pending'||row.status==='In Production'||row.status==='Ready') row.dispatched_qty=0;
   const x=orders.find(o=>o.id===editId); if(!x){closeDrawer();return;}
   if(row.status!==x.status) row.updated_at=new Date().toISOString();
   // Snapshot only the fields we're about to mutate, for rollback
@@ -1512,25 +1789,27 @@ function renderWorkStatus(){
     document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+'</div>';
     return;
   }
-  document.getElementById('wo-list').innerHTML=list.map(o=>orderCardHTML(o,{edit:true})).join('');
+  document.getElementById('wo-list').innerHTML=list.map(o=>statusCardHTML(o)).join('');
 }
 function woFilter(f){woF=f;renderWorkStatus();}
+// Status changes are now a straight patch — Ready/Dispatched qtys are edited
+// directly on the Ledger card, so no side-effects here.
 async function woStatusChange(id,s){
   const x=orders.find(o=>o.id===id); if(!x) return;
   if(x.status===s) return;
-  // Partial Dispatch needs a qty — show the inline prompt on the card and let user type
-  if(s==='Partial Dispatch'){
-    woPromptPartialQty(id, x);
-    return;
-  }
-  const prev={status:x.status,updated_at:x.updated_at,dispatched_qty:x.dispatched_qty};
+  const prev={status:x.status,updated_at:x.updated_at,ready_qty:x.ready_qty,dispatched_qty:x.dispatched_qty};
   const ts=new Date().toISOString();
   const patch={status:s,updated_at:ts};
-  // Sensible auto-values for dispatched_qty when moving to non-partial statuses
-  if(s==='Dispatched'){ patch.dispatched_qty=Number(x.qty)||0; }
-  else if(s==='Pending'||s==='In Production'||s==='Ready'){ patch.dispatched_qty=0; }
+  // Sensible bucket auto-fills when the user picks a definitive status.
+  //   Dispatched  → everything shipped     (ready_qty=0, dispatched_qty=qty)
+  //   Ready       → everything ready       (ready_qty=qty, dispatched_qty=0)
+  //   Pending/InProduction → nothing yet   (both zeroed)
+  //   Partial Dispatch → leave counters alone; user edits them directly
+  const total=Number(x.qty)||0;
+  if(s==='Dispatched'){ patch.dispatched_qty=total; patch.ready_qty=0; }
+  else if(s==='Ready'){ patch.ready_qty=total; patch.dispatched_qty=0; }
+  else if(s==='Pending'||s==='In Production'){ patch.ready_qty=0; patch.dispatched_qty=0; }
   Object.assign(x,patch);
-  // Optimistic: update both pages' pills + lists in place
   renderOrders(); renderWorkStatus();
   try{
     const ok=await db.update('orders',id,patch);
@@ -1543,58 +1822,7 @@ async function woStatusChange(id,s){
     showToast('Update failed — reverted','err');
   }
 }
-// Show an inline numeric input next to the dropdown so the user can enter this-batch qty.
-function woPromptPartialQty(id, ord){
-  const card=document.querySelector('.wo-card[data-oid="'+id+'"]'); if(!card) return;
-  const body=card.querySelector('.obody-c'); if(!body) return;
-  const total=Number(ord.qty)||0;
-  const cur=Number(ord.dispatched_qty)||0;
-  const suggested=cur>0?cur:Math.max(0,Math.floor(total/2));
-  // Reset the dropdown visually since we haven't committed yet
-  const sel=card.querySelector('.wo-sel'); if(sel) sel.value=ord.status;
-  // Remove any prior prompt on this card
-  card.querySelectorAll('.wo-part-prompt').forEach(el=>el.remove());
-  const wrap=document.createElement('div');
-  wrap.className='wo-part-prompt';
-  wrap.innerHTML='<input class="inp num wo-part-inp" type="number" inputmode="numeric" min="0" max="'+total+'" value="'+suggested+'" placeholder="dispatched" />'
-    +'<span class="wo-part-of">of '+fmt(total)+' nos</span>'
-    +'<button class="btn btn-p btn-sm wo-part-save" type="button">Save</button>'
-    +'<button class="btn btn-g btn-sm wo-part-cancel" type="button" aria-label="Cancel">✕</button>';
-  body.appendChild(wrap);
-  const inp=wrap.querySelector('input');
-  inp.focus(); inp.select();
-  const commit=async ()=>{
-    const dq=parseFloat(inp.value)||0;
-    if(dq<=0){showToast('Enter a qty greater than 0','err');inp.focus();return;}
-    if(dq>total){showToast('Cannot exceed total qty ('+fmt(total)+')','err');inp.focus();return;}
-    // Auto-transition to Dispatched if fully shipped
-    const newStatus=dq>=total?'Dispatched':'Partial Dispatch';
-    const ts=new Date().toISOString();
-    const prev={status:ord.status,updated_at:ord.updated_at,dispatched_qty:ord.dispatched_qty};
-    const patch={status:newStatus,updated_at:ts,dispatched_qty:dq};
-    Object.assign(ord,patch);
-    renderOrders(); renderWorkStatus();
-    try{
-      const ok=await db.update('orders',id,patch);
-      if(ok===null) throw new Error('Save failed');
-      showToast(newStatus==='Dispatched'?'Fully dispatched ('+fmt(dq)+' / '+fmt(total)+')':'Partial dispatched — '+fmt(dq)+' / '+fmt(total),'ok');
-      renderProductData();
-    }catch(e){
-      Object.assign(ord,prev);
-      renderOrders(); renderWorkStatus();
-      showToast('Update failed — reverted','err');
-    }
-  };
-  const cancel=()=>{wrap.remove();};
-  wrap.querySelector('.wo-part-save').addEventListener('click',commit);
-  wrap.querySelector('.wo-part-cancel').addEventListener('click',cancel);
-  inp.addEventListener('keydown',e=>{
-    if(e.key==='Enter'){e.preventDefault();commit();}
-    if(e.key==='Escape'){e.preventDefault();cancel();}
-  });
-  // Don't let clicks in the prompt bubble up to open the drawer
-  wrap.addEventListener('click',e=>e.stopPropagation());
-}
+// woPromptPartialQty removed — Ready and Dispatched are now edited directly on the Ledger card.
 
 // ── TASKS ────────────────────────────────────────────────
 // SVG delete icon markup (reused)
@@ -2055,10 +2283,15 @@ function renderProductData(){
   const fmtDate=d=>{if(!d)return '—';const dt=new Date(d+'T00:00:00');return dt.getDate()+' '+dt.toLocaleString('en-IN',{month:'short'})+' '+dt.getFullYear();};
   const showCust=!custSel.value;
   const dqOf=o=>o.status==='Dispatched'?(Number(o.qty)||0):(Number(o.dispatched_qty)||0);
-  const pageQty=pageList.reduce((s,o)=>s+(o.qty||0),0);
+  const rqOf=o=>o.status==='Dispatched'?0:(Number(o.ready_qty)||0);
+  const pageQty =pageList.reduce((s,o)=>s+(o.qty||0),0);
+  const pageRdy =pageList.reduce((s,o)=>s+rqOf(o),0);
   const pageDisp=pageList.reduce((s,o)=>s+dqOf(o),0);
+  const pagePend=pageList.reduce((s,o)=>s+Math.max(0,(o.qty||0)-rqOf(o)-dqOf(o)),0);
+  const totalRdy =list.reduce((s,o)=>s+rqOf(o),0);
   const totalDisp=list.reduce((s,o)=>s+dqOf(o),0);
-  // Column count for the footer's leading blank span — data cols before Dispatched/Balance/Qty
+  const totalPend=list.reduce((s,o)=>s+Math.max(0,(o.qty||0)-rqOf(o)-dqOf(o)),0);
+  // Column count for the footer's leading blank span — data cols before Qty/Ready/Dispatched/Pending
   const leadCols=(showCust?5:4);
 
   document.getElementById('pd-list').innerHTML=
@@ -2067,17 +2300,20 @@ function renderProductData(){
     +'<th>Dispatch date</th>'
     +(showCust?'<th>Customer</th>':'')
     +'<th>Product</th><th>PLY</th><th>Size</th>'
-    +'<th class="r">Qty</th><th class="r">Dispatched</th><th class="r">Balance</th>'
+    +'<th class="r">Qty</th><th class="r">Ready</th><th class="r">Dispatched</th><th class="r">Pending</th>'
     +'<th>Status</th>'
     +'</tr></thead><tbody>'
     +pageList.map(ord=>{
       const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
       const total=Number(ord.qty)||0;
-      const dq=dqOf(ord);
-      const bal=Math.max(0,total-dq);
-      const balCell=ord.status==='Partial Dispatch' && bal>0
-        ? '<td class="r" style="color:var(--amber);font-weight:700">'+fmt(bal)+'</td>'
-        : '<td class="r muted">'+(bal>0?fmt(bal):'—')+'</td>';
+      const rq=rqOf(ord), dq=dqOf(ord);
+      const pend=Math.max(0,total-rq-dq);
+      const pendCell=pend>0
+        ? '<td class="r" style="color:var(--amber);font-weight:700">'+fmt(pend)+'</td>'
+        : '<td class="r muted">—</td>';
+      const rdyCell=rq>0
+        ? '<td class="r" style="color:var(--green);font-weight:700">'+fmt(rq)+'</td>'
+        : '<td class="r muted">—</td>';
       return '<tr>'
         +'<td class="pd-date">'+fmtDate(ord.disp)+'</td>'
         +(showCust?'<td style="font-weight:500">'+esc(ord.cust||'—')+'</td>':'')
@@ -2085,8 +2321,9 @@ function renderProductData(){
         +'<td><span class="c-chip c-chip-ply">'+esc(String(ord.ply||'?'))+' PLY</span></td>'
         +'<td class="muted">'+size+'</td>'
         +'<td class="r">'+fmt(total)+'</td>'
+        +rdyCell
         +'<td class="r">'+fmt(dq)+'</td>'
-        +balCell
+        +pendCell
         +'<td>'+badge(ord.status)+'</td>'
         +'</tr>';
     }).join('')
@@ -2096,15 +2333,17 @@ function renderProductData(){
         +(totalPages>1?'Page total':'Total')
       +'</td>'
       +'<td class="r">'+fmt(pageQty)+'</td>'
+      +'<td class="r">'+fmt(pageRdy)+'</td>'
       +'<td class="r">'+fmt(pageDisp)+'</td>'
-      +'<td></td>'
+      +'<td class="r">'+fmt(pagePend)+'</td>'
       +'<td></td>'
     +'</tr>'
     +(totalPages>1?'<tr style="background:var(--s2);font-weight:700">'
       +'<td colspan="'+leadCols+'" style="text-align:right;color:var(--ink3);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Grand total</td>'
       +'<td class="r">'+fmt(totalQty)+'</td>'
+      +'<td class="r">'+fmt(totalRdy)+'</td>'
       +'<td class="r">'+fmt(totalDisp)+'</td>'
-      +'<td></td>'
+      +'<td class="r">'+fmt(totalPend)+'</td>'
       +'<td></td>'
     +'</tr>':'')
     +'</tfoot>'
@@ -2140,14 +2379,15 @@ function pdClear(){
 function pdExportCsv(){
   const list=pdComputeList();
   if(!list.length){showToast('Nothing to export — apply filters that return orders','err');return;}
-  const head=['Dispatch date','Order date','Customer','Order no','Product','PLY','L','W','H','Unit','Qty','Dispatched','Balance','Status'];
+  const head=['Dispatch date','Order date','Customer','Order no','Product','PLY','L','W','H','Unit','Qty','Ready','Dispatched','Pending','Status'];
   const q=v=>{const s=(v==null?'':String(v));return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
   const dqOf=o=>o.status==='Dispatched'?(Number(o.qty)||0):(Number(o.dispatched_qty)||0);
+  const rqOf=o=>o.status==='Dispatched'?0:(Number(o.ready_qty)||0);
   const rows=list.map(o=>{
     const total=Number(o.qty)||0;
-    const dq=dqOf(o);
-    const bal=Math.max(0,total-dq);
-    return [o.disp,o.date,o.cust,o.no,o.prod,o.ply,o.l,o.w,o.h,o.su,total,dq,bal,o.status].map(q).join(',');
+    const rq=rqOf(o), dq=dqOf(o);
+    const pend=Math.max(0,total-rq-dq);
+    return [o.disp,o.date,o.cust,o.no,o.prod,o.ply,o.l,o.w,o.h,o.su,total,rq,dq,pend,o.status].map(q).join(',');
   });
   // Excel-friendly: UTF-8 BOM + CRLF
   const csv='﻿'+[head.join(','),...rows].join('\r\n');
