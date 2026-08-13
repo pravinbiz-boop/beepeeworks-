@@ -24,6 +24,11 @@
   --green:#15803D;       --green-bg:#DCFCE7;
   --red:#B91C1C;         --red-bg:#FEE2E2;
   --blue:#1D4ED8;        --blue-bg:#DBEAFE;
+  /* Vivid status swatches — used on bar segments, dots, chips, badges. */
+  /* Kept separate from the text --red/--amber/--green so ink stays readable. */
+  --stat-pend:#DC2626;   /* Pending  = red */
+  --stat-ready:#F59E0B;  /* Ready    = yellow-amber */
+  --stat-disp:#16A34A;   /* Dispatched = green */
   --violet:#6D28D9;      --violet-bg:#EDE9FE;
   --r:16px;--r2:12px;--r3:8px;
   --shadow-sm:0 1px 2px rgba(0,0,0,.03);
@@ -142,21 +147,15 @@ body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-appl
   /* Drawer bucket row: keep it as 3 columns on mobile too, since the readouts are compact */
   #ed-dqty-row{grid-template-columns:1fr 1fr 1fr;gap:6px}
 
-  /* ── LEDGER card on phones: tighten the buckets so all three fit ── */
-  .led-head{padding:10px 12px 6px}
-  .led-cust{font-size:14px}
-  .led-spec{padding:5px 12px;font-size:11.5px}
-  .led-buckets{padding:8px 2px}
-  .led-bucket{padding:3px 4px;gap:3px}
-  .led-bucket-lbl{font-size:9px;letter-spacing:.08em}
-  .led-bucket-val{font-size:18px;padding:2px 6px;min-width:38px}
-  .led-bucket-val.editing{font-size:16px;width:64px;padding:2px 4px;
-    /* iOS: keep 16px to block auto-zoom on focus */
-    font-size:16px;
-  }
-  .led-foot{padding:8px 12px 10px;flex-wrap:wrap;gap:8px}
-  .led-tot{font-size:10.5px}
-  .led-sel{font-size:16px;height:36px;flex:1 1 100%;min-width:0}
+  /* ── STATUS CARD (scard) on phones ── */
+  .tc-bar{margin:3px 0;height:18px}
+  .tc-nums{font-size:11px;gap:8px}
+  .tc-num b{font-size:12px}
+  .tc-tab{padding:12px 4px;font-size:11px;letter-spacing:.04em}
+  .tc-panel{padding:10px 12px;gap:6px}
+  .tc-panel input[type="number"]{font-size:16px;height:40px;width:88px}
+  .tc-panel .tc-save,.tc-panel .tc-cancel{height:40px}
+  .wo-sort{font-size:16px;height:44px}
 }
 
 /* ── SHELL ── */
@@ -202,11 +201,13 @@ body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-appl
 
 /* ── BADGES ── */
 .bdg{display:inline-flex;align-items:center;font-size:10px;font-weight:600;height:22px;padding:0 10px;border-radius:11px;white-space:nowrap;font-family:'Manrope',sans-serif;letter-spacing:.01em}
-.bdg.pn{background:var(--s2);color:var(--ink3)}
+/* Status badges — aligned with the Status page palette */
+.bdg.pn{background:var(--red-bg);color:var(--red)}
+.bdg.rd{background:var(--amber-bg);color:var(--amber)}
+.bdg.ds{background:var(--green-bg);color:var(--green)}
+/* Legacy classes (In Production / Partial Dispatch) — retired but kept for safety */
 .bdg.ip{background:var(--amber-bg);color:var(--amber)}
 .bdg.pd{background:var(--blue-bg);color:var(--blue)}
-.bdg.rd{background:var(--green-bg);color:var(--green)}
-.bdg.ds{background:var(--s2);color:var(--ink3)}
 
 /* ── INPUTS ── */
 .inp{font-family:inherit;font-size:14px;height:38px;padding:0 12px;border-radius:var(--r2);border:var(--bw) solid var(--line);background:var(--surface);color:var(--ink);outline:0;width:100%;transition:border-color .15s,box-shadow .15s}
@@ -230,18 +231,23 @@ table.t{width:100%;border-collapse:collapse}
 /* ── ORDER CARDS (saved view) ── */
 .order-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
 .ocard{background:var(--surface);border-radius:var(--r2);display:flex;overflow:hidden;cursor:pointer;transition:all .15s ease;border:var(--bw) solid var(--line)}
-.ocard.pn{background:var(--surface)}
-.ocard.ip{background:var(--amber-bg);border-color:rgba(180,83,9,.1)}
+/* Order cards — subtle status tints matching the Status page palette */
+.ocard.pn{background:var(--red-bg);border-color:rgba(185,28,28,.08)}
+.ocard.rd{background:var(--amber-bg);border-color:rgba(180,83,9,.08)}
+.ocard.ds{background:var(--green-bg);border-color:rgba(21,128,61,.08)}
+/* Legacy — kept for any lingering data */
+.ocard.ip{background:var(--amber-bg);border-color:rgba(180,83,9,.08)}
 .ocard.pd{background:var(--blue-bg);border-color:rgba(29,78,216,.08)}
-.ocard.rd{background:var(--green-bg);border-color:rgba(21,128,61,.08)}
-.ocard.ds{background:var(--s2);border-color:var(--line)}
 .ocard:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
 .ocard:active{transform:translateY(0)}
 .ocard:focus-visible,.wo-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .ostripe{width:3px;flex-shrink:0}
-.ostripe.pn{background:var(--muted)}.ostripe.ip{background:var(--amber)}
-.ostripe.pd{background:var(--blue)}.ostripe.rd{background:var(--green)}
-.ostripe.ds{background:var(--muted)}
+/* Left stripe on order cards — vivid status swatches */
+.ostripe.pn{background:var(--stat-pend)}
+.ostripe.rd{background:var(--stat-ready)}
+.ostripe.ds{background:var(--stat-disp)}
+.ostripe.ip{background:var(--amber)}
+.ostripe.pd{background:var(--blue)}
 .obody{flex:1;padding:8px 10px;min-width:0}
 .orow1{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .ocust{font-size:13.5px;font-weight:600;line-height:1.25;word-break:break-word}
@@ -301,135 +307,99 @@ table.t{width:100%;border-collapse:collapse}
 /* Bump the left stripe for a clearer status signal */
 .wo-stripe{width:4px}
 
-/* ── LEDGER · Status page bucket card (aged paper aesthetic) ── */
-.wo-card.ledger{
-  background:#F6F2E8;border:1px solid #C5BCA6;border-radius:2px;
-  font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
-  color:#1A1614;
-  display:flex;flex-direction:column;padding:0;overflow:hidden;
-  cursor:default;transition:background .15s ease;
-  box-shadow:0 1px 0 rgba(107,88,50,.08);
+/* ── TOGGLE CARD · Status page (variant A: bar + compact nums, 2 tabs) ── */
+/* Palette: Pending = red, Ready = amber, Dispatched = green. Fonts: Manrope
+   (matches every other list card in the app); Outfit is reserved for page titles. */
+/* ── STATUS CARD (scard) — uses .ocard shell, adds bar/nums/tabs below ── */
+.ocard.scard{cursor:default}
+.ocard.scard .obody-c{padding-bottom:0}
+.tc-bar{
+  display:flex;height:16px;margin:3px 0 3px;border-radius:3px;overflow:hidden;
+  border:1px solid var(--line);
 }
-.wo-card.ledger:hover{background:#F0EBDA}
-.wo-card.ledger .wo-stripe{display:none}
-.led-head{
-  display:flex;align-items:baseline;justify-content:space-between;gap:8px;
-  padding:12px 14px 8px;border-bottom:1px double #B7B0A2;cursor:pointer;
+.tc-bar>span{
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:700;padding:0 6px;color:#fff;
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+  white-space:nowrap;overflow:hidden;
 }
-.led-title{display:flex;align-items:baseline;gap:8px;min-width:0;flex:1}
-.led-glyph{
-  font-size:16px;line-height:1;flex-shrink:0;color:#1A1614;
-  font-family:"Iowan Old Style",Palatino,Georgia,serif;
+.tc-bar .p{background:var(--stat-pend)}
+.tc-bar .r{background:var(--stat-ready);color:#1F1611}
+.tc-bar .d{background:var(--stat-disp)}
+.tc-nums{
+  display:flex;align-items:center;gap:8px;padding:0 0 4px;
+  font-family:'Manrope',sans-serif;font-size:11px;color:var(--ink3);
+  font-variant-numeric:tabular-nums;letter-spacing:-.01em;
 }
-.led-glyph.pn{color:#6A5F51}
-.led-glyph.ip,.led-glyph.pd{color:#A9832F}
-.led-glyph.rd,.led-glyph.ds{color:#2A4838}
-.led-cust{
-  font-family:"Rockwell","Roboto Slab","Bookman Old Style",Georgia,serif;
-  font-size:15px;font-weight:700;color:#1A1614;letter-spacing:-.005em;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+.tc-num{display:inline-flex;align-items:center;gap:5px}
+.tc-num::before{content:"";width:7px;height:7px;border-radius:2px;flex-shrink:0}
+.tc-num.p::before{background:var(--stat-pend)}
+.tc-num.r::before{background:var(--stat-ready)}
+.tc-num.d::before{background:var(--stat-disp)}
+.tc-num b{color:var(--ink);font-weight:700;font-size:12.5px}
+.tc-sep{color:var(--line2,var(--line));font-weight:400}
+.tc-tabs{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:1px;
+  background:var(--line);border-top:1px solid var(--line);
 }
-.led-no{
-  color:#6A5F51;font-size:11.5px;font-variant-numeric:tabular-nums;
-  font-family:"SF Mono","IBM Plex Mono",Menlo,Consolas,monospace;
+.tc-tab{
+  background:var(--surface);border:0;color:var(--ink2);
+  font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;
+  padding:9px 6px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  transition:background .15s,color .15s;
 }
-.led-moved{color:#6A5F51;font-size:10.5px;font-family:-apple-system,"Segoe UI",sans-serif;font-weight:500;margin-left:6px}
-.led-due{
-  font-family:-apple-system,"Segoe UI",sans-serif;
-  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-  color:#3A322B;flex-shrink:0;white-space:nowrap;
+.tc-tab .tc-glyph{font-size:13px;line-height:1;opacity:.85;font-weight:800}
+.tc-tab:not(.on):hover{background:var(--s2);color:var(--ink)}
+.tc-tab[data-tab="ready"].on   {background:var(--stat-ready);color:#1F1611}
+.tc-tab[data-tab="dispatch"].on{background:var(--stat-disp);color:#fff}
+.tc-tab.on .tc-glyph{opacity:1}
+.tc-tab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.tc-panel{
+  padding:12px 14px;background:var(--s2);
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  border-top:1px solid var(--line);
 }
-.led-due.overdue{color:#8E1A1A}
-.led-due.today{color:#A9832F}
-.led-due.done{color:#2A4838}
-.led-spec{
-  padding:6px 14px;font-size:12px;color:#3A322B;font-style:italic;
-  border-bottom:1px solid #C5BCA6;cursor:pointer;
+.tc-panel-lbl{
+  font-family:'Manrope',sans-serif;font-size:10.5px;color:var(--ink3);
+  font-weight:700;letter-spacing:.06em;text-transform:uppercase;
 }
-.led-buckets{
-  display:grid;grid-template-columns:1fr 1fr 1fr;padding:10px 4px;
-  background:#F0E9D6;
+.tc-panel input[type="number"]{
+  height:36px;width:96px;padding:0 10px;border-radius:6px;
+  border:1.5px solid var(--stat-ready);background:var(--surface);
+  font-family:'Manrope',sans-serif;font-size:16px;font-weight:700;color:var(--amber);
+  font-variant-numeric:tabular-nums;outline:none;
 }
-.led-bucket{
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  padding:4px 8px;position:relative;
+.tc-panel input.tc-inp-dispatch{border-color:var(--stat-disp);color:var(--green)}
+.tc-panel .tc-unit{
+  font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;
 }
-.led-bucket + .led-bucket::before{
-  content:"";position:absolute;left:0;top:20%;bottom:20%;width:1px;background:#B7B0A2;
+.tc-panel .tc-unit.ready{color:var(--amber)}
+.tc-panel .tc-unit.dispatch{color:var(--green)}
+.tc-panel .tc-save{
+  background:var(--ink);color:var(--surface);border:0;
+  height:36px;padding:0 16px;border-radius:6px;
+  font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;cursor:pointer;margin-left:auto;
 }
-.led-bucket-lbl{
-  font-family:-apple-system,"Segoe UI",sans-serif;
-  font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
-  color:#6A5F51;
+.tc-panel .tc-cancel{
+  background:transparent;color:var(--ink3);border:1px solid var(--line);
+  height:36px;padding:0 10px;border-radius:6px;
+  font-family:'Manrope',sans-serif;font-size:12px;font-weight:600;cursor:pointer;
 }
-.led-bucket-val{
-  font-family:"Rockwell","Roboto Slab",Georgia,serif;
-  font-size:22px;font-weight:400;line-height:1;
-  font-variant-numeric:tabular-nums oldstyle-nums;
-  color:#1A1614;padding:3px 8px;border-radius:3px;
-  border:1px dashed transparent;transition:border-color .15s,background .15s;
-  min-width:44px;text-align:center;
+.tc-panel .tc-hint{
+  font-family:'Manrope',sans-serif;font-size:10.5px;color:var(--ink3);
+  font-style:italic;flex:1 1 100%;margin-top:2px;
 }
-.led-bucket.pending .led-bucket-val{color:#6A5F51;cursor:default}
-.led-bucket.ready .led-bucket-val{color:#2A4838}
-.led-bucket.dispatched .led-bucket-val{color:#1A1614}
-.led-bucket-val.editable{cursor:text}
-.led-bucket-val.editable:hover,.led-bucket-val.editable:focus-visible{border-color:#6A5F51;background:rgba(107,88,50,.06);outline:none}
-.led-bucket-val.editing{
-  border:1px solid #8E1A1A;background:#FFF;outline:none;
-  padding:3px 8px;text-align:center;width:80px;
-  font-family:"Rockwell","Roboto Slab",Georgia,serif;
-  font-size:22px;font-weight:400;color:#1A1614;
-  font-variant-numeric:tabular-nums oldstyle-nums;
-}
-.led-warn{
-  padding:8px 14px;background:rgba(142,26,26,.08);border-top:1px solid #8E1A1A;
-  font-size:11px;color:#8E1A1A;font-weight:700;
-  font-family:-apple-system,"Segoe UI",sans-serif;letter-spacing:.03em;
-}
-.led-foot{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:10px 14px 12px;border-top:1px solid #C5BCA6;flex-wrap:wrap;
-}
-.led-tot{
-  font-family:-apple-system,"Segoe UI",sans-serif;
-  font-size:11px;color:#6A5F51;
-  display:flex;align-items:baseline;gap:6px;letter-spacing:.02em;
-}
-.led-tot b{
-  color:#1A1614;font-family:"Rockwell","Roboto Slab",Georgia,serif;
-  font-size:14px;font-weight:400;font-variant-numeric:tabular-nums oldstyle-nums;
-}
-.led-sel{
-  font-family:-apple-system,"Segoe UI",sans-serif;font-size:12px;font-weight:600;
-  background:#EEE9DD;border:1px solid #B7B0A2;color:#1A1614;
-  height:32px;padding:0 10px;border-radius:2px;cursor:pointer;
-}
-.led-sel:focus{outline:none;border-color:#8E1A1A}
-@media (prefers-color-scheme: dark){
-  .wo-card.ledger{background:#241D14;border-color:#4A3F2E;color:#EAE1CE;box-shadow:0 1px 0 rgba(0,0,0,.4)}
-  .wo-card.ledger:hover{background:#2D2519}
-  .led-head{border-bottom-color:#4A3F2E}
-  .led-glyph,.led-cust{color:#EAE1CE}
-  .led-glyph.pn{color:#B7A78F}
-  .led-glyph.ip,.led-glyph.pd{color:#D9B85A}
-  .led-glyph.rd,.led-glyph.ds{color:#7EA88F}
-  .led-no,.led-moved,.led-bucket-lbl,.led-tot{color:#9B8E77}
-  .led-due{color:#B7A78F}
-  .led-due.overdue{color:#E8776E}
-  .led-due.today{color:#D9B85A}
-  .led-due.done{color:#7EA88F}
-  .led-spec{color:#B7A78F;border-bottom-color:#3A3226}
-  .led-buckets{background:#1F1810}
-  .led-bucket + .led-bucket::before{background:#4A3F2E}
-  .led-bucket .led-bucket-val,.led-bucket.dispatched .led-bucket-val,.led-tot b{color:#EAE1CE}
-  .led-bucket.pending .led-bucket-val{color:#9B8E77}
-  .led-bucket.ready .led-bucket-val{color:#7EA88F}
-  .led-bucket-val.editable:hover,.led-bucket-val.editable:focus-visible{background:rgba(234,225,206,.05);border-color:#B7A78F}
-  .led-bucket-val.editing{background:#0F0A03;color:#EAE1CE;border-color:#E8776E}
-  .led-warn{background:rgba(232,119,110,.08);color:#E8776E;border-top-color:#E8776E}
-  .led-foot{border-top-color:#3A3226}
-  .led-sel{background:#241D14;border-color:#4A3F2E;color:#EAE1CE}
+.tc-panel .tc-hint.err{color:var(--red);font-style:normal;font-weight:600}
+/* Sort dropdown next to search */
+.wo-sort-wrap{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.wo-sort-wrap #wo-search{flex:1;min-width:180px}
+.wo-sort{
+  height:44px;padding:0 12px;border-radius:6px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  font-family:inherit;font-size:14px;font-weight:600;
+  min-width:150px;
 }
 .wo-stripe{width:3px;flex-shrink:0}
 .wo-stripe.pn{background:var(--muted)}.wo-stripe.ip{background:var(--amber)}
@@ -707,7 +677,7 @@ table.t{width:100%;border-collapse:collapse}
         <div class="fg2">
           <div class="frow"><label class="flbl">Status</label>
             <select class="sel" id="no-status">
-              <option>Pending</option><option>In Production</option><option>Partial Dispatch</option><option>Ready</option><option>Dispatched</option>
+              <option>Pending</option><option>Ready</option><option>Dispatched</option>
             </select>
           </div>
           <div class="frow"><label class="flbl">Dispatch Date *</label><input type="date" class="inp" id="no-disp" style="border-color:#C7D2FE;background:#EEF2FF;color:#4338CA;font-weight:600"></div>
@@ -735,8 +705,13 @@ table.t{width:100%;border-collapse:collapse}
       <div><div class="ptitle">Work Status</div></div>
     </div>
     <div class="fbar" id="wo-filters"></div>
-    <div style="margin-bottom:12px">
+    <div class="wo-sort-wrap">
       <input class="inp" id="wo-search" placeholder="Search customer, order no, size, product, PLY…" oninput="renderWorkStatus()">
+      <select class="wo-sort" id="wo-sort" onchange="woSortChange(this.value)" aria-label="Sort orders">
+        <option value="due">Sort: due date</option>
+        <option value="moved">Sort: recently moved</option>
+        <option value="cust">Sort: customer A–Z</option>
+      </select>
     </div>
     <div class="wo-list" id="wo-list"></div>
   </section>
@@ -963,9 +938,9 @@ table.t{width:100%;border-collapse:collapse}
           <div class="frow">
             <label class="flbl">Include</label>
             <select class="sel" id="pdf-scope" onchange="pdGoPage(1)">
-              <option value="both">Dispatched + Partial</option>
-              <option value="dispatched">Dispatched only</option>
-              <option value="partial">Partial only</option>
+              <option value="both">Any dispatched activity</option>
+              <option value="dispatched">Fully Dispatched only</option>
+              <option value="partial">Partial (still Ready) only</option>
             </select>
           </div>
         </div>
@@ -1070,10 +1045,9 @@ table.t{width:100%;border-collapse:collapse}
       <div class="frow"><label class="flbl">Qty *</label><input class="inp num" type="number" inputmode="decimal" id="ed-qty" min="0" oninput="edRecalcBalance()"></div>
     </div>
     <div class="fg2">
-      <div class="frow"><label class="flbl">Status</label>
-        <select class="sel" id="ed-status" onchange="edStatusChange()">
-          <option>Pending</option><option>In Production</option><option>Partial Dispatch</option><option>Ready</option><option>Dispatched</option>
-        </select>
+      <div class="frow"><label class="flbl">Status <span style="font-size:9.5px;color:var(--ink3);font-weight:500;text-transform:none;letter-spacing:0;font-style:italic">(derived)</span></label>
+        <div class="inp readout" id="ed-status-txt">—</div>
+        <input type="hidden" id="ed-status" value="Pending">
       </div>
       <div class="frow"><label class="flbl">Dispatch Date *</label>
         <input type="date" class="inp" id="ed-disp" style="border-color:#C7D2FE;background:#EEF2FF;color:#4338CA;font-weight:600">
@@ -1217,7 +1191,7 @@ const db={
 // ── CONSTANTS ────────────────────────────────────────────
 const PRODUCTS=['Box','Pallet','Layer / Board','OE Layer','Corner Pad'];
 const PLYS=['2','3','5','7'];
-const STATUSES=['Pending','In Production','Partial Dispatch','Ready','Dispatched'];
+const STATUSES=['Pending','Ready','Dispatched'];
 const TSTATS=['Pending','In progress','Done'];
 const MEMBERS=['Mahesh','Kondal','Pravin'];
 const JOINTS=['double','single'];
@@ -1231,7 +1205,10 @@ const DEF_GSM={'Top Paper':150,'Flute 1':120,'Base 1':150,'Flute 2':120,'Base 2'
 
 // ── STATE ────────────────────────────────────────────────
 let parties=[], orders=[], tasks=[];
-let pf='all', oSF='Pending', tSF='All', tMF='All', woF='Pending', pdPage=1;
+let pf='all', oSF='Pending', tSF='All', tMF='All', pdPage=1;
+// Status page: multi-select filter (all statuses visible by default) + sort control
+let woFilterSet=new Set(['Pending','Ready','Dispatched']);
+let woSort='due';
 const PD_PAGE_SIZE=50;
 let editId=null;
 let editTaskId=null;
@@ -1266,8 +1243,18 @@ const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 const today=()=>new Date().toISOString().slice(0,10);
 const TODAY=today();
 
-function skCls(s){return s==='Pending'?'pn':s==='In Production'?'ip':s==='Partial Dispatch'?'pd':s==='Ready'?'rd':'ds';}
+function skCls(s){return s==='Pending'?'pn':s==='Ready'?'rd':s==='Dispatched'?'ds':'pn';}
 function badge(s){return '<span class="bdg '+skCls(s)+'">'+esc(s)+'</span>';}
+// Sequential-flow status: derived from the buckets, never manually set.
+//   D >= qty            → Dispatched
+//   R = 0 && D = 0      → Pending
+//   otherwise           → Ready (in progress or partially shipped)
+function deriveStatus(qty, ready_qty, dispatched_qty){
+  const total=Number(qty)||0, r=Number(ready_qty)||0, d=Number(dispatched_qty)||0;
+  if(total>0 && d>=total) return 'Dispatched';
+  if(r===0 && d===0) return 'Pending';
+  return 'Ready';
+}
 // Compact "time since" label — for the Work Status "recently moved" sort key.
 function timeAgo(ts){
   if(!ts) return '';
@@ -1349,11 +1336,13 @@ async function saveNewOrder(){
     renderParties();
   }
 
-  // Seed bucket fields from the chosen status so a new order lands consistent with what the user picked
-  const newStatus=getVal('no-status');
-  const seedRq = newStatus==='Ready' ? qty : 0;
-  const seedDq = newStatus==='Dispatched' ? qty : 0;
-  const row={date,no:getVal('no-no'),cust,prod,ply,l:L,w:W,h:H,su:getVal('no-su'),qty,joint:'double',disp,status:newStatus,ready_qty:seedRq,dispatched_qty:seedDq};
+  // Seed bucket fields from the chosen status, then derive the real status from those buckets.
+  // (Pending → both 0; Ready → ready_qty = qty; Dispatched → dispatched_qty = qty.)
+  const picked=getVal('no-status');
+  const seedRq = picked==='Ready' ? qty : 0;
+  const seedDq = picked==='Dispatched' ? qty : 0;
+  const derived=deriveStatus(qty,seedRq,seedDq);
+  const row={date,no:getVal('no-no'),cust,prod,ply,l:L,w:W,h:H,su:getVal('no-su'),qty,joint:'double',disp,status:derived,ready_qty:seedRq,dispatched_qty:seedDq};
   try{
     const res=await db.insert('orders',row);
     if(!res || !res[0]) throw new Error('Insert failed');
@@ -1373,28 +1362,28 @@ async function saveNewOrder(){
 
 // Shared card renderer — used by both Orders and Work Status pages.
 // edit=true renders the Work Status variant (adds inline status dropdown).
-function orderCardHTML(ord, opts){
-  const edit=!!(opts && opts.edit);
+// Renders an Orders-page card. Work Status uses statusCardHTML (Toggle Card) instead.
+function orderCardHTML(ord){
   const dm=dispMeta(ord.disp,ord.status);
   const sk=skCls(ord.status);
   const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' · '+dm.label:'No date set';
   const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
   const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
-  const cardCls=edit?'wo-card':'ocard';
-  const stripeCls=edit?'wo-stripe':'ostripe';
-  const trailing=edit
-    ? '<select class="wo-sel" onclick="event.stopPropagation()" onchange="woStatusChange('+ord.id+',this.value)">'+STATUSES.map(s=>'<option'+(s===ord.status?' selected':'')+'>'+s+'</option>').join('')+'</select>'
-    : badge(ord.status);
-  const moved=edit?timeAgo(ord.updated_at||ord.created_at):'';
+  const cardCls='ocard';
+  const stripeCls='ostripe';
+  const trailing=badge(ord.status);
+  const moved='';
   const movedHTML=moved?' <span style="font-size:10.5px;color:var(--ink3);font-weight:500">· '+esc(moved)+'</span>':'';
-  // Qty display — for Partial Dispatch, show `dispatched / total` + a balance chip
+  // Qty display — for Ready orders (partial state), show shipped/total + balance chip
+  const rq=Number(ord.ready_qty)||0;
   const dq=Number(ord.dispatched_qty)||0;
   const total=Number(ord.qty)||0;
-  const balance=Math.max(0,total-dq);
+  const pending=Math.max(0,total-rq-dq);
   let qtyHTML;
-  if(ord.status==='Partial Dispatch'){
+  if(ord.status==='Ready' && (dq>0||rq>0) && total>0 && dq<total){
+    // Partial state: show what's shipped of the total, plus pending balance if any
     qtyHTML='<span class="c-qty c-qty-part">'+fmt(dq)+' / '+fmt(total)+' nos</span>'
-      +(balance>0?' <span class="qtag">'+fmt(balance)+' balance</span>':'');
+      +(pending>0?' <span class="qtag">'+fmt(pending)+' pending</span>':'');
   } else if(ord.status==='Dispatched'){
     qtyHTML='<span class="c-qty">'+fmt(total)+' nos</span>';
   } else {
@@ -1420,8 +1409,10 @@ function orderCardHTML(ord, opts){
   +'</div>';
 }
 // ── LEDGER · Status page bucket card ───────────────────────────
-// Renders one order as a Pending / Ready / Dispatched triptych with
-// direct-edit on the Ready and Dispatched values.
+// Renders one order as a Toggle Card: header + bucket bar + 4-tab action strip.
+// Variant A — bar + compact nums, 2 tabs (+ Ready / + Dispatch).
+// Total qty lives inline with the spec line. Status is derived (no pill/tab shown).
+// Edit total qty from the drawer (open by clicking the card header).
 function statusCardHTML(ord){
   const total=Number(ord.qty)||0;
   const rq=Math.max(0,Number(ord.ready_qty)||0);
@@ -1430,130 +1421,182 @@ function statusCardHTML(ord){
   const sk=skCls(ord.status);
   const dm=dispMeta(ord.disp,ord.status);
   const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' · '+dm.label:'No date';
-  const dispCls=dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':'ok';
-  const glyph=ord.status==='Dispatched'?'✓'
-    :ord.status==='Ready'?'●'
-    :(ord.status==='Partial Dispatch'||ord.status==='In Production')?'◐'
-    :'○';
-  const size=esc(String(ord.l||0))+' × '+esc(String(ord.w||0))+(ord.prod==='Box'?' × '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
-  const noHTML=ord.no?' <span class="led-no">#'+esc(ord.no)+'</span>':'';
-  const moved=timeAgo(ord.updated_at||ord.created_at);
-  const movedHTML=moved?'<span class="led-moved">· '+esc(moved)+'</span>':'';
-  const openHandler='onclick="openDrawer('+ord.id+')"';
-  const editSpan=(role,field,value)=>
-    '<span class="led-bucket-val editable" data-role="'+role+'" data-oid="'+ord.id+'" data-field="'+field+'" tabindex="0" role="button" aria-label="Edit '+role+'"'
-    +' onclick="event.stopPropagation();ledEditStart(this,'+ord.id+',\''+field+'\')"'
-    +' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();ledEditStart(this,'+ord.id+',\''+field+'\')}">'
-    +fmt(value)+'</span>';
-  return '<div class="wo-card ledger '+sk+'" data-oid="'+ord.id+'">'
-    +'<div class="led-head" '+openHandler+'>'
-      +'<div class="led-title">'
-        +'<span class="led-glyph '+sk+'" aria-hidden="true">'+glyph+'</span>'
-        +'<span class="led-cust">'+esc(ord.cust||'—')+'</span>'
-        +noHTML
-        +movedHTML
+  const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
+  const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
+  const pFlex=total>0?pending/total:1, rFlex=total>0?rq/total:0, dFlex=total>0?dq/total:0;
+  const seg=(cls,val,flex)=>flex>0?'<span class="'+cls+'" style="flex:'+flex.toFixed(3)+'">'+(flex>0.06?fmt(val):'')+'</span>':'';
+  return '<div class="ocard scard '+sk+'" data-oid="'+ord.id+'">'
+    +'<div class="ostripe '+sk+'"></div>'
+    +'<div class="obody-c">'
+      +'<div class="orow-c1" onclick="openDrawer('+ord.id+')" style="cursor:pointer">'
+        +'<div style="min-width:0"><span class="ocust">'+esc(ord.cust||'—')+'</span>'+(ord.no?' <span class="ono">#'+esc(ord.no)+'</span>':'')+'</div>'
+        +'<span class="'+dispCls+'">'+esc(dispTxt)+'</span>'
       +'</div>'
-      +'<span class="led-due '+dispCls+'">'+esc(dispTxt)+'</span>'
-    +'</div>'
-    +'<div class="led-spec" '+openHandler+'>'
-      +esc(ord.prod||'—')+' · '+esc(String(ord.ply||'?'))+' PLY · '+size
-    +'</div>'
-    +'<div class="led-buckets">'
-      +'<div class="led-bucket pending" title="Derived: qty − ready − dispatched">'
-        +'<span class="led-bucket-lbl">Pending</span>'
-        +'<span class="led-bucket-val" data-role="pending">'+fmt(pending)+'</span>'
+      +'<div class="orow-c2">'
+        +'<span class="c-chip c-chip-ply">'+esc(String(ord.ply||'?'))+' PLY</span>'
+        +'<span class="c-chip c-chip-prod">'+esc(ord.prod||'—')+'</span>'
       +'</div>'
-      +'<div class="led-bucket ready">'
-        +'<span class="led-bucket-lbl">Ready</span>'
-        +editSpan('ready','ready_qty',rq)
+      +'<div class="orow-c2" style="padding-left:2px"><span style="font-size:12px;color:var(--ink3);font-weight:500">'+size+'</span></div>'
+      +'<div class="orow-c3">'
+        +'<span class="c-qty">'+fmt(total)+' nos.</span>'
+        +badge(ord.status)
       +'</div>'
-      +'<div class="led-bucket dispatched">'
-        +'<span class="led-bucket-lbl">Dispatched</span>'
-        +editSpan('dispatched','dispatched_qty',dq)
+      +'<div class="tc-bar" aria-label="Progress: '+fmt(pending)+' pending, '+fmt(rq)+' ready, '+fmt(dq)+' dispatched">'
+        +seg('p',pending,pFlex)
+        +seg('r',rq,rFlex)
+        +seg('d',dq,dFlex)
       +'</div>'
-    +'</div>'
-    +'<div class="led-warn" data-role="warn" style="display:none"></div>'
-    +'<div class="led-foot">'
-      +'<span class="led-tot">Total ordered · <b>'+fmt(total)+' nos</b></span>'
-      +'<select class="led-sel" aria-label="Order status" onclick="event.stopPropagation()" onchange="woStatusChange('+ord.id+',this.value)">'
-        +STATUSES.map(s=>'<option'+(s===ord.status?' selected':'')+'>'+s+'</option>').join('')
-      +'</select>'
+      +'<div class="tc-nums">'
+        +'<span class="tc-num p">P <b>'+fmt(pending)+'</b></span>'
+        +'<span class="tc-sep">·</span>'
+        +'<span class="tc-num r">R <b>'+fmt(rq)+'</b></span>'
+        +'<span class="tc-sep">·</span>'
+        +'<span class="tc-num d">D <b>'+fmt(dq)+'</b></span>'
+      +'</div>'
+      +'<div class="tc-tabs" role="tablist">'
+        +'<button class="tc-tab" role="tab" data-tab="ready"    onclick="tcTabToggle(this,\'ready\')"><span class="tc-glyph">+</span>Ready</button>'
+        +'<button class="tc-tab" role="tab" data-tab="dispatch" onclick="tcTabToggle(this,\'dispatch\')"><span class="tc-glyph">+</span>Dispatch</button>'
+      +'</div>'
+      +'<div class="tc-panel" style="display:none"></div>'
     +'</div>'
   +'</div>';
 }
 
-// Enter edit mode on a Ready or Dispatched value. Blur/Enter commits, Escape cancels.
-// Guards against ready + dispatched > total qty.
-function ledEditStart(el, id, field){
-  if(el.classList.contains('editing')) return;
-  const o=orders.find(x=>x.id===id); if(!o) return;
-  const cur=Number(o[field])||0;
-  const inp=document.createElement('input');
-  inp.type='number';
-  inp.inputMode='numeric';
-  inp.min='0';
-  inp.value=cur;
-  inp.className='led-bucket-val editing';
-  inp.dataset.field=field;
-  inp.dataset.oid=id;
-  el.replaceWith(inp);
-  inp.focus();
-  inp.select();
-  let done=false;
-  const cancel=()=>{if(done) return;done=true;updateOrderCardDom(id);};
-  const commit=async ()=>{
-    if(done) return;done=true;
-    const raw=inp.value.trim();
-    const newVal=raw===''?0:parseInt(raw,10);
-    if(isNaN(newVal)||newVal<0){
-      showToast('Enter a whole number (0 or more)','err');
-      updateOrderCardDom(id);return;
-    }
-    const total=Number(o.qty)||0;
-    const otherField=field==='ready_qty'?'dispatched_qty':'ready_qty';
-    const otherVal=Number(o[otherField])||0;
-    if(newVal+otherVal>total){
-      showToast('Ready + Dispatched ('+fmt(newVal+otherVal)+') exceeds Total ('+fmt(total)+')','err');
-      updateOrderCardDom(id);return;
-    }
-    if(newVal===cur){updateOrderCardDom(id);return;}
-    // Optimistic
-    const prev=o[field], prevTs=o.updated_at;
-    o[field]=newVal;
-    o.updated_at=new Date().toISOString();
-    updateOrderCardDom(id);
-    try{
-      const ok=await db.update('orders',id,{[field]:newVal,updated_at:o.updated_at});
-      if(ok===null) throw new Error('Save failed');
-      showToast((field==='ready_qty'?'Ready → ':'Dispatched → ')+fmt(newVal)+' nos','ok');
-      renderProductData();
-    }catch(e){
-      o[field]=prev; o.updated_at=prevTs;
-      updateOrderCardDom(id);
-      showToast('Save failed — reverted','err');
-    }
-  };
-  inp.addEventListener('keydown',e=>{
-    if(e.key==='Enter'){e.preventDefault();commit();}
-    if(e.key==='Escape'){e.preventDefault();cancel();}
-  });
-  inp.addEventListener('blur',()=>commit());
-  inp.addEventListener('click',e=>e.stopPropagation());
+// Toggle the active action tab on a card. Same tab twice = collapse.
+function tcTabToggle(btn, tabName){
+  const card=btn.closest('.ocard.scard'); if(!card) return;
+  const oid=Number(card.dataset.oid);
+  const active=card.dataset.activeTab||'';
+  const panel=card.querySelector('.tc-panel');
+  card.querySelectorAll('.tc-tab').forEach(t=>t.classList.remove('on'));
+  if(active===tabName){
+    // Collapse
+    card.dataset.activeTab='';
+    panel.style.display='none';
+    panel.innerHTML='';
+    return;
+  }
+  card.dataset.activeTab=tabName;
+  btn.classList.add('on');
+  panel.style.display='';
+  panel.innerHTML=tcPanelHTML(oid, tabName);
+  // Wire up Enter/Escape and auto-focus first input
+  const inp=panel.querySelector('input,select');
+  if(inp){
+    if(inp.tagName==='INPUT') inp.select?.();
+    inp.focus();
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){e.preventDefault();const s=panel.querySelector('.tc-save'); if(s) s.click();}
+      if(e.key==='Escape'){e.preventDefault();tcTabToggle(btn,tabName);}
+    });
+  }
 }
 
+// Build the panel HTML for the active tab. Sequential flow: pending → ready → dispatched.
+function tcPanelHTML(id, tabName){
+  const o=orders.find(x=>x.id===id); if(!o) return '';
+  const total=Number(o.qty)||0;
+  const rq=Number(o.ready_qty)||0;
+  const dq=Number(o.dispatched_qty)||0;
+  const pending=Math.max(0,total-rq-dq);
+  if(tabName==='ready'){
+    // Pre-fill with what's pending — most common action is "mark everything remaining as ready"
+    return '<span class="tc-panel-lbl">Mark ready</span>'
+      +'<input type="number" inputmode="numeric" min="1" max="'+pending+'" id="tc-inp-ready" value="'+pending+'" />'
+      +'<span class="tc-unit ready">nos</span>'
+      +'<button class="tc-save" onclick="tcCommitReady('+id+')">Save</button>';
+  }
+  if(tabName==='dispatch'){
+    // Pre-fill with what's ready — most common action is "ship the entire ready buffer"
+    return '<span class="tc-panel-lbl">Dispatch now</span>'
+      +'<input type="number" inputmode="numeric" min="1" max="'+rq+'" id="tc-inp-dispatch" class="tc-inp-dispatch" value="'+rq+'" />'
+      +'<span class="tc-unit dispatch">nos</span>'
+      +'<button class="tc-save" onclick="tcCommitDispatch('+id+')">Save</button>';
+  }
+  return '';
+}
+
+// ── Toggle Card action commits (optimistic + rollback + toast) ─────
+// Every commit runs the patch through deriveStatus so the stored status
+// is always in sync with the buckets (sequential-flow model, option A).
+async function tcPatchOrder(id, patch, successMsg){
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  // Derive the new status from the post-patch bucket state
+  const nextQty=patch.qty!=null?patch.qty:o.qty;
+  const nextR  =patch.ready_qty!=null?patch.ready_qty:o.ready_qty;
+  const nextD  =patch.dispatched_qty!=null?patch.dispatched_qty:o.dispatched_qty;
+  patch.status=deriveStatus(nextQty,nextR,nextD);
+  const prev={}; Object.keys(patch).forEach(k=>{prev[k]=o[k];});
+  Object.assign(o,patch);
+  updateOrderCardDom(id);
+  try{
+    const ok=await db.update('orders',id,patch);
+    if(ok===null) throw new Error('Save failed');
+    showToast(successMsg,'ok');
+    renderProductData();
+    if(typeof renderOrders==='function') renderOrders();
+    renderWorkStatus();
+  }catch(e){
+    Object.assign(o,prev);
+    updateOrderCardDom(id);
+    showToast('Save failed — reverted','err');
+  }
+}
+
+// + Ready X: pulls X from Pending; adds X to Ready. Guardrail: X ≤ Pending.
+async function tcCommitReady(id){
+  const inp=document.getElementById('tc-inp-ready'); if(!inp) return;
+  const delta=parseInt(inp.value,10);
+  if(isNaN(delta)||delta<=0){showToast('Enter a positive number','err');inp.focus();return;}
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  const total=Number(o.qty)||0;
+  const rq=Number(o.ready_qty)||0;
+  const dq=Number(o.dispatched_qty)||0;
+  const pending=Math.max(0,total-rq-dq);
+  if(delta>pending){
+    showToast('Only '+fmt(pending)+' pending — cannot mark '+fmt(delta)+' ready','err');
+    inp.focus();inp.select();return;
+  }
+  const newR=rq+delta;
+  await tcPatchOrder(id, {ready_qty:newR, updated_at:new Date().toISOString()},
+    'Ready + '+fmt(delta)+' → '+fmt(newR));
+}
+
+// + Dispatch X: pulls X from Ready; adds X to Dispatched. Pending unchanged.
+// Guardrail: X ≤ Ready.
+async function tcCommitDispatch(id){
+  const inp=document.getElementById('tc-inp-dispatch'); if(!inp) return;
+  const delta=parseInt(inp.value,10);
+  if(isNaN(delta)||delta<=0){showToast('Enter a positive number','err');inp.focus();return;}
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  const total=Number(o.qty)||0;
+  const rq=Number(o.ready_qty)||0;
+  const dq=Number(o.dispatched_qty)||0;
+  if(delta>rq){
+    showToast('Only '+fmt(rq)+' ready — mark more as ready first','err');
+    inp.focus();inp.select();return;
+  }
+  const newR=rq-delta;
+  const newD=dq+delta;
+  const okMsg=(newD>=total && total>0)
+    ? 'Fully dispatched · '+fmt(total)+'/'+fmt(total)
+    : 'Dispatch + '+fmt(delta)+' → '+fmt(newD)+' (Ready now '+fmt(newR)+')';
+  await tcPatchOrder(id, {ready_qty:newR, dispatched_qty:newD, updated_at:new Date().toISOString()}, okMsg);
+}
+
+// Edit Qty removed from the Toggle Card — total qty is edited from the drawer
+// (open by clicking the card header). Rare enough that the drawer is the right home.
+
 // In-place refresh for a single order card DOM node — updates every instance
-// (Orders page uses .ocard; Work Status uses .wo-card.ledger).
+// (Both Orders and Status pages use .ocard; Status adds .scard for bar/nums/tabs.)
 function updateOrderCardDom(id){
   const o=orders.find(x=>x.id===id); if(!o) return;
-  document.querySelectorAll('[data-oid="'+id+'"]').forEach(el=>{
-    // Skip nested data-oid elements (e.g. the editable spans inside a ledger card)
-    if(!el.classList.contains('wo-card')&&!el.classList.contains('ocard')) return;
+  document.querySelectorAll('.ocard[data-oid="'+id+'"]').forEach(el=>{
     const wrap=document.createElement('div');
-    if(el.classList.contains('ledger')){
+    if(el.classList.contains('scard')){
       wrap.innerHTML=statusCardHTML(o);
     } else {
-      const edit=el.classList.contains('wo-card');
-      wrap.innerHTML=orderCardHTML(o,{edit:edit});
+      wrap.innerHTML=orderCardHTML(o);
     }
     el.replaceWith(wrap.firstElementChild);
   });
@@ -1595,7 +1638,7 @@ function renderOrders(){
     return;
   }
 
-  document.getElementById('ol-cards').innerHTML=list.map(o=>orderCardHTML(o,{edit:false})).join('');
+  document.getElementById('ol-cards').innerHTML=list.map(o=>orderCardHTML(o)).join('');
 }
 function olFilter(s){oSF=s;renderOrders();}
 
@@ -1628,24 +1671,13 @@ function openDrawer(id){
   setVal('ed-status',ord.status);
   document.getElementById('ed-warn').style.display='none';
   document.querySelectorAll('#edit-drawer .inp.err,#edit-drawer .sel.err').forEach(el=>el.classList.remove('err'));
-  edStatusChange();
+  edRecalcBalance();
   document.getElementById('ed-backdrop').classList.add('open');
   document.getElementById('edit-drawer').classList.add('open');
   document.body.style.overflow='hidden';
 }
-// Pre-fill sensible bucket defaults for definitive statuses; recompute balance.
-function edStatusChange(){
-  const status=getVal('ed-status');
-  const total=parseFloat(getVal('ed-qty'))||0;
-  const rq=parseFloat(getVal('ed-rqty'))||0;
-  const dq=parseFloat(getVal('ed-dqty'))||0;
-  if(status==='Dispatched' && total && !dq){ setVal('ed-dqty',total); setVal('ed-rqty',0); }
-  else if(status==='Ready' && total && !rq && !dq){ setVal('ed-rqty',total); }
-  else if((status==='Pending'||status==='In Production') && (rq||dq)){ /* leave alone; user may intend to blank via save */ }
-  edRecalcBalance();
-}
-// Live balance + validation for the drawer.
-// Pending = qty − ready − dispatched (never negative). Guardrail: sum ≤ qty.
+// Live balance + validation + derived-status readout for the drawer.
+// Sequential-flow model: Pending = qty − ready − dispatched; status derives from buckets.
 function edRecalcBalance(){
   const total=parseFloat(getVal('ed-qty'))||0;
   const rq=parseFloat(getVal('ed-rqty'))||0;
@@ -1658,9 +1690,14 @@ function edRecalcBalance(){
   document.getElementById('ed-dqty-warn').style.display=over?'block':'none';
   document.getElementById('ed-rqty').classList.toggle('err',over);
   document.getElementById('ed-dqty').classList.toggle('err',over);
-  // Hint if everything is shipped — status will auto-flip on save
-  const status=getVal('ed-status');
-  const autoHint=status!=='Dispatched' && total>0 && dq>=total;
+  // Live-derive status from the current bucket values and reflect it in the readout
+  const derived=deriveStatus(total,rq,dq);
+  const stEl=document.getElementById('ed-status-txt');
+  if(stEl){stEl.textContent=derived;stEl.className='inp readout';stEl.classList.add(skCls(derived));}
+  setVal('ed-status',derived);
+  // Hint if editing values would auto-move to Dispatched
+  const orig=(orders.find(o=>o.id===editId)||{}).status;
+  const autoHint=derived!==orig && derived==='Dispatched';
   document.getElementById('ed-auto-hint').style.display=autoHint?'block':'none';
 }
 function closeDrawer(){
@@ -1694,7 +1731,7 @@ async function saveDrawer(){
   const warnEl=document.getElementById('ed-warn');
   if(row.disp&&row.date&&row.disp<row.date){warnEl.style.display='block';return;}
   warnEl.style.display='none';
-  // Bucket validation: ready + dispatched cannot exceed total qty
+  // Bucket validation: ready + dispatched cannot exceed total qty (sequential-flow invariant)
   if(row.ready_qty + row.dispatched_qty > row.qty){
     document.getElementById('ed-dqty-warn').style.display='block';
     document.getElementById('ed-rqty').classList.add('err');
@@ -1702,20 +1739,8 @@ async function saveDrawer(){
     document.getElementById('ed-rqty').focus();
     return;
   }
-  // Auto-transitions on save (status ↔ buckets):
-  //   Everything shipped → Dispatched
-  //   Dispatched status → dispatched_qty = qty, ready_qty = 0
-  //   Pending / In Production → both zeroed
-  //   Ready → ready_qty = qty (unless partial already), dispatched_qty = 0
-  if(row.dispatched_qty>=row.qty && row.qty>0){
-    row.status='Dispatched'; row.dispatched_qty=row.qty; row.ready_qty=0;
-  } else if(row.status==='Dispatched'){
-    row.dispatched_qty=row.qty; row.ready_qty=0;
-  } else if(row.status==='Pending'||row.status==='In Production'){
-    row.ready_qty=0; row.dispatched_qty=0;
-  } else if(row.status==='Ready' && !row.ready_qty && !row.dispatched_qty){
-    row.ready_qty=row.qty;
-  }
+  // Status is fully derived from the buckets — no manual override.
+  row.status=deriveStatus(row.qty,row.ready_qty,row.dispatched_qty);
   const x=orders.find(o=>o.id===editId); if(!x){closeDrawer();return;}
   if(row.status!==x.status) row.updated_at=new Date().toISOString();
   // Snapshot only the fields we're about to mutate, for rollback
@@ -1772,57 +1797,67 @@ async function duplicateOrder(){
 }
 
 // ── WORK STATUS ──────────────────────────────────────────
+// Bucket-based filter: chips match "has any qty in this bucket", not status.
+// One order can appear on multiple chips — e.g. a Ready order with pending qty
+// > 0 shows under both "Pending" and "Ready".
+function woBucketMatch(o, chip){
+  const t=Number(o.qty)||0, r=Number(o.ready_qty)||0, d=Number(o.dispatched_qty)||0;
+  if(chip==='Pending')    return Math.max(0,t-r-d)>0;
+  if(chip==='Ready')      return r>0;
+  if(chip==='Dispatched') return d>0;
+  return false;
+}
 function renderWorkStatus(){
   const q=(document.getElementById('wo-search')?.value||'').toLowerCase().trim();
-  const pool=orders.filter(x=>x.status===woF);
+  // Filter: any bucket in the active set has qty > 0 for this order
+  const pool=orders.filter(x=>{
+    for(const chip of woFilterSet){ if(woBucketMatch(x,chip)) return true; }
+    return false;
+  });
   let list=q?pool.filter(x=>orderMatchesQuery(x,q)):pool;
-  // Most recently moved (status updated) first — same rule for every pill
+  // Sort per current selection
   const mv=o=>o.updated_at||o.created_at||'';
-  list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
-  // Counts reflect the current search — so pill numbers match what you see
+  if(woSort==='due')       list.sort((a,b)=>(a.disp||'9999').localeCompare(b.disp||'9999') || (b.id-a.id));
+  else if(woSort==='moved') list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
+  else if(woSort==='cust')  list.sort((a,b)=>(a.cust||'').localeCompare(b.cust||''));
+  // Chip counts reflect the current search AND bucket rule (an order can count in multiple chips)
   const searchPool=q?orders.filter(x=>orderMatchesQuery(x,q)):orders;
-  const counts={};STATUSES.forEach(s=>counts[s]=searchPool.filter(x=>x.status===s).length);
+  const counts={};
+  STATUSES.forEach(s=>counts[s]=searchPool.filter(x=>woBucketMatch(x,s)).length);
   document.getElementById('wo-filters').innerHTML=
-    STATUSES.map(s=>{const pc=' pill-'+skCls(s);return '<button class="pill'+pc+(woF===s?' active':'')+'" onclick="woFilter(\''+s+'\')">'+s+' <span class="pill-count">'+counts[s]+'</span></button>';}).join('');
+    STATUSES.map(s=>{
+      const on=woFilterSet.has(s);
+      const pc=' pill-'+skCls(s);
+      return '<button class="pill'+pc+(on?' active':'')+'" onclick="woFilterToggle(\''+s+'\')" aria-pressed="'+on+'">'+s+' <span class="pill-count">'+counts[s]+'</span></button>';
+    }).join('');
+  // Sync sort select
+  const sortSel=document.getElementById('wo-sort'); if(sortSel && sortSel.value!==woSort) sortSel.value=woSort;
   if(!list.length){
-    const msg=q?'No orders match your search.':'No '+woF+' orders.';
-    document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+'</div>';
+    const anyFilter=woFilterSet.size<STATUSES.length;
+    const msg=q?'No orders match your search.':(anyFilter?'No orders in the selected buckets.':'No orders yet.');
+    const clearBtn=anyFilter?'<div style="margin-top:10px"><button class="pill" onclick="woFilterAll()">Show all</button></div>':'';
+    document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+clearBtn+'</div>';
     return;
   }
   document.getElementById('wo-list').innerHTML=list.map(o=>statusCardHTML(o)).join('');
 }
-function woFilter(f){woF=f;renderWorkStatus();}
-// Status changes are now a straight patch — Ready/Dispatched qtys are edited
-// directly on the Ledger card, so no side-effects here.
-async function woStatusChange(id,s){
-  const x=orders.find(o=>o.id===id); if(!x) return;
-  if(x.status===s) return;
-  const prev={status:x.status,updated_at:x.updated_at,ready_qty:x.ready_qty,dispatched_qty:x.dispatched_qty};
-  const ts=new Date().toISOString();
-  const patch={status:s,updated_at:ts};
-  // Sensible bucket auto-fills when the user picks a definitive status.
-  //   Dispatched  → everything shipped     (ready_qty=0, dispatched_qty=qty)
-  //   Ready       → everything ready       (ready_qty=qty, dispatched_qty=0)
-  //   Pending/InProduction → nothing yet   (both zeroed)
-  //   Partial Dispatch → leave counters alone; user edits them directly
-  const total=Number(x.qty)||0;
-  if(s==='Dispatched'){ patch.dispatched_qty=total; patch.ready_qty=0; }
-  else if(s==='Ready'){ patch.ready_qty=total; patch.dispatched_qty=0; }
-  else if(s==='Pending'||s==='In Production'){ patch.ready_qty=0; patch.dispatched_qty=0; }
-  Object.assign(x,patch);
-  renderOrders(); renderWorkStatus();
-  try{
-    const ok=await db.update('orders',id,patch);
-    if(ok===null) throw new Error('Save failed');
-    showToast('Status → '+s,'ok');
-    renderProductData();
-  }catch(e){
-    Object.assign(x,prev);
-    renderOrders(); renderWorkStatus();
-    showToast('Update failed — reverted','err');
+// Toggle a bucket chip. Empty set not allowed — clicking the last remaining chip re-selects it.
+function woFilterToggle(s){
+  if(woFilterSet.has(s)){
+    if(woFilterSet.size===1) return;
+    woFilterSet.delete(s);
+  } else {
+    woFilterSet.add(s);
   }
+  renderWorkStatus();
 }
-// woPromptPartialQty removed — Ready and Dispatched are now edited directly on the Ledger card.
+function woFilterAll(){
+  woFilterSet=new Set(STATUSES);
+  renderWorkStatus();
+}
+function woSortChange(v){woSort=v;renderWorkStatus();}
+// woStatusChange removed — status is derived from buckets under sequential-flow model.
+// Direct qty edits happen via the Toggle Card's + Ready / + Dispatch / ✎ Qty tabs.
 
 // ── TASKS ────────────────────────────────────────────────
 // SVG delete icon markup (reused)
@@ -2182,9 +2217,11 @@ function pdPagerHTML(page,totalPages){
 function pdComputeList(){
   const scope=document.getElementById('pdf-scope')?.value||'both';
   const eligible=orders.filter(o=>{
-    if(scope==='dispatched') return o.status==='Dispatched';
-    if(scope==='partial')    return o.status==='Partial Dispatch';
-    return o.status==='Dispatched'||o.status==='Partial Dispatch';
+    const dq=Number(o.dispatched_qty)||0;
+    if(dq<=0) return false;                       // no dispatch = not on Data page
+    if(scope==='dispatched') return o.status==='Dispatched';   // fully shipped
+    if(scope==='partial')    return o.status!=='Dispatched';   // partially — status is Ready
+    return true;                                  // both = any order with dispatched_qty > 0
   });
   const custSel=document.getElementById('pdf-cust');
   const prodSel=document.getElementById('pdf-prod');
@@ -2217,9 +2254,11 @@ function renderProductData(){
 
   const scope=document.getElementById('pdf-scope')?.value||'both';
   const eligible=orders.filter(o=>{
-    if(scope==='dispatched') return o.status==='Dispatched';
-    if(scope==='partial')    return o.status==='Partial Dispatch';
-    return o.status==='Dispatched'||o.status==='Partial Dispatch';
+    const dq=Number(o.dispatched_qty)||0;
+    if(dq<=0) return false;                       // no dispatch = not on Data page
+    if(scope==='dispatched') return o.status==='Dispatched';   // fully shipped
+    if(scope==='partial')    return o.status!=='Dispatched';   // partially — status is Ready
+    return true;                                  // both = any order with dispatched_qty > 0
   });
 
   // Populate customer dropdown — preserve prev selection even if it no longer has orders
@@ -2253,7 +2292,7 @@ function renderProductData(){
     const f=document.getElementById('pdf-from').value, t=document.getElementById('pdf-to').value;
     if(f||t) chips.push({lbl:(f||'…')+' → '+(t||'…'), clear:'pdChipClear(\'custom\')'});
   }
-  if(scope!=='both') chips.push({lbl:scope==='dispatched'?'Dispatched only':'Partial only', clear:'pdChipClear(\'scope\')'});
+  if(scope!=='both') chips.push({lbl:scope==='dispatched'?'Fully Dispatched only':'Partial only', clear:'pdChipClear(\'scope\')'});
   document.getElementById('pd-chips').innerHTML=chips.length
     ? chips.map(c=>'<button class="pill" onclick="'+c.clear+'">'+esc(c.lbl)+' ✕</button>').join('')
       +'<button class="pill" style="border-style:dashed" onclick="pdClear()">Clear all</button>'
