@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>BeePeeWorks</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#F8FAFC;
@@ -37,8 +37,8 @@
   --bw:0.8px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-apple-system,sans-serif;font-size:13.5px;line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-.num{font-family:'Manrope',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em;font-weight:500}
+body{background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,-apple-system,sans-serif;font-size:13.5px;line-height:1.5;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.num{font-family:'DM Sans',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.01em;font-weight:500}
 
 /* ── DESKTOP: LEFT SIDEBAR · MOBILE: BOTTOM NAV ── */
 .layout{display:flex;min-height:100vh}
@@ -51,7 +51,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-appl
 .brand-sub{font-size:10px;color:var(--ink3);font-weight:500;padding:0 10px 20px;letter-spacing:.01em}
 .nl{
   display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r2);
-  font-family:'Manrope',sans-serif;font-size:13px;font-weight:500;color:var(--ink3);
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--ink3);
   cursor:pointer;background:transparent;border:0;text-align:left;width:100%;
   transition:all .15s ease;
 }
@@ -77,7 +77,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-appl
   .bn{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:2px;padding:4px 2px;background:transparent;border:0;cursor:pointer;
-    font-family:'Manrope',sans-serif;font-size:10px;font-weight:500;color:var(--muted);
+    font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;color:var(--muted);
     min-width:0;transition:color .15s;
   }
   .bn svg{width:20px;height:20px;color:var(--muted);transition:color .15s}
@@ -131,10 +131,18 @@ body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-appl
   /* Keep the +New inline row compact and single-row */
   #t-new-row .taskcard-actions{padding-left:0}
 
-  /* ── Partial Dispatch: keep qty + balance chip readable on 350–390px phones ── */
-  .orow-c3{gap:6px}
-  .orow-c3>.c-qty{flex-wrap:wrap;font-size:12px}
-  .qtag{font-size:10px;padding:2px 6px}
+  /* ── Compact order card: stack on mobile ── */
+  .obody-c{flex-wrap:wrap;padding:8px 10px;gap:4px}
+  .o-left{flex:1 1 100%;gap:6px}
+  .o-cust{max-width:none}
+  .o-detail{white-space:normal;word-break:break-word;flex:1 1 100%}
+  .o-right{flex:1 1 100%;justify-content:space-between}
+  /* Status card header wraps on mobile */
+  .sc-head{gap:4px}
+  .sc-head .o-cust{max-width:none}
+  .sc-head .o-detail{flex:1 1 100%}
+  /* Pills: slightly taller on mobile for tap targets */
+  .pill{height:36px;font-size:12px}
 
   /* Data page: keep the new columns from crowding — the wrapper already scrolls X */
   .pd-tbl th,.pd-tbl td{white-space:nowrap}
@@ -148,9 +156,11 @@ body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-appl
   #ed-dqty-row{grid-template-columns:1fr 1fr 1fr;gap:6px}
 
   /* ── STATUS CARD (scard) on phones ── */
-  .tc-bar{margin:3px 0;height:18px}
+  .tc-bar{margin:4px 0;height:6px}
   .tc-nums{font-size:11px;gap:8px}
   .tc-num b{font-size:12px}
+  .tc-tabs{gap:6px;margin-top:2px}
+  .tc-tab{height:32px;font-size:11px}
   .tc-tab{padding:12px 4px;font-size:11px;letter-spacing:.04em}
   .tc-panel{padding:10px 12px;gap:6px}
   .tc-panel input[type="number"]{font-size:16px;height:40px;width:88px}
@@ -165,7 +175,7 @@ body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-appl
 /* ── PAGE HEADER ── */
 .ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap}
 .ptitle{font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
-.psub{font-size:11px;color:var(--ink3);font-family:'Manrope',sans-serif;margin-top:1px}
+.psub{font-size:11px;color:var(--ink3);font-family:'DM Sans',sans-serif;margin-top:1px}
 
 /* ── CARD ── */
 .card{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow-sm);border:var(--bw) solid var(--line)}
@@ -183,25 +193,26 @@ body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-appl
 .btn-full{width:100%;justify-content:center;height:44px;font-size:14px;border-radius:var(--r2)}
 
 /* ── PILLS ── */
-.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;height:28px;padding:0 12px;border-radius:9999px;border:0;background:var(--s2);color:var(--ink3);cursor:pointer;flex-shrink:0;font-family:'Manrope',sans-serif;font-weight:600;transition:all .15s ease}
-.pill:hover{background:var(--hover);color:var(--ink2)}
-.pill.active{background:var(--accent);color:#fff}
-.pill.pill-pn{background:var(--s2);color:var(--ink3)}
-.pill.pill-ip{background:var(--s2);color:var(--ink3)}
-.pill.pill-pd{background:var(--s2);color:var(--ink3)}
-.pill.pill-rd{background:var(--s2);color:var(--ink3)}
-.pill.pill-ds{background:var(--s2);color:var(--ink3)}
-.pill.pill-pn.active{background:var(--stat-pend);color:#fff}
-.pill.pill-ip.active{background:var(--amber);color:#fff}
-.pill.pill-pd.active{background:var(--blue);color:#fff}
-.pill.pill-rd.active{background:var(--stat-ready);color:#1F1611}
-.pill.pill-ds.active{background:var(--stat-disp);color:#fff}
-.pill-count{font-size:10px;padding:1px 6px;border-radius:9px;background:rgba(0,0,0,.06);color:var(--ink3);font-weight:600;min-width:18px;text-align:center}
-.pill.active .pill-count{background:#fff;color:var(--ink);font-weight:700}
-.pill.pill-rd.active .pill-count{color:#1F1611}
+.pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;height:34px;padding:0 12px 0 0;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);cursor:pointer;flex-shrink:0;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .15s ease;overflow:hidden}
+.pill:hover{border-color:var(--ink3)}
+.pill.active{border-color:var(--line2)}
+.pill-edge{width:4px;align-self:stretch;flex-shrink:0;background:var(--line)}
+.pill-lbl{padding-left:10px}
+.pill-count{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;min-width:22px;text-align:center;background:rgba(0,0,0,.05);color:var(--ink3)}
+.pill.pill-pn .pill-edge{background:var(--stat-pend)}
+.pill.pill-rd .pill-edge{background:var(--stat-ready)}
+.pill.pill-ds .pill-edge{background:var(--stat-disp)}
+.pill.pill-ip .pill-edge{background:var(--amber)}
+.pill.pill-pd .pill-edge{background:var(--blue)}
+.pill.pill-pn.active .pill-count{background:#fecaca;color:#991b1b}
+.pill.pill-rd.active .pill-count{background:#fde68a;color:#92400e}
+.pill.pill-ds.active .pill-count{background:#bbf7d0;color:#166534}
+.pill.pill-ip.active .pill-count{background:var(--amber-bg);color:var(--amber)}
+.pill.pill-pd.active .pill-count{background:var(--blue-bg);color:var(--blue)}
+.pill.active .pill-count{font-weight:700}
 
 /* ── BADGES ── */
-.bdg{display:inline-flex;align-items:center;font-size:10px;font-weight:600;height:22px;padding:0 10px;border-radius:11px;white-space:nowrap;font-family:'Manrope',sans-serif;letter-spacing:.01em}
+.bdg{display:inline-flex;align-items:center;font-size:10px;font-weight:600;height:22px;padding:0 10px;border-radius:11px;white-space:nowrap;font-family:'DM Sans',sans-serif;letter-spacing:.01em}
 /* Status badges — aligned with the Status page palette */
 .bdg.pn{background:var(--red-bg);color:var(--red)}
 .bdg.rd{background:var(--amber-bg);color:var(--amber)}
@@ -252,44 +263,41 @@ table.t{width:100%;border-collapse:collapse}
 .obody{flex:1;padding:8px 10px;min-width:0}
 .orow1{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .ocust{font-size:13.5px;font-weight:600;line-height:1.25;word-break:break-word}
-.ono{font-size:10.5px;font-family:'Manrope',sans-serif;color:var(--ink3);margin-left:6px}
+.ono{font-size:10.5px;font-family:'DM Sans',sans-serif;color:var(--ink3);margin-left:6px}
 .orow2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px}
-.odisp{font-size:11px;font-family:'Manrope',sans-serif}
+.odisp{font-size:11px;font-family:'DM Sans',sans-serif}
 .odisp.overdue{color:var(--red);font-weight:600}
 .odisp.today{color:var(--amber);font-weight:600}
 .odisp.ok{color:var(--ink3)}
 .odisp.done{color:var(--muted)}
 
-/* ── ORDER CARD v2 (Option C) ── */
+/* ── ORDER CARD v2 (compact row) ── */
 .ocard{background:var(--surface)}
 .ocard.ip,.ocard.pd{background:var(--surface);border-color:var(--line)}
-.obody-c{flex:1;padding:9px 11px;min-width:0;display:flex;flex-direction:column;gap:5px}
-.orow-c1{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-.orow-c2{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.orow-c3{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.c-chip{font-size:11.5px;font-weight:700;border-radius:6px;padding:3px 9px;white-space:nowrap;line-height:1.4}
-.c-chip-ply{background:var(--amber-bg);color:var(--amber)}
-.c-chip-prod{background:var(--accent-bg);color:var(--accent2)}
-.c-chip-size{background:var(--s2);color:var(--ink2);border:var(--bw) solid var(--line2);font-weight:600}
+.obody-c{flex:1;padding:8px 12px;min-width:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.o-left{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+.o-cust{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.o-ono{font-size:12px;color:var(--ink3);white-space:nowrap}
+.o-detail{font-size:12.5px;font-weight:700;color:var(--ink2);white-space:nowrap}
+.o-right{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:auto}
 .c-disp{font-size:11px;font-weight:700;border-radius:6px;padding:3px 9px;white-space:nowrap;flex-shrink:0;line-height:1.4}
 .c-disp.overdue{background:var(--red-bg);color:var(--red)}
 .c-disp.today{background:var(--amber-bg);color:var(--amber)}
 .c-disp.ok{background:var(--green-bg);color:var(--green)}
 .c-disp.done{background:var(--s2);color:var(--muted)}
 .c-disp.nodate{background:var(--s2);color:var(--muted)}
+.o-stat{font-size:11.5px;font-weight:600;white-space:nowrap}
+.o-stat.pn{color:var(--stat-pend)}
+.o-stat.rd{color:var(--stat-ready)}
+.o-stat.ds{color:var(--stat-disp)}
+/* Status card still uses chips */
+.c-chip{font-size:11.5px;font-weight:700;border-radius:6px;padding:3px 9px;white-space:nowrap;line-height:1.4}
+.c-chip-ply{background:var(--amber-bg);color:var(--amber)}
+.c-chip-prod{background:var(--accent-bg);color:var(--accent2)}
 .c-qty{font-size:12.5px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
-.c-qty-part{color:var(--amber)}
-.qtag{
-  display:inline-block;
-  font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:5px;
-  background:var(--amber-bg);color:var(--amber);
-  border:1px solid rgba(180,83,9,.2);
-  font-variant-numeric:tabular-nums;
-  vertical-align:middle;
-}
-/* Balance chip: allow the qty group to wrap on very narrow phones without pushing the badge off */
-.orow-c3{flex-wrap:wrap}
-.orow-c3>.c-qty{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0}
+.orow-c1{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.orow-c2{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.orow-c3{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 
 /* ── FILTER BAR ── */
 .fbar{display:flex;gap:6px;padding:8px 0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
@@ -314,22 +322,18 @@ table.t{width:100%;border-collapse:collapse}
 /* ── STATUS CARD (scard) — uses .ocard shell, adds bar/nums/tabs below ── */
 .ocard.scard{cursor:default}
 .ocard.scard .obody-c{padding-bottom:0}
+.sc-body{flex-direction:column;align-items:stretch}
+.sc-head{flex-wrap:wrap}
 .tc-bar{
-  display:flex;height:16px;margin:3px 0 3px;border-radius:3px;overflow:hidden;
-  border:1px solid var(--line);
+  display:flex;height:6px;margin:6px 0 6px;border-radius:3px;overflow:hidden;gap:1px;
 }
-.tc-bar>span{
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Manrope',sans-serif;font-size:10.5px;font-weight:700;padding:0 6px;color:#fff;
-  font-variant-numeric:tabular-nums;letter-spacing:-.01em;
-  white-space:nowrap;overflow:hidden;
-}
+.tc-bar>span{display:block}
 .tc-bar .p{background:var(--stat-pend)}
-.tc-bar .r{background:var(--stat-ready);color:#1F1611}
+.tc-bar .r{background:var(--stat-ready)}
 .tc-bar .d{background:var(--stat-disp)}
 .tc-nums{
   display:flex;align-items:center;gap:8px;padding:0 0 4px;
-  font-family:'Manrope',sans-serif;font-size:11px;color:var(--ink3);
+  font-family:'DM Sans',sans-serif;font-size:11px;color:var(--ink3);
   font-variant-numeric:tabular-nums;letter-spacing:-.01em;
 }
 .tc-num{display:inline-flex;align-items:center;gap:5px}
@@ -340,21 +344,20 @@ table.t{width:100%;border-collapse:collapse}
 .tc-num b{color:var(--ink);font-weight:700;font-size:12.5px}
 .tc-sep{color:var(--line2,var(--line));font-weight:400}
 .tc-tabs{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:1px;
-  background:var(--line);border-top:1px solid var(--line);
+  display:flex;gap:8px;margin-top:4px;
 }
 .tc-tab{
-  background:var(--surface);border:0;color:var(--ink2);
-  font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;
-  padding:9px 6px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:5px;
-  transition:background .15s,color .15s;
+  flex:1;height:30px;border:1px solid var(--line);border-radius:8px;
+  background:var(--surface);color:var(--ink2);
+  font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:3px;
+  transition:all .15s;
 }
-.tc-tab .tc-glyph{font-size:13px;line-height:1;opacity:.85;font-weight:800}
-.tc-tab:not(.on):hover{background:var(--s2);color:var(--ink)}
-.tc-tab[data-tab="ready"].on   {background:var(--stat-ready);color:#1F1611}
-.tc-tab[data-tab="dispatch"].on{background:var(--stat-disp);color:#fff}
-.tc-tab.on .tc-glyph{opacity:1}
+.tc-tab .tc-glyph{font-size:13px;line-height:1;font-weight:700}
+.tc-tab[data-tab="ready"]:not(.on):hover{background:#fef9c3;border-color:#F59E0B;color:#92400e}
+.tc-tab[data-tab="dispatch"]:not(.on):hover{background:#dcfce7;border-color:#16A34A;color:#166534}
+.tc-tab[data-tab="ready"].on   {background:var(--stat-ready);color:#1F1611;border-color:var(--stat-ready)}
+.tc-tab[data-tab="dispatch"].on{background:var(--stat-disp);color:#fff;border-color:var(--stat-disp)}
 .tc-tab:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .tc-panel{
   padding:12px 14px;background:var(--s2);
@@ -362,34 +365,34 @@ table.t{width:100%;border-collapse:collapse}
   border-top:1px solid var(--line);
 }
 .tc-panel-lbl{
-  font-family:'Manrope',sans-serif;font-size:10.5px;color:var(--ink3);
+  font-family:'DM Sans',sans-serif;font-size:10.5px;color:var(--ink3);
   font-weight:700;letter-spacing:.06em;text-transform:uppercase;
 }
 .tc-panel input[type="number"]{
   height:36px;width:96px;padding:0 10px;border-radius:6px;
   border:1.5px solid var(--stat-ready);background:var(--surface);
-  font-family:'Manrope',sans-serif;font-size:16px;font-weight:700;color:var(--amber);
+  font-family:'DM Sans',sans-serif;font-size:16px;font-weight:700;color:var(--amber);
   font-variant-numeric:tabular-nums;outline:none;
 }
 .tc-panel input.tc-inp-dispatch{border-color:var(--stat-disp);color:var(--green)}
 .tc-panel .tc-unit{
-  font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;
 }
 .tc-panel .tc-unit.ready{color:var(--amber)}
 .tc-panel .tc-unit.dispatch{color:var(--green)}
 .tc-panel .tc-save{
   background:var(--ink);color:var(--surface);border:0;
   height:36px;padding:0 16px;border-radius:6px;
-  font-family:'Manrope',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:.06em;
   text-transform:uppercase;cursor:pointer;margin-left:auto;
 }
 .tc-panel .tc-cancel{
   background:transparent;color:var(--ink3);border:1px solid var(--line);
   height:36px;padding:0 10px;border-radius:6px;
-  font-family:'Manrope',sans-serif;font-size:12px;font-weight:600;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;
 }
 .tc-panel .tc-hint{
-  font-family:'Manrope',sans-serif;font-size:10.5px;color:var(--ink3);
+  font-family:'DM Sans',sans-serif;font-size:10.5px;color:var(--ink3);
   font-style:italic;flex:1 1 100%;margin-top:2px;
 }
 .tc-panel .tc-hint.err{color:var(--red);font-style:normal;font-weight:600}
@@ -409,11 +412,11 @@ table.t{width:100%;border-collapse:collapse}
 .wo-body{flex:1;padding:8px 10px;min-width:0}
 .wo-row1{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .wo-cust{font-size:13.5px;font-weight:600;word-break:break-word}
-.wo-no{font-size:10.5px;font-family:'Manrope',sans-serif;color:var(--ink3);margin-left:6px}
+.wo-no{font-size:10.5px;font-family:'DM Sans',sans-serif;color:var(--ink3);margin-left:6px}
 .wo-row2{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:3px}
 .wo-detail{font-size:12px;color:var(--ink);font-weight:500}
 .wo-detail span{color:var(--ink3);font-weight:400}
-.wo-disp{font-size:11px;font-family:'Manrope',sans-serif;flex-shrink:0}
+.wo-disp{font-size:11px;font-family:'DM Sans',sans-serif;flex-shrink:0}
 .wo-disp.overdue{color:var(--red);font-weight:600}
 .wo-disp.today{color:var(--amber);font-weight:600}
 .wo-disp.ok{color:var(--ink3)}.wo-disp.done{color:var(--muted)}
@@ -445,7 +448,7 @@ table.t{width:100%;border-collapse:collapse}
 .tdot.Done{background:var(--green);border-color:var(--green)}
 .tname{font-size:13px;font-weight:500;color:var(--ink);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tmeta{font-size:10.5px;color:var(--ink3);margin-top:1px}
-.tstatus-sel{font-family:'Manrope',sans-serif;font-size:11px;border:var(--bw) solid var(--line);border-radius:var(--r3);background:var(--surface);height:30px;padding:0 8px;color:var(--ink);cursor:pointer;font-weight:500;transition:border-color .15s}
+.tstatus-sel{font-family:'DM Sans',sans-serif;font-size:11px;border:var(--bw) solid var(--line);border-radius:var(--r3);background:var(--surface);height:30px;padding:0 8px;color:var(--ink);cursor:pointer;font-weight:500;transition:border-color .15s}
 .tstatus-sel:focus{border-color:var(--accent)}
 .btn-del-task{
   height:32px;width:32px;padding:0;border-radius:var(--r3);color:var(--red);background:transparent;
@@ -457,10 +460,10 @@ table.t{width:100%;border-collapse:collapse}
 /* Tasks toolbar row: sort + count */
 .t-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 8px}
 .t-toolbar-left{font-size:11px;color:var(--ink3);font-weight:600}
-.t-sort-sel{font-family:'Manrope',sans-serif;font-size:12px;height:32px;padding:0 8px;border-radius:var(--r3);border:var(--bw) solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.t-sort-sel{font-family:'DM Sans',sans-serif;font-size:12px;height:32px;padding:0 8px;border-radius:var(--r3);border:var(--bw) solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
 /* Empty state */
 .t-empty{text-align:center;padding:40px 16px;color:var(--muted);font-size:13px;display:flex;flex-direction:column;gap:10px;align-items:center}
-.t-empty-clear{background:transparent;border:var(--bw) solid var(--line);border-radius:var(--r3);padding:6px 12px;font-size:12px;color:var(--accent);cursor:pointer;font-family:'Manrope',sans-serif;font-weight:600}
+.t-empty-clear{background:transparent;border:var(--bw) solid var(--line);border-radius:var(--r3);padding:6px 12px;font-size:12px;color:var(--accent);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600}
 .t-empty-clear:hover{background:var(--s2)}
 /* Toast */
 .toast-wrap{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:6px;pointer-events:none;max-width:calc(100% - 24px)}
@@ -481,7 +484,7 @@ table.t{width:100%;border-collapse:collapse}
 .sop-text{font-size:13.5px;color:var(--ink);line-height:1.55;font-weight:400}
 
 /* ── MEMBER CHIPS ── */
-.mchip{display:inline-flex;align-items:center;gap:5px;font-size:11px;height:26px;padding:0 10px 0 4px;border-radius:9999px;border:var(--bw) solid var(--line);background:var(--surface);color:var(--ink2);cursor:pointer;font-family:'Manrope',sans-serif;font-weight:500;transition:all .15s ease}
+.mchip{display:inline-flex;align-items:center;gap:5px;font-size:11px;height:26px;padding:0 10px 0 4px;border-radius:9999px;border:var(--bw) solid var(--line);background:var(--surface);color:var(--ink2);cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .15s ease}
 .mchip:hover{border-color:var(--line2);color:var(--ink)}
 .mchip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 .mchip-avatar{width:18px;height:18px;border-radius:50%;background:var(--accent-bg);color:var(--accent2);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;letter-spacing:-.02em}
@@ -499,7 +502,7 @@ table.t{width:100%;border-collapse:collapse}
 .w-result-strip{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;background:linear-gradient(135deg,var(--ink) 0%,#1a3a4a 100%);border-radius:var(--r) var(--r) 0 0}
 .w-result-val{font-size:36px;font-weight:700;letter-spacing:-.03em;font-family:'Outfit',sans-serif;color:#fff;line-height:1}
 .w-result-unit{font-size:13px;color:rgba(255,255,255,.5);font-weight:500}
-.w-formula-bar{padding:8px 18px;font-size:10px;color:var(--ink3);font-family:'Manrope',sans-serif;line-height:1.5;background:var(--s2);border-top:var(--bw) solid var(--line)}
+.w-formula-bar{padding:8px 18px;font-size:10px;color:var(--ink3);font-family:'DM Sans',sans-serif;line-height:1.5;background:var(--s2);border-top:var(--bw) solid var(--line)}
 .w-sec-title{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .w-sec-icon{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .w-sec-badge{font-size:10px;color:var(--ink3);background:var(--s2);padding:2px 8px;border-radius:10px;font-weight:500}
@@ -542,12 +545,12 @@ table.t{width:100%;border-collapse:collapse}
 .pd-summary-qty{font-size:12px;font-weight:700;color:var(--accent)}
 .pd-pagination{display:flex;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap;gap:6px}
 .pd-pg-btns{display:flex;gap:4px;flex-wrap:wrap}
-.pd-pg-btn{height:26px;padding:0 10px;border-radius:6px;border:var(--bw) solid var(--line);background:var(--surface);color:var(--ink3);font-size:11px;font-weight:600;cursor:pointer;font-family:'Manrope',sans-serif;transition:all .15s}
+.pd-pg-btn{height:26px;padding:0 10px;border-radius:6px;border:var(--bw) solid var(--line);background:var(--surface);color:var(--ink3);font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
 .pd-pg-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
 .pd-pg-btn:disabled{opacity:.35;cursor:default}
 
 /* ── WARN ── */
-.warn-txt{font-size:10.5px;color:var(--amber);font-family:'Manrope',sans-serif;margin-top:4px}
+.warn-txt{font-size:10.5px;color:var(--amber);font-family:'DM Sans',sans-serif;margin-top:4px}
 
 /* Balance readout inside the drawer (matches .inp visual weight, but read-only) */
 .balance-readout{
@@ -566,7 +569,7 @@ table.t{width:100%;border-collapse:collapse}
   .topnav{padding:0 14px}
   .brand{font-size:16px;margin-right:12px}
   .w-result-card{position:sticky;top:0;z-index:10}
-  .pill{height:36px;padding:0 14px;font-size:12px}
+  .pill{height:36px;font-size:12px}
   .btn{height:42px;padding:0 18px;font-size:13.5px}
   .btn-sm{height:36px;padding:0 14px}
   .tstatus-sel{height:38px;font-size:16px}
@@ -698,6 +701,7 @@ table.t{width:100%;border-collapse:collapse}
 
     <!-- Saved order cards -->
     <div class="order-list" id="ol-cards"></div>
+    <div class="pd-pagination" id="ol-pagination" style="display:none"></div>
   </section>
 
   <!-- WORK STATUS -->
@@ -715,6 +719,7 @@ table.t{width:100%;border-collapse:collapse}
       </select>
     </div>
     <div class="wo-list" id="wo-list"></div>
+    <div class="pd-pagination" id="wo-pagination" style="display:none"></div>
   </section>
 
   <!-- TASKS -->
@@ -1143,7 +1148,12 @@ async function refreshSession(rt){
   clearSession();return false;
 }
 
+const DEV_MODE=location.hostname==='localhost'&&new URLSearchParams(location.search).has('dev');
 async function checkAuth(){
+  if(DEV_MODE){
+    const d=await sbAuth('token?grant_type=password',{email:AUTH_EMAIL,password:'BpInternalComm@2026'});
+    if(d.access_token){saveSession(d);accessToken=d.access_token;hideLogin();appInited=false;init();return;}
+  }
   const s=getSession();
   if(!s||!s.access_token){showLogin();return;}
   const exp=s.expires_at||0;
@@ -1207,10 +1217,11 @@ const DEF_GSM={'Top Paper':150,'Flute 1':120,'Base 1':150,'Flute 2':120,'Base 2'
 // ── STATE ────────────────────────────────────────────────
 let parties=[], orders=[], tasks=[];
 let pf='all', oSF='Pending', tSF='All', tMF='All', pdPage=1;
+let olPage=1, woPage=1;
 // Status page: multi-select filter (all statuses visible by default) + sort control
 let woFilterSet=new Set(['Pending','Ready','Dispatched']);
 let woSort='due';
-let woShowAll=false;
+const PAGE_SIZE=50;
 const PD_PAGE_SIZE=50;
 let editId=null;
 let editTaskId=null;
@@ -1369,40 +1380,22 @@ function orderCardHTML(ord){
   const derived=deriveStatus(ord.qty,ord.ready_qty,ord.dispatched_qty);
   const dm=dispMeta(ord.disp,derived);
   const sk=skCls(derived);
-  const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' · '+dm.label:'No date set';
+  const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' - '+dm.label:'No date set';
   const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
   const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
-  const cardCls='ocard';
-  const stripeCls='ostripe';
-  const trailing=badge(ord.status);
-  const moved='';
-  const movedHTML=moved?' <span style="font-size:10.5px;color:var(--ink3);font-weight:500">· '+esc(moved)+'</span>':'';
-  // Qty display — for Ready orders (partial state), show shipped/total + balance chip
-  const rq=Number(ord.ready_qty)||0;
-  const dq=Number(ord.dispatched_qty)||0;
   const total=Number(ord.qty)||0;
-  const pending=Math.max(0,total-rq-dq);
-  let qtyHTML;
-  if(ord.status==='Ready' && rq>0 && total>0){
-    qtyHTML='<span class="c-qty"><span style="color:var(--stat-ready)">R '+fmt(rq)+'</span> / '+fmt(total)+' nos</span>';
-  } else {
-    qtyHTML='<span class="c-qty">'+fmt(total)+' nos.</span>';
-  }
-  return '<div class="'+cardCls+' '+sk+'" data-oid="'+ord.id+'" tabindex="0" role="button" aria-label="Open order '+esc(ord.no||ord.cust||'')+'" onclick="openDrawer('+ord.id+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openDrawer('+ord.id+');}">'
-    +'<div class="'+stripeCls+' '+sk+'"></div>'
+  const detail=esc(String(ord.ply||'?'))+' PLY - '+esc(ord.prod||'—')+' - '+size+' - '+fmt(total)+' nos.';
+  return '<div class="ocard '+sk+'" data-oid="'+ord.id+'" tabindex="0" role="button" aria-label="Open order '+esc(ord.no||ord.cust||'')+'" onclick="openDrawer('+ord.id+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openDrawer('+ord.id+');}">'
+    +'<div class="ostripe '+sk+'"></div>'
     +'<div class="obody-c">'
-      +'<div class="orow-c1">'
-        +'<div style="min-width:0"><span class="ocust">'+esc(ord.cust||'—')+'</span> <span class="ono">#'+esc(ord.no||'ORD')+'</span>'+movedHTML+'</div>'
+      +'<div class="o-left">'
+        +'<span class="o-cust">'+esc(ord.cust||'—')+'</span>'
+        +'<span class="o-ono">#'+esc(ord.no||'ORD')+'</span>'
+        +'<span class="o-detail">'+detail+'</span>'
+      +'</div>'
+      +'<div class="o-right">'
         +'<span class="'+dispCls+'">'+esc(dispTxt)+'</span>'
-      +'</div>'
-      +'<div class="orow-c2">'
-        +'<span class="c-chip c-chip-ply">'+esc(String(ord.ply||'?'))+' PLY</span>'
-        +'<span class="c-chip c-chip-prod">'+esc(ord.prod||'—')+'</span>'
-      +'</div>'
-      +'<div class="orow-c2" style="padding-left:2px"><span style="font-size:12px;color:var(--ink3);font-weight:700">'+size+'</span></div>'
-      +'<div class="orow-c3">'
-        +qtyHTML
-        +trailing
+        +'<span class="o-stat '+sk+'">'+esc(derived)+'</span>'
       +'</div>'
     +'</div>'
   +'</div>';
@@ -1420,25 +1413,20 @@ function statusCardHTML(ord){
   const derived=deriveStatus(ord.qty,ord.ready_qty,ord.dispatched_qty);
   const sk=skCls(derived);
   const dm=dispMeta(ord.disp,derived);
-  const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' · '+dm.label:'No date';
+  const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' - '+dm.label:'No date';
   const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
   const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
+  const detail=esc(String(ord.ply||'?'))+' PLY - '+esc(ord.prod||'—')+' - '+size+' - '+fmt(total)+' nos.';
   const pFlex=total>0?pending/total:1, rFlex=total>0?rq/total:0, dFlex=total>0?dq/total:0;
-  const seg=(cls,val,flex)=>flex>0?'<span class="'+cls+'" style="flex:'+flex.toFixed(3)+'">'+(flex>0.06?fmt(val):'')+'</span>':'';
+  const seg=(cls,val,flex)=>flex>0?'<span class="'+cls+'" style="flex:'+flex.toFixed(3)+'"></span>':'';
   return '<div class="ocard scard '+sk+'" data-oid="'+ord.id+'">'
     +'<div class="ostripe '+sk+'"></div>'
-    +'<div class="obody-c">'
-      +'<div class="orow-c1" onclick="openDrawer('+ord.id+')" style="cursor:pointer">'
-        +'<div style="min-width:0"><span class="ocust">'+esc(ord.cust||'—')+'</span> <span class="ono">#'+esc(ord.no||'ORD')+'</span></div>'
+    +'<div class="obody-c sc-body">'
+      +'<div class="o-left sc-head" onclick="openDrawer('+ord.id+')" style="cursor:pointer">'
+        +'<span class="o-cust">'+esc(ord.cust||'—')+'</span>'
+        +'<span class="o-ono">#'+esc(ord.no||'ORD')+'</span>'
+        +'<span class="o-detail">'+detail+'</span>'
         +'<span class="'+dispCls+'">'+esc(dispTxt)+'</span>'
-      +'</div>'
-      +'<div class="orow-c2">'
-        +'<span class="c-chip c-chip-ply">'+esc(String(ord.ply||'?'))+' PLY</span>'
-        +'<span class="c-chip c-chip-prod">'+esc(ord.prod||'—')+'</span>'
-      +'</div>'
-      +'<div class="orow-c2" style="padding-left:2px"><span style="font-size:12px;color:var(--ink3);font-weight:700">'+size+'</span></div>'
-      +'<div class="orow-c3">'
-        +'<span class="c-qty">'+fmt(total)+' nos.</span>'
       +'</div>'
       +'<div class="tc-bar" aria-label="Progress: '+fmt(pending)+' pending, '+fmt(rq)+' ready, '+fmt(dq)+' dispatched">'
         +seg('p',pending,pFlex)
@@ -1614,7 +1602,8 @@ function orderMatchesQuery(o,q){
 function renderOrders(){
   const q=(document.getElementById('ol-search')?.value||'').toLowerCase().trim();
   // Pool the search applies to — respects the active status filter (unless 'All')
-  const pool=oSF==='All'?orders:orders.filter(x=>x.status===oSF);
+  const dSt=x=>deriveStatus(x.qty,x.ready_qty,x.dispatched_qty);
+  const pool=oSF==='All'?orders:orders.filter(x=>dSt(x)===oSF);
   let list=q?pool.filter(x=>orderMatchesQuery(x,q)):pool;
 
   // Most recently moved (status updated) first — same rule for every pill
@@ -1624,22 +1613,34 @@ function renderOrders(){
   // Counts reflect the current search — so pill numbers agree with what you see
   const searchPool=q?orders.filter(x=>orderMatchesQuery(x,q)):orders;
   const counts={All:searchPool.length};
-  STATUSES.forEach(s=>counts[s]=searchPool.filter(x=>x.status===s).length);
+  STATUSES.forEach(s=>counts[s]=searchPool.filter(x=>dSt(x)===s).length);
   document.getElementById('ol-filters').innerHTML=
     ['All',...STATUSES].map(s=>{
       const pc=s==='All'?'':' pill-'+skCls(s);
-      return '<button class="pill'+pc+(oSF===s?' active':'')+'" onclick="olFilter(\''+s+'\')">'+s+' <span class="pill-count">'+(counts[s]||0)+'</span></button>';
+      return '<button class="pill'+pc+(oSF===s?' active':'')+'" onclick="olFilter(\''+s+'\')"><span class="pill-edge"></span><span class="pill-lbl">'+s+'</span><span class="pill-count">'+(counts[s]||0)+'</span></button>';
     }).join('');
 
   if(!list.length){
     const msg=q?'No orders match your search.':orders.length?(oSF==='All'?'No orders.':'No '+oSF+' orders.'):'No orders yet. Tap + New to add one.';
     document.getElementById('ol-cards').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+'</div>';
+    document.getElementById('ol-pagination').style.display='none';
     return;
   }
 
-  document.getElementById('ol-cards').innerHTML=list.map(o=>orderCardHTML(o)).join('');
+  const totalPages=Math.max(1,Math.ceil(list.length/PAGE_SIZE));
+  if(olPage>totalPages) olPage=totalPages;
+  const start=(olPage-1)*PAGE_SIZE;
+  const page=list.slice(start,start+PAGE_SIZE);
+  document.getElementById('ol-cards').innerHTML=page.map(o=>orderCardHTML(o)).join('');
+  const pgEl=document.getElementById('ol-pagination');
+  if(totalPages>1){
+    pgEl.style.display='flex';
+    pgEl.innerHTML='<span style="font-size:11px;color:var(--ink3)">Showing '+(start+1)+'–'+Math.min(start+PAGE_SIZE,list.length)+' of '+list.length+'</span>'
+      +'<div class="pd-pg-btns">'+pdPagerHTML(olPage,totalPages).replace(/pdGoPage/g,'olGoPage')+'</div>';
+  } else pgEl.style.display='none';
 }
-function olFilter(s){oSF=s;renderOrders();}
+function olGoPage(p){olPage=p;renderOrders();window.scrollTo({top:0,behavior:'smooth'});}
+function olFilter(s){oSF=s;olPage=1;renderOrders();}
 
 // ── DRAWER ───────────────────────────────────────────────
 function toggleH(prefix){
@@ -1667,7 +1668,7 @@ function openDrawer(id){
   setVal('ed-rqty',Number(ord.ready_qty)||0);
   setVal('ed-dqty',Number(ord.dispatched_qty)||0);
   setVal('ed-disp',ord.disp);
-  setVal('ed-status',ord.status);
+  setVal('ed-status',deriveStatus(ord.qty,ord.ready_qty,ord.dispatched_qty));
   document.getElementById('ed-warn').style.display='none';
   document.querySelectorAll('#edit-drawer .inp.err,#edit-drawer .sel.err').forEach(el=>el.classList.remove('err'));
   edRecalcBalance();
@@ -1827,7 +1828,7 @@ function renderWorkStatus(){
     STATUSES.map(s=>{
       const on=woFilterSet.has(s);
       const pc=' pill-'+skCls(s);
-      return '<button class="pill'+pc+(on?' active':'')+'" onclick="woFilterToggle(\''+s+'\')" aria-pressed="'+on+'">'+s+' <span class="pill-count">'+counts[s]+'</span></button>';
+      return '<button class="pill'+pc+(on?' active':'')+'" onclick="woFilterToggle(\''+s+'\')" aria-pressed="'+on+'"><span class="pill-edge"></span><span class="pill-lbl">'+s+'</span><span class="pill-count">'+counts[s]+'</span></button>';
     }).join('');
   // Sync sort select
   const sortSel=document.getElementById('wo-sort'); if(sortSel && sortSel.value!==woSort) sortSel.value=woSort;
@@ -1836,19 +1837,23 @@ function renderWorkStatus(){
     const msg=q?'No orders match your search.':(anyFilter?'No orders in the selected buckets.':'No orders yet.');
     const clearBtn=anyFilter?'<div style="margin-top:10px"><button class="pill" onclick="woFilterAll()">Show all</button></div>':'';
     document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+clearBtn+'</div>';
+    document.getElementById('wo-pagination').style.display='none';
     return;
   }
-  const WO_LIMIT=50;
-  const isComplete=o=>{const t=Number(o.qty)||0;return t>0&&(Number(o.dispatched_qty)||0)>=t;};
-  const active=list.filter(o=>!isComplete(o));
-  const done=list.filter(o=>isComplete(o));
-  const visible=woShowAll?[...active,...done]:[...active,...done.slice(0,Math.max(0,WO_LIMIT-active.length))];
-  const hidden=woShowAll?0:done.length-Math.max(0,WO_LIMIT-active.length);
-  let html=visible.map(o=>statusCardHTML(o)).join('');
-  if(hidden>0) html+='<div style="text-align:center;padding:16px"><button class="pill" onclick="woShowAll=true;renderWorkStatus()">Show '+hidden+' completed order'+(hidden>1?'s':'')+'</button></div>';
-  document.getElementById('wo-list').innerHTML=html;
+  const totalPages=Math.max(1,Math.ceil(list.length/PAGE_SIZE));
+  if(woPage>totalPages) woPage=totalPages;
+  const start=(woPage-1)*PAGE_SIZE;
+  const page=list.slice(start,start+PAGE_SIZE);
+  document.getElementById('wo-list').innerHTML=page.map(o=>statusCardHTML(o)).join('');
+  const pgEl=document.getElementById('wo-pagination');
+  if(totalPages>1){
+    pgEl.style.display='flex';
+    pgEl.innerHTML='<span style="font-size:11px;color:var(--ink3)">Showing '+(start+1)+'–'+Math.min(start+PAGE_SIZE,list.length)+' of '+list.length+'</span>'
+      +'<div class="pd-pg-btns">'+pdPagerHTML(woPage,totalPages).replace(/pdGoPage/g,'woGoPage')+'</div>';
+  } else pgEl.style.display='none';
 }
 // Toggle a bucket chip. Empty set not allowed — clicking the last remaining chip re-selects it.
+function woGoPage(p){woPage=p;renderWorkStatus();window.scrollTo({top:0,behavior:'smooth'});}
 function woFilterToggle(s){
   if(woFilterSet.has(s)){
     if(woFilterSet.size===1) return;
@@ -1856,13 +1861,13 @@ function woFilterToggle(s){
   } else {
     woFilterSet.add(s);
   }
-  renderWorkStatus();
+  woPage=1;renderWorkStatus();
 }
 function woFilterAll(){
   woFilterSet=new Set(STATUSES);
-  renderWorkStatus();
+  woPage=1;renderWorkStatus();
 }
-function woSortChange(v){woSort=v;renderWorkStatus();}
+function woSortChange(v){woSort=v;woPage=1;renderWorkStatus();}
 // woStatusChange removed — status is derived from buckets under sequential-flow model.
 // Direct qty edits happen via the Toggle Card's + Ready / + Dispatch / ✎ Qty tabs.
 
@@ -1927,7 +1932,7 @@ function renderTasks(){
     ['All',...TSTATS].map(s=>{
       const clsMap={'Pending':'','In progress':' pill-ip','Done':' pill-rd'};
       const cls=s==='All'?'':clsMap[s]||'';
-      return '<button class="pill'+cls+(tSF===s?' active':'')+'" onclick="tFilter(\''+s+'\')">'+s+' <span class="pill-count">'+(counts[s]||0)+'</span></button>';
+      return '<button class="pill'+cls+(tSF===s?' active':'')+'" onclick="tFilter(\''+s+'\')"><span class="pill-edge"></span><span class="pill-lbl">'+s+'</span><span class="pill-count">'+(counts[s]||0)+'</span></button>';
     }).join('');
   // Member filter chips (canonical + Unassigned + Other as needed)
   const chips=tMemberChips();
@@ -2225,10 +2230,11 @@ function pdComputeList(){
   const scope=document.getElementById('pdf-scope')?.value||'both';
   const eligible=orders.filter(o=>{
     const dq=Number(o.dispatched_qty)||0;
-    if(dq<=0) return false;                       // no dispatch = not on Data page
-    if(scope==='dispatched') return o.status==='Dispatched';   // fully shipped
-    if(scope==='partial')    return o.status!=='Dispatched';   // partially — status is Ready
-    return true;                                  // both = any order with dispatched_qty > 0
+    if(dq<=0) return false;
+    const ds=deriveStatus(o.qty,o.ready_qty,o.dispatched_qty);
+    if(scope==='dispatched') return ds==='Dispatched';
+    if(scope==='partial')    return ds!=='Dispatched';
+    return true;
   });
   const custSel=document.getElementById('pdf-cust');
   const prodSel=document.getElementById('pdf-prod');
@@ -2262,10 +2268,11 @@ function renderProductData(){
   const scope=document.getElementById('pdf-scope')?.value||'both';
   const eligible=orders.filter(o=>{
     const dq=Number(o.dispatched_qty)||0;
-    if(dq<=0) return false;                       // no dispatch = not on Data page
-    if(scope==='dispatched') return o.status==='Dispatched';   // fully shipped
-    if(scope==='partial')    return o.status!=='Dispatched';   // partially — status is Ready
-    return true;                                  // both = any order with dispatched_qty > 0
+    if(dq<=0) return false;
+    const ds=deriveStatus(o.qty,o.ready_qty,o.dispatched_qty);
+    if(scope==='dispatched') return ds==='Dispatched';
+    if(scope==='partial')    return ds!=='Dispatched';
+    return true;
   });
 
   // Populate customer dropdown — preserve prev selection even if it no longer has orders
@@ -2328,8 +2335,8 @@ function renderProductData(){
 
   const fmtDate=d=>{if(!d)return '—';const dt=new Date(d+'T00:00:00');return dt.getDate()+' '+dt.toLocaleString('en-IN',{month:'short'})+' '+dt.getFullYear();};
   const showCust=!custSel.value;
-  const dqOf=o=>o.status==='Dispatched'?(Number(o.qty)||0):(Number(o.dispatched_qty)||0);
-  const rqOf=o=>o.status==='Dispatched'?0:(Number(o.ready_qty)||0);
+  const dqOf=o=>deriveStatus(o.qty,o.ready_qty,o.dispatched_qty)==='Dispatched'?(Number(o.qty)||0):(Number(o.dispatched_qty)||0);
+  const rqOf=o=>deriveStatus(o.qty,o.ready_qty,o.dispatched_qty)==='Dispatched'?0:(Number(o.ready_qty)||0);
   const pageQty =pageList.reduce((s,o)=>s+(o.qty||0),0);
   const pageRdy =pageList.reduce((s,o)=>s+rqOf(o),0);
   const pageDisp=pageList.reduce((s,o)=>s+dqOf(o),0);
@@ -2370,7 +2377,7 @@ function renderProductData(){
         +rdyCell
         +'<td class="r">'+fmt(dq)+'</td>'
         +pendCell
-        +'<td>'+badge(ord.status)+'</td>'
+        +'<td>'+badge(deriveStatus(ord.qty,ord.ready_qty,ord.dispatched_qty))+'</td>'
         +'</tr>';
     }).join('')
     // Footer with page total (and grand total when more than one page)
@@ -2427,13 +2434,13 @@ function pdExportCsv(){
   if(!list.length){showToast('Nothing to export — apply filters that return orders','err');return;}
   const head=['Dispatch date','Order date','Customer','Order no','Product','PLY','L','W','H','Unit','Qty','Ready','Dispatched','Pending','Status'];
   const q=v=>{const s=(v==null?'':String(v));return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
-  const dqOf=o=>o.status==='Dispatched'?(Number(o.qty)||0):(Number(o.dispatched_qty)||0);
-  const rqOf=o=>o.status==='Dispatched'?0:(Number(o.ready_qty)||0);
+  const dqOf=o=>deriveStatus(o.qty,o.ready_qty,o.dispatched_qty)==='Dispatched'?(Number(o.qty)||0):(Number(o.dispatched_qty)||0);
+  const rqOf=o=>deriveStatus(o.qty,o.ready_qty,o.dispatched_qty)==='Dispatched'?0:(Number(o.ready_qty)||0);
   const rows=list.map(o=>{
     const total=Number(o.qty)||0;
     const rq=rqOf(o), dq=dqOf(o);
     const pend=Math.max(0,total-rq-dq);
-    return [o.disp,o.date,o.cust,o.no,o.prod,o.ply,o.l,o.w,o.h,o.su,total,rq,dq,pend,o.status].map(q).join(',');
+    return [o.disp,o.date,o.cust,o.no,o.prod,o.ply,o.l,o.w,o.h,o.su,total,rq,dq,pend,deriveStatus(o.qty,o.ready_qty,o.dispatched_qty)].map(q).join(',');
   });
   // Excel-friendly: UTF-8 BOM + CRLF
   const csv='﻿'+[head.join(','),...rows].join('\r\n');
