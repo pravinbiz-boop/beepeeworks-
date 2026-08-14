@@ -119,7 +119,7 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,-appl
   .taskcard{flex-wrap:wrap;align-items:flex-start;padding:10px 12px;column-gap:8px;row-gap:6px}
   .taskcard .tdot{margin-top:6px}
   .taskcard-body{flex:1 1 100%;order:1}
-  .taskcard .tname{white-space:normal;font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .taskcard .tname{white-space:pre-line;font-size:14px;line-height:1.35}
   .taskcard .tmeta{font-size:10.5px;opacity:.75}
   .taskcard-actions{flex:1 1 100%;order:2;justify-content:flex-end;padding-left:22px}
   /* Compact status select on mobile — still 16px to block iOS zoom */
@@ -446,7 +446,7 @@ table.t{width:100%;border-collapse:collapse}
 .tdot.Pending{border-color:var(--muted);background:transparent}
 .tdot.In-progress{background:var(--amber);border-color:var(--amber)}
 .tdot.Done{background:var(--green);border-color:var(--green)}
-.tname{font-size:13px;font-weight:500;color:var(--ink);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tname{font-size:13px;font-weight:500;color:var(--ink);line-height:1.35;white-space:pre-line;word-break:break-word}
 .tmeta{font-size:10.5px;color:var(--ink3);margin-top:1px}
 .tstatus-sel{font-family:'DM Sans',sans-serif;font-size:11px;border:var(--bw) solid var(--line);border-radius:var(--r3);background:var(--surface);height:30px;padding:0 8px;color:var(--ink);cursor:pointer;font-weight:500;transition:border-color .15s}
 .tstatus-sel:focus{border-color:var(--accent)}
@@ -1096,7 +1096,7 @@ table.t{width:100%;border-collapse:collapse}
   <div class="drawer-body" style="display:flex;flex-direction:column;gap:12px">
     <div class="frow">
       <label class="flbl">Task *</label>
-      <input class="inp" id="td-task" placeholder="What needs to be done?">
+      <textarea class="inp" id="td-task" placeholder="What needs to be done?" rows="3" style="min-height:38px;resize:vertical;line-height:1.4;padding:8px 12px;font-family:inherit"></textarea>
     </div>
     <div class="fg2">
       <div class="frow"><label class="flbl">Assigned to</label>
@@ -2004,7 +2004,7 @@ function addTask(){
   row.className='taskcard Pending';row.id='t-new-row';
   row.innerHTML='<div class="tdot Pending"></div>'
     +'<div class="taskcard-body" style="gap:6px">'
-      +'<input class="inp" id="t-new-name" placeholder="Task name" style="height:36px;font-size:16px" onkeydown="if(event.key===\'Enter\')saveNewTask();if(event.key===\'Escape\')cancelNewTask()">'
+      +'<textarea class="inp" id="t-new-name" placeholder="Task name" rows="2" style="min-height:36px;font-size:16px;resize:vertical;line-height:1.4;padding:8px 12px;font-family:inherit" onkeydown="if(event.key===\'Enter\'&&(event.ctrlKey||event.metaKey)){event.preventDefault();saveNewTask();}if(event.key===\'Escape\')cancelNewTask()"></textarea>'
       +'<select class="tstatus-sel" id="t-new-assign" style="height:34px;font-size:14px;width:100%"><option value="">Unassigned</option>'+MEMBERS.map(m=>'<option>'+m+'</option>').join('')+'</select>'
     +'</div>'
     +'<div class="taskcard-actions">'
