@@ -662,6 +662,7 @@ table.t{width:100%;border-collapse:collapse}
         <div class="frow"><label class="flbl">Unit</label>
           <select class="sel" id="no-su" style="max-width:120px"><option value="in">Inches</option><option value="cm">CM</option></select>
         </div>
+        <div id="no-warn" class="warn-txt" style="display:none">⚠ Dispatch date is before order date</div>
         <hr style="border:none;border-top:1px solid var(--bdr);margin:2px 0">
         <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3)">Products</div>
         <div id="no-prod-rows"></div>
@@ -1408,7 +1409,7 @@ async function saveNewOrder(){
     renderParties();
   }
 
-  const inserts=prodRows.map(r=>({date,no:orderNo,cust,prod:r.prod,ply:r.ply,l:r.l,w:r.w,h:r.h,su,qty:r.qty,joint:'double',disp:r.disp,status:'Pending',ready_qty:0,dispatched_qty:0,description:r.description||null}));
+  const inserts=prodRows.map(r=>{const o={date,no:orderNo,cust,prod:r.prod,ply:r.ply,l:r.l,w:r.w,h:r.h,su,qty:r.qty,joint:'double',disp:r.disp,status:'Pending',ready_qty:0,dispatched_qty:0};if(r.description)o.description=r.description;return o;});
   try{
     const res=await db.insert('orders',inserts);
     if(!res||!res.length) throw new Error('Insert failed');
@@ -1764,7 +1765,6 @@ async function saveDrawer(){
     prod:getVal('ed-prod'),ply:getVal('ed-ply'),
     l:parseFloat(getVal('ed-L'))||0,w:parseFloat(getVal('ed-W'))||0,h:parseFloat(getVal('ed-H'))||0,
     su:getVal('ed-su'),qty:parseFloat(getVal('ed-qty'))||0,
-    description:getVal('ed-desc')||null,
     joint:'double',disp:getVal('ed-disp'),status:getVal('ed-status'),
     ready_qty:parseFloat(getVal('ed-rqty'))||0,
     dispatched_qty:parseFloat(getVal('ed-dqty'))||0
@@ -1793,6 +1793,8 @@ async function saveDrawer(){
   }
   // Status is fully derived from the buckets — no manual override.
   row.status=deriveStatus(row.qty,row.ready_qty,row.dispatched_qty);
+  const edDesc=getVal('ed-desc');
+  if(edDesc) row.description=edDesc; else row.description=null;
   const x=orders.find(o=>o.id===editId); if(!x){closeDrawer();return;}
   if(row.status!==x.status) row.updated_at=new Date().toISOString();
   // Snapshot only the fields we're about to mutate, for rollback
@@ -1835,7 +1837,8 @@ async function deleteFromDrawer(){
 async function duplicateOrder(){
   if(!editId) return;
   const src=orders.find(o=>o.id===editId); if(!src) return;
-  const row={date:today(),no:'',cust:src.cust,prod:src.prod,ply:src.ply,l:src.l,w:src.w,h:src.h,su:src.su||'in',qty:src.qty,joint:src.joint||'double',disp:'',status:'Pending',description:src.description||null};
+  const row={date:today(),no:'',cust:src.cust,prod:src.prod,ply:src.ply,l:src.l,w:src.w,h:src.h,su:src.su||'in',qty:src.qty,joint:src.joint||'double',disp:'',status:'Pending'};
+  if(src.description) row.description=src.description;
   try{
     const res=await db.insert('orders',row);
     if(!res || !res[0]) throw new Error('Insert failed');
@@ -1851,7 +1854,7 @@ async function duplicateOrder(){
 async function addProductToOrder(){
   if(!editId) return;
   const src=orders.find(o=>o.id===editId); if(!src) return;
-  const row={date:src.date,no:src.no||'',cust:src.cust,prod:'',ply:'',l:0,w:0,h:0,su:src.su||'in',qty:0,joint:'double',disp:src.disp||'',status:'Pending',ready_qty:0,dispatched_qty:0,description:null};
+  const row={date:src.date,no:src.no||'',cust:src.cust,prod:'',ply:'',l:0,w:0,h:0,su:src.su||'in',qty:0,joint:'double',disp:src.disp||'',status:'Pending',ready_qty:0,dispatched_qty:0};
   try{
     const res=await db.insert('orders',row);
     if(!res || !res[0]) throw new Error('Insert failed');
