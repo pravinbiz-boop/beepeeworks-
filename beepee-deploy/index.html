@@ -662,7 +662,7 @@ table.t{width:100%;border-collapse:collapse}
         <div class="frow"><label class="flbl">Unit</label>
           <select class="sel" id="no-su" style="max-width:120px"><option value="in">Inches</option><option value="cm">CM</option></select>
         </div>
-        <div id="no-warn" class="warn-txt" style="display:none">⚠ Dispatch date is before order date</div>
+        <div id="no-warn" class="warn-txt" style="display:none">⚠ Dispatch date is before today's date</div>
         <hr style="border:none;border-top:1px solid var(--bdr);margin:2px 0">
         <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3)">Products</div>
         <div id="no-prod-rows"></div>
@@ -1011,11 +1011,11 @@ table.t{width:100%;border-collapse:collapse}
     <div class="fg2">
       <div class="frow"><label class="flbl">Product *</label>
         <select class="sel" id="ed-prod" onchange="toggleH('ed')">
-          <option>Box</option><option>Pallet</option><option>Layer / Board</option><option>OE Layer</option><option>Corner Pad</option><option>Paper</option>
+          <option value="">Select…</option><option>Box</option><option>Pallet</option><option>Layer / Board</option><option>OE Layer</option><option>Corner Pad</option><option>Paper</option>
         </select>
       </div>
       <div class="frow"><label class="flbl">PLY *</label>
-        <select class="sel" id="ed-ply"><option>2</option><option>3</option><option>5</option><option>7</option><option>9</option></select>
+        <select class="sel" id="ed-ply"><option value="">Select…</option><option>2</option><option>3</option><option>5</option><option>7</option><option>9</option></select>
       </div>
     </div>
     <div class="frow">
@@ -1239,7 +1239,7 @@ const fmt=n=>(n||0).toLocaleString('en-IN');
 const ddmm=d=>d?d.slice(8,10)+'/'+d.slice(5,7):'';
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const today=()=>new Date().toISOString().slice(0,10);
-const TODAY=today();
+
 
 function skCls(s){return s==='Pending'?'pn':s==='Ready'?'rd':s==='Dispatched'?'ds':'pn';}
 function badge(s){return '<span class="bdg '+skCls(s)+'">'+esc(s)+'</span>';}
@@ -1272,9 +1272,9 @@ function timeAgo(ts){
 function dispMeta(disp,status){
   if(status==='Dispatched') return {label:'Dispatched',cls:'done'};
   if(!disp) return {label:'No date set',cls:'ok'};
-  if(disp<TODAY){const od=Math.round((new Date(TODAY)-new Date(disp))/864e5);return {label:od+'d overdue',cls:'overdue'};}
-  if(disp===TODAY) return {label:'Due today',cls:'today'};
-  const d=Math.round((new Date(disp)-new Date(TODAY))/864e5);
+  if(disp<today()){const od=Math.round((new Date(today())-new Date(disp))/864e5);return {label:od+'d overdue',cls:'overdue'};}
+  if(disp===today()) return {label:'Due today',cls:'today'};
+  const d=Math.round((new Date(disp)-new Date(today()))/864e5);
   return {label:d+'d away',cls:d<=3?'today':'ok'};
 }
 function boardSizes(ord){
@@ -1653,7 +1653,8 @@ function orderMatchesQuery(o,q){
       || (o.no||'').toLowerCase().includes(q)
       || size.includes(q)
       || (o.prod||'').toLowerCase().includes(q)
-      || String(o.ply||'').toLowerCase().includes(q);
+      || String(o.ply||'').toLowerCase().includes(q)
+      || (o.description||'').toLowerCase().includes(q);
 }
 function renderOrders(){
   const q=(document.getElementById('ol-search')?.value||'').toLowerCase().trim();
@@ -1692,7 +1693,7 @@ function renderOrders(){
   if(totalPages>1){
     pgEl.style.display='flex';
     pgEl.innerHTML='<span style="font-size:11px;color:var(--ink3)">Showing '+(start+1)+'–'+Math.min(start+PAGE_SIZE,list.length)+' of '+list.length+'</span>'
-      +'<div class="pd-pg-btns">'+pdPagerHTML(olPage,totalPages).replace(/pdGoPage/g,'olGoPage')+'</div>';
+      +'<div class="pd-pg-btns">'+pdPagerHTML(olPage,totalPages,'olGoPage')+'</div>';
   } else pgEl.style.display='none';
 }
 function olGoPage(p){olPage=p;renderOrders();window.scrollTo({top:0,behavior:'smooth'});}
@@ -1702,7 +1703,9 @@ function olFilter(s){oSF=s;olPage=1;renderOrders();}
 function toggleH(prefix){
   const prod=getVal(prefix+'-prod');
   const isBox=prod==='Box';
-  document.getElementById('ed-H').style.display=isBox?'':'none';
+  const hEl=document.getElementById('ed-H');
+  hEl.style.display=isBox?'':'none';
+  hEl.parentElement.style.gridTemplateColumns=isBox?'1fr 1fr 1fr':'1fr 1fr';
   document.getElementById('ed-size-lbl').textContent=isBox?'Size L × W × H *':'Size L × W *';
   if(!isBox) setVal('ed-H','0');
 }
@@ -1772,6 +1775,8 @@ async function saveDrawer(){
   // Required-field validation (mirrors the New Order form)
   const errs=[];
   if(!row.cust) errs.push('ed-cust');
+  if(!row.prod) errs.push('ed-prod');
+  if(!row.ply)  errs.push('ed-ply');
   if(!row.l)    errs.push('ed-L');
   if(!row.w)    errs.push('ed-W');
   if(row.prod==='Box'&&!row.h) errs.push('ed-H');
@@ -1837,7 +1842,7 @@ async function deleteFromDrawer(){
 async function duplicateOrder(){
   if(!editId) return;
   const src=orders.find(o=>o.id===editId); if(!src) return;
-  const row={date:today(),no:'',cust:src.cust,prod:src.prod,ply:src.ply,l:src.l,w:src.w,h:src.h,su:src.su||'in',qty:src.qty,joint:src.joint||'double',disp:'',status:'Pending'};
+  const row={date:today(),no:'',cust:src.cust,prod:src.prod,ply:src.ply,l:src.l,w:src.w,h:src.h,su:src.su||'in',qty:src.qty,joint:src.joint||'double',disp:'',status:'Pending',ready_qty:0,dispatched_qty:0};
   if(src.description) row.description=src.description;
   try{
     const res=await db.insert('orders',row);
@@ -1851,21 +1856,17 @@ async function duplicateOrder(){
   }
 }
 
-async function addProductToOrder(){
+function addProductToOrder(){
   if(!editId) return;
   const src=orders.find(o=>o.id===editId); if(!src) return;
-  const row={date:src.date,no:src.no||'',cust:src.cust,prod:'',ply:'',l:0,w:0,h:0,su:src.su||'in',qty:0,joint:'double',disp:src.disp||'',status:'Pending',ready_qty:0,dispatched_qty:0};
-  try{
-    const res=await db.insert('orders',row);
-    if(!res || !res[0]) throw new Error('Insert failed');
-    orders.unshift(res[0]);
-    closeDrawer();
-    showToast('New product row added — fill in the details','ok');
-    renderOrders(); renderWorkStatus(); renderProductData();
-    openDrawer(res[0].id);
-  }catch(e){
-    showToast('Add failed — try again','err');
-  }
+  closeDrawer();
+  nav('orders');
+  showNewOrderForm();
+  document.getElementById('no-cust').value=src.cust||'';
+  document.getElementById('no-no').value=src.no||'';
+  document.getElementById('no-su').value=src.su||'in';
+  const row1=document.querySelector('.no-prow');
+  if(row1&&src.disp){row1.querySelector('[data-f="disp"]').value=src.disp;}
 }
 
 // ── WORK STATUS ──────────────────────────────────────────
@@ -1907,7 +1908,7 @@ function renderWorkStatus(){
   if(!list.length){
     const anyFilter=woFilterSet.size<STATUSES.length;
     const msg=q?'No orders match your search.':(anyFilter?'No orders in the selected buckets.':'No orders yet.');
-    const clearBtn=anyFilter?'<div style="margin-top:10px"><button class="pill" onclick="woFilterAll()">Show all</button></div>':'';
+    const clearBtn=(anyFilter||q)?'<div style="margin-top:10px"><button class="pill" onclick="woFilterAll()">Show all</button></div>':'';
     document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+clearBtn+'</div>';
     document.getElementById('wo-pagination').style.display='none';
     return;
@@ -1921,7 +1922,7 @@ function renderWorkStatus(){
   if(totalPages>1){
     pgEl.style.display='flex';
     pgEl.innerHTML='<span style="font-size:11px;color:var(--ink3)">Showing '+(start+1)+'–'+Math.min(start+PAGE_SIZE,list.length)+' of '+list.length+'</span>'
-      +'<div class="pd-pg-btns">'+pdPagerHTML(woPage,totalPages).replace(/pdGoPage/g,'woGoPage')+'</div>';
+      +'<div class="pd-pg-btns">'+pdPagerHTML(woPage,totalPages,'woGoPage')+'</div>';
   } else pgEl.style.display='none';
 }
 // Toggle a bucket chip. Empty set not allowed — clicking the last remaining chip re-selects it.
@@ -1937,6 +1938,7 @@ function woFilterToggle(s){
 }
 function woFilterAll(){
   woFilterSet=new Set(STATUSES);
+  const sb=document.getElementById('wo-search');if(sb)sb.value='';
   woPage=1;renderWorkStatus();
 }
 function woSortChange(v){woSort=v;woPage=1;renderWorkStatus();}
@@ -2002,7 +2004,7 @@ function renderTasks(){
   const counts={All:tasks.length};TSTATS.forEach(s=>counts[s]=tasks.filter(t=>t.status===s).length);
   document.getElementById('t-filters').innerHTML=
     ['All',...TSTATS].map(s=>{
-      const clsMap={'Pending':'','In progress':' pill-ip','Done':' pill-rd'};
+      const clsMap={'Pending':' pill-pn','In progress':' pill-ip','Done':' pill-ds'};
       const cls=s==='All'?'':clsMap[s]||'';
       return '<button class="pill'+cls+(tSF===s?' active':'')+'" onclick="tFilter(\''+s+'\')"><span class="pill-edge"></span><span class="pill-lbl">'+s+'</span><span class="pill-count">'+(counts[s]||0)+'</span></button>';
     }).join('');
@@ -2103,8 +2105,9 @@ async function saveNewTask(){
     const res=await db.insert('tasks',row);
     if(res && res[0]){
       tasks.unshift(res[0]);
+      tSF='All';tMF='All';tPage=1;
       showToast('Task added','ok');
-      renderTasks();
+      saveTaskFilters();renderTasks();
     } else {
       rowEl.classList.remove('pending-save');
       showToast('Could not save — check your connection','err');
@@ -2122,17 +2125,10 @@ async function uT(id,f,v){
   const prev=x[f];
   if(prev===v) return;
   x[f]=v;
-  updateTaskCardDom(id);
-  // Status changes may affect filter counts / pagination — refresh chips silently
   if(f==='status'||f==='assigned'){
-    // Only refresh the chip bars, not the whole list
-    const counts={All:tasks.length};TSTATS.forEach(s=>counts[s]=tasks.filter(t=>t.status===s).length);
-    document.querySelectorAll('#t-filters .pill').forEach(btn=>{
-      const label=btn.textContent.trim().split(' ')[0];
-      const key=label==='In'?'In progress':label; // handle "In progress"
-      const c=btn.querySelector('.pill-count');
-      if(c && counts[key]!=null) c.textContent=counts[key];
-    });
+    renderTasks();
+  } else {
+    updateTaskCardDom(id);
   }
   try{
     const ok=await db.update('tasks',id,{[f]:v});
@@ -2281,9 +2277,10 @@ function pdRangeChange(){
   pdGoPage(1);
 }
 // Build a truncated page-number strip: [1] … [n-1] [n] [n+1] … [total]
-function pdPagerHTML(page,totalPages){
+function pdPagerHTML(page,totalPages,goFn){
+  goFn=goFn||'pdGoPage';
   if(totalPages<=1) return '';
-  const btn=(n,label,active,disabled)=>'<button class="pd-pg-btn'+(active?' active':'')+'" '+(disabled?'disabled ':'')+'onclick="pdGoPage('+n+')">'+label+'</button>';
+  const btn=(n,label,active,disabled)=>'<button class="pd-pg-btn'+(active?' active':'')+'" '+(disabled?'disabled ':'')+'onclick="'+goFn+'('+n+')">'+label+'</button>';
   const dots='<span class="pd-pg-btn" style="border:none;background:transparent;cursor:default">…</span>';
   const nums=new Set([1,totalPages,page-1,page,page+1]);
   const shown=[...nums].filter(n=>n>=1&&n<=totalPages).sort((a,b)=>a-b);
