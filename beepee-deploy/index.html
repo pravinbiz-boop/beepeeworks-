@@ -134,12 +134,12 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,-appl
   /* ── Compact order card: stack on mobile ── */
   .obody-c{flex-wrap:wrap;padding:8px 10px;gap:4px}
   .o-left{flex:1 1 100%;gap:6px}
-  .o-cust{max-width:none}
+  .o-cust{max-width:none;white-space:normal;word-break:break-word}
   .o-detail{white-space:normal;word-break:break-word;flex:1 1 100%}
   .o-right{flex:1 1 100%;justify-content:space-between}
   /* Status card header wraps on mobile */
   .sc-head{gap:4px}
-  .sc-head .o-cust{max-width:none}
+  .sc-head .o-cust{max-width:none;white-space:normal;word-break:break-word}
   .sc-head .o-detail{flex:1 1 100%}
   /* Pills: slightly taller on mobile for tap targets */
   .pill{height:36px;font-size:12px}
@@ -275,11 +275,12 @@ table.t{width:100%;border-collapse:collapse}
 .ocard{background:var(--surface)}
 .ocard.ip,.ocard.pd{background:var(--surface);border-color:var(--line)}
 .obody-c{flex:1;padding:8px 12px;min-width:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.o-left{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
-.o-cust{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.o-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.o-cust{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+.o-desc{font-size:11.5px;color:var(--ink3);font-style:italic;white-space:pre-line;word-break:break-word;flex:1 1 100%;margin-top:-2px}
 .o-ono{font-size:12px;color:var(--ink3);white-space:nowrap}
 .o-detail{font-size:12.5px;font-weight:700;color:var(--ink2);white-space:nowrap}
-.o-right{display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:auto}
+.o-right{display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:auto}
 .c-disp{font-size:11px;font-weight:700;border-radius:6px;padding:3px 9px;white-space:nowrap;flex-shrink:0;line-height:1.4}
 .c-disp.overdue{background:var(--red-bg);color:var(--red)}
 .c-disp.today{background:var(--amber-bg);color:var(--amber)}
@@ -648,46 +649,24 @@ table.t{width:100%;border-collapse:collapse}
       <input type="hidden" id="no-date">
       <div class="ch"><span class="ctitle">New Order</span><button class="btn-del" onclick="hideNewOrderForm()">✕</button></div>
       <div class="cb" style="padding:12px 14px;display:flex;flex-direction:column;gap:9px">
-        <div class="frow">
-          <label class="flbl">Customer *</label>
-          <input class="inp" id="no-cust" list="custList" placeholder="Type customer name">
-        </div>
-        <div class="frow">
-          <label class="flbl">Order No</label>
-          <input class="inp" id="no-no">
-        </div>
         <div class="fg2">
-          <div class="frow"><label class="flbl">Product *</label>
-            <select class="sel" id="no-prod" onchange="toggleH('no')">
-              <option value="">Select…</option>
-              <option>Box</option><option>Pallet</option><option>Layer / Board</option><option>OE Layer</option><option>Corner Pad</option><option>Paper</option>
-            </select>
+          <div class="frow">
+            <label class="flbl">Customer *</label>
+            <input class="inp" id="no-cust" list="custList" placeholder="Type customer name">
           </div>
-          <div class="frow"><label class="flbl">PLY *</label>
-            <select class="sel" id="no-ply"><option value="">Select…</option><option>2</option><option>3</option><option>5</option><option>7</option><option>9</option></select>
+          <div class="frow">
+            <label class="flbl">Order No</label>
+            <input class="inp" id="no-no">
           </div>
         </div>
-        <div class="fg3">
-          <div class="frow"><label class="flbl">L *</label><input class="inp num" type="number" inputmode="decimal" id="no-L" min="0" placeholder="0"></div>
-          <div class="frow"><label class="flbl">W *</label><input class="inp num" type="number" inputmode="decimal" id="no-W" min="0" placeholder="0"></div>
-          <div class="frow" id="no-H-wrap" style="display:none"><label class="flbl">H *</label><input class="inp num" type="number" inputmode="decimal" id="no-H" min="0" placeholder="0"></div>
+        <div class="frow"><label class="flbl">Unit</label>
+          <select class="sel" id="no-su" style="max-width:120px"><option value="in">Inches</option><option value="cm">CM</option></select>
         </div>
-        <div class="fg2">
-          <div class="frow"><label class="flbl">Unit</label>
-            <select class="sel" id="no-su"><option value="in">Inches</option><option value="cm">CM</option></select>
-          </div>
-          <div class="frow"><label class="flbl">Qty *</label><input class="inp num" type="number" inputmode="decimal" id="no-qty" min="0" placeholder="0"></div>
-        </div>
-        <div class="fg2">
-          <div class="frow"><label class="flbl">Status</label>
-            <select class="sel" id="no-status">
-              <option>Pending</option><option>Ready</option><option>Dispatched</option>
-            </select>
-          </div>
-          <div class="frow"><label class="flbl">Dispatch Date *</label><input type="date" class="inp" id="no-disp" style="border-color:#C7D2FE;background:#EEF2FF;color:#4338CA;font-weight:600"></div>
-        </div>
-        <div id="no-warn" class="warn-txt" style="display:none">⚠ Dispatch date is before order date</div>
-        <button class="btn btn-p btn-full" onclick="saveNewOrder()">Save Order</button>
+        <hr style="border:none;border-top:1px solid var(--bdr);margin:2px 0">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3)">Products</div>
+        <div id="no-prod-rows"></div>
+        <button class="btn" onclick="noAddRow()" style="align-self:flex-start;font-size:12px">+ Add product row</button>
+        <button class="btn btn-p btn-full" id="no-save-btn" onclick="saveNewOrder()">Save order (1 product)</button>
       </div>
     </div>
 
@@ -1050,6 +1029,10 @@ table.t{width:100%;border-collapse:collapse}
       <div class="frow"><label class="flbl">Unit</label><select class="sel" id="ed-su"><option value="in">Inches</option><option value="cm">CM</option></select></div>
       <div class="frow"><label class="flbl">Qty *</label><input class="inp num" type="number" inputmode="decimal" id="ed-qty" min="0" oninput="edRecalcBalance()"></div>
     </div>
+    <div class="frow">
+      <label class="flbl">Description</label>
+      <input class="inp" id="ed-desc" placeholder="Optional description">
+    </div>
     <div class="fg2">
       <div class="frow"><label class="flbl">Status <span style="font-size:9.5px;color:var(--ink3);font-weight:500;text-transform:none;letter-spacing:0;font-style:italic">(derived)</span></label>
         <div class="inp readout" id="ed-status-txt">—</div>
@@ -1309,64 +1292,129 @@ function setVal(id,v){const el=document.getElementById(id);if(el)el.value=v||'';
 function getVal(id){return(document.getElementById(id)?.value||'').trim();}
 
 // ── ORDERS ───────────────────────────────────────────────
+let noRowId=0;
+function noProdRowHTML(rid){
+  return '<div class="no-prow" data-rid="'+rid+'" style="display:flex;flex-direction:column;gap:6px;padding:8px 10px;border:1px solid var(--bdr);border-radius:8px;margin-bottom:6px;background:var(--bg)">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center">'
+    +'<span style="font-size:14px;font-weight:700;color:var(--ink2)">#'+rid+'</span>'
+    +'<div style="display:flex;gap:6px;align-items:center">'
+    +'<button class="no-desc-toggle" onclick="noToggleDesc(this)" title="Add description" style="background:none;border:none;cursor:pointer;padding:2px;color:var(--ink3);font-size:15px;line-height:1">✎</button>'
+    +'<button class="btn-del" onclick="noRemoveRow('+rid+')" title="Remove" style="font-size:13px">✕</button>'
+    +'</div></div>'
+    +'<div class="fg2">'
+    +'<div class="frow"><label class="flbl">Product *</label>'
+    +'<select class="sel no-f" data-f="prod" onchange="noToggleH(this)">'
+    +'<option value="">Select…</option><option>Box</option><option>Pallet</option><option>Layer / Board</option><option>OE Layer</option><option>Corner Pad</option><option>Paper</option>'
+    +'</select></div>'
+    +'<div class="frow"><label class="flbl">PLY *</label>'
+    +'<select class="sel no-f" data-f="ply"><option value="">Select…</option><option>2</option><option>3</option><option>5</option><option>7</option><option>9</option></select></div>'
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">'
+    +'<div class="frow"><label class="flbl">L *</label><input class="inp num no-f" data-f="l" type="number" inputmode="decimal" min="0" placeholder="0"></div>'
+    +'<div class="frow"><label class="flbl">W *</label><input class="inp num no-f" data-f="w" type="number" inputmode="decimal" min="0" placeholder="0"></div>'
+    +'<div class="frow no-h-wrap" style="display:none"><label class="flbl">H *</label><input class="inp num no-f" data-f="h" type="number" inputmode="decimal" min="0" placeholder="0"></div>'
+    +'<div class="frow"><label class="flbl">Qty *</label><input class="inp num no-f" data-f="qty" type="number" inputmode="decimal" min="0" placeholder="0"></div>'
+    +'</div>'
+    +'<div class="fg2">'
+    +'<div class="frow"><label class="flbl">Dispatch *</label><input type="date" class="inp no-f" data-f="disp" style="border-color:#C7D2FE;background:#EEF2FF;color:#4338CA;font-weight:600"></div>'
+    +'<div></div>'
+    +'</div>'
+    +'<div class="frow no-desc-wrap" style="display:none"><label class="flbl">Description</label><input class="inp no-f" data-f="description" placeholder="Optional description"></div>'
+    +'</div>';
+}
+function noAddRow(){
+  const prevRows=document.querySelectorAll('.no-prow');
+  const lastDisp=prevRows.length?prevRows[prevRows.length-1].querySelector('[data-f="disp"]')?.value:'';
+  noRowId++;
+  document.getElementById('no-prod-rows').insertAdjacentHTML('beforeend',noProdRowHTML(noRowId));
+  if(lastDisp){const newRow=document.querySelector('.no-prow[data-rid="'+noRowId+'"]');newRow.querySelector('[data-f="disp"]').value=lastDisp;}
+  noUpdateSaveBtn();
+}
+function noToggleDesc(btn){
+  const row=btn.closest('.no-prow');
+  const wrap=row.querySelector('.no-desc-wrap');
+  const showing=wrap.style.display!=='none';
+  wrap.style.display=showing?'none':'';
+  if(!showing) wrap.querySelector('input').focus();
+}
+function noRemoveRow(rid){
+  const rows=document.querySelectorAll('.no-prow');
+  if(rows.length<=1){showToast('Need at least one product','err');return;}
+  const row=document.querySelector('.no-prow[data-rid="'+rid+'"]');
+  if(row) row.remove();
+  noUpdateSaveBtn();
+}
+function noToggleH(sel){
+  const row=sel.closest('.no-prow');
+  const wrap=row.querySelector('.no-h-wrap');
+  const isBox=sel.value==='Box';
+  wrap.style.display=isBox?'':'none';
+  if(!isBox){const h=wrap.querySelector('input');if(h)h.value='';}
+}
+function noUpdateSaveBtn(){
+  const n=document.querySelectorAll('.no-prow').length;
+  document.getElementById('no-save-btn').textContent='Save order ('+n+' product'+(n>1?'s':'')+')';
+}
+function noGetRows(){
+  const rows=[];
+  document.querySelectorAll('.no-prow').forEach(row=>{
+    const g=f=>{ const el=row.querySelector('[data-f="'+f+'"]'); return el?el.value.trim():''; };
+    rows.push({prod:g('prod'),ply:g('ply'),l:parseFloat(g('l'))||0,w:parseFloat(g('w'))||0,h:parseFloat(g('h'))||0,qty:parseFloat(g('qty'))||0,disp:g('disp'),description:g('description'),rowEl:row});
+  });
+  return rows;
+}
+
 function showNewOrderForm(){
   document.getElementById('new-order-form').style.display='block';
   document.getElementById('no-date').value=today();
+  noRowId=0;
+  document.getElementById('no-prod-rows').innerHTML='';
+  noAddRow();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function hideNewOrderForm(){document.getElementById('new-order-form').style.display='none';}
 
 async function saveNewOrder(){
-  const cust=getVal('no-cust'), prod=getVal('no-prod'), ply=getVal('no-ply');
-  const L=parseFloat(getVal('no-L'))||0, W=parseFloat(getVal('no-W'))||0;
-  const H=parseFloat(getVal('no-H'))||0, qty=parseFloat(getVal('no-qty'))||0;
-  const disp=getVal('no-disp'), date=getVal('no-date');
+  const cust=getVal('no-cust'), date=getVal('no-date');
+  const su=getVal('no-su'), orderNo=getVal('no-no');
+  const prodRows=noGetRows();
 
-  // Validate
-  const errs=[];
-  if(!cust) errs.push('no-cust');
-  if(!prod) errs.push('no-prod');
-  if(!ply)  errs.push('no-ply');
-  if(!L)    errs.push('no-L');
-  if(!W)    errs.push('no-W');
-  if(prod==='Box'&&!H) errs.push('no-H');
-  if(!qty)  errs.push('no-qty');
-  if(!disp) errs.push('no-disp');
+  document.querySelectorAll('#new-order-form .inp.err,#new-order-form .sel.err').forEach(el=>el.classList.remove('err'));
 
-  document.querySelectorAll('.inp.err,.sel.err').forEach(el=>el.classList.remove('err'));
-  errs.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('err');});
-  if(errs.length) return;
+  let hasErr=false;
+  if(!cust){document.getElementById('no-cust').classList.add('err');hasErr=true;}
 
-  // Date warning — block save so the message is seen and the date can be corrected
+  prodRows.forEach(r=>{
+    const mark=f=>{const el=r.rowEl.querySelector('[data-f="'+f+'"]');if(el)el.classList.add('err');};
+    if(!r.prod){mark('prod');hasErr=true;}
+    if(!r.ply){mark('ply');hasErr=true;}
+    if(!r.l){mark('l');hasErr=true;}
+    if(!r.w){mark('w');hasErr=true;}
+    if(r.prod==='Box'&&!r.h){mark('h');hasErr=true;}
+    if(!r.qty){mark('qty');hasErr=true;}
+    if(!r.disp){mark('disp');hasErr=true;}
+  });
+  if(hasErr) return;
+
+  const dateWarn=prodRows.some(r=>r.disp&&date&&r.disp<date);
   const warnEl=document.getElementById('no-warn');
-  if(disp&&date&&disp<date){warnEl.style.display='block';return;}
+  if(dateWarn){warnEl.style.display='block';return;}
   warnEl.style.display='none';
 
-  // Auto-create customer if new (case- and whitespace-insensitive)
   if(!parties.find(p=>(p.name||'').trim().toLowerCase()===cust.toLowerCase())){
     const res=await db.insert('parties',{name:cust,type:'Customer'});
     if(res) parties.push(res[0]);
     renderParties();
   }
 
-  // Seed bucket fields from the chosen status, then derive the real status from those buckets.
-  // (Pending → both 0; Ready → ready_qty = qty; Dispatched → dispatched_qty = qty.)
-  const picked=getVal('no-status');
-  const seedRq = picked==='Ready' ? qty : 0;
-  const seedDq = picked==='Dispatched' ? qty : 0;
-  const derived=deriveStatus(qty,seedRq,seedDq);
-  const row={date,no:getVal('no-no'),cust,prod,ply,l:L,w:W,h:H,su:getVal('no-su'),qty,joint:'double',disp,status:derived,ready_qty:seedRq,dispatched_qty:seedDq};
+  const inserts=prodRows.map(r=>({date,no:orderNo,cust,prod:r.prod,ply:r.ply,l:r.l,w:r.w,h:r.h,su,qty:r.qty,joint:'double',disp:r.disp,status:'Pending',ready_qty:0,dispatched_qty:0,description:r.description||null}));
   try{
-    const res=await db.insert('orders',row);
-    if(!res || !res[0]) throw new Error('Insert failed');
-    orders.unshift(res[0]);
+    const res=await db.insert('orders',inserts);
+    if(!res||!res.length) throw new Error('Insert failed');
+    res.forEach(r=>orders.unshift(r));
     hideNewOrderForm();
-    // Reset form
-    ['no-no','no-cust','no-L','no-W','no-H','no-qty','no-disp'].forEach(id=>setVal(id,''));
-    document.getElementById('no-prod').value='';
-    document.getElementById('no-ply').value='';
-    document.getElementById('no-status').value='Pending';
-    showToast('Order added','ok');
+    setVal('no-cust',''); setVal('no-no','');
+    showToast(res.length+' product'+(res.length>1?'s':'')+' added','ok');
     renderOrders(); renderWorkStatus(); renderProductData();
   }catch(e){
     showToast('Save failed — try again','err');
@@ -1385,13 +1433,16 @@ function orderCardHTML(ord){
   const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
   const total=Number(ord.qty)||0;
   const detail=esc(String(ord.ply||'?'))+' PLY - '+esc(ord.prod||'—')+' - '+size+' - '+fmt(total)+' nos.';
+  const onoHtml=ord.no?'<span class="o-ono">'+esc(ord.no)+'</span>':'';
+  const descHtml=ord.description?'<span class="o-desc">'+esc(ord.description)+'</span>':'';
   return '<div class="ocard '+sk+'" data-oid="'+ord.id+'" tabindex="0" role="button" aria-label="Open order '+esc(ord.no||ord.cust||'')+'" onclick="openDrawer('+ord.id+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openDrawer('+ord.id+');}">'
     +'<div class="ostripe '+sk+'"></div>'
     +'<div class="obody-c">'
       +'<div class="o-left">'
         +'<span class="o-cust">'+esc(ord.cust||'—')+'</span>'
-        +'<span class="o-ono">#'+esc(ord.no||'ORD')+'</span>'
+        +onoHtml
         +'<span class="o-detail">'+detail+'</span>'
+        +descHtml
       +'</div>'
       +'<div class="o-right">'
         +'<span class="'+dispCls+'">'+esc(dispTxt)+'</span>'
@@ -1417,6 +1468,8 @@ function statusCardHTML(ord){
   const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
   const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
   const detail=esc(String(ord.ply||'?'))+' PLY - '+esc(ord.prod||'—')+' - '+size+' - '+fmt(total)+' nos.';
+  const onoHtml=ord.no?'<span class="o-ono">'+esc(ord.no)+'</span>':'';
+  const descHtml=ord.description?'<span class="o-desc">'+esc(ord.description)+'</span>':'';
   const pFlex=total>0?pending/total:1, rFlex=total>0?rq/total:0, dFlex=total>0?dq/total:0;
   const seg=(cls,val,flex)=>flex>0?'<span class="'+cls+'" style="flex:'+flex.toFixed(3)+'"></span>':'';
   return '<div class="ocard scard '+sk+'" data-oid="'+ord.id+'">'
@@ -1424,8 +1477,9 @@ function statusCardHTML(ord){
     +'<div class="obody-c sc-body">'
       +'<div class="o-left sc-head" onclick="openDrawer('+ord.id+')" style="cursor:pointer">'
         +'<span class="o-cust">'+esc(ord.cust||'—')+'</span>'
-        +'<span class="o-ono">#'+esc(ord.no||'ORD')+'</span>'
+        +onoHtml
         +'<span class="o-detail">'+detail+'</span>'
+        +descHtml
         +'<span class="'+dispCls+'">'+esc(dispTxt)+'</span>'
       +'</div>'
       +'<div class="tc-bar" aria-label="Progress: '+fmt(pending)+' pending, '+fmt(rq)+' ready, '+fmt(dq)+' dispatched">'
@@ -1646,14 +1700,9 @@ function olFilter(s){oSF=s;olPage=1;renderOrders();}
 function toggleH(prefix){
   const prod=getVal(prefix+'-prod');
   const isBox=prod==='Box';
-  if(prefix==='no'){
-    document.getElementById('no-H-wrap').style.display=isBox?'':'none';
-    if(!isBox) setVal('no-H','');
-  } else {
-    document.getElementById('ed-H').style.display=isBox?'':'none';
-    document.getElementById('ed-size-lbl').textContent=isBox?'Size L × W × H *':'Size L × W *';
-    if(!isBox) setVal('ed-H','0');
-  }
+  document.getElementById('ed-H').style.display=isBox?'':'none';
+  document.getElementById('ed-size-lbl').textContent=isBox?'Size L × W × H *':'Size L × W *';
+  if(!isBox) setVal('ed-H','0');
 }
 function openDrawer(id){
   const ord=orders.find(o=>o.id===id);
@@ -1665,6 +1714,7 @@ function openDrawer(id){
   setVal('ed-L',ord.l); setVal('ed-W',ord.w); setVal('ed-H',ord.h||0);
   toggleH('ed');
   setVal('ed-su',ord.su||'in'); setVal('ed-qty',ord.qty);
+  setVal('ed-desc',ord.description||'');
   setVal('ed-rqty',Number(ord.ready_qty)||0);
   setVal('ed-dqty',Number(ord.dispatched_qty)||0);
   setVal('ed-disp',ord.disp);
@@ -1713,6 +1763,7 @@ async function saveDrawer(){
     prod:getVal('ed-prod'),ply:getVal('ed-ply'),
     l:parseFloat(getVal('ed-L'))||0,w:parseFloat(getVal('ed-W'))||0,h:parseFloat(getVal('ed-H'))||0,
     su:getVal('ed-su'),qty:parseFloat(getVal('ed-qty'))||0,
+    description:getVal('ed-desc')||null,
     joint:'double',disp:getVal('ed-disp'),status:getVal('ed-status'),
     ready_qty:parseFloat(getVal('ed-rqty'))||0,
     dispatched_qty:parseFloat(getVal('ed-dqty'))||0
@@ -1783,7 +1834,7 @@ async function deleteFromDrawer(){
 async function duplicateOrder(){
   if(!editId) return;
   const src=orders.find(o=>o.id===editId); if(!src) return;
-  const row={date:today(),no:'',cust:src.cust,prod:src.prod,ply:src.ply,l:src.l,w:src.w,h:src.h,su:src.su||'in',qty:src.qty,joint:src.joint||'double',disp:'',status:'Pending'};
+  const row={date:today(),no:'',cust:src.cust,prod:src.prod,ply:src.ply,l:src.l,w:src.w,h:src.h,su:src.su||'in',qty:src.qty,joint:src.joint||'double',disp:'',status:'Pending',description:src.description||null};
   try{
     const res=await db.insert('orders',row);
     if(!res || !res[0]) throw new Error('Insert failed');
