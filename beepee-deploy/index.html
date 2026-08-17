@@ -1061,9 +1061,10 @@ table.t{width:100%;border-collapse:collapse}
     <div class="warn-txt" id="ed-dqty-warn" style="display:none;color:var(--red)">⚠ Ready + Dispatched cannot exceed Total qty</div>
     <div class="warn-txt" id="ed-auto-hint" style="display:none;color:var(--green)">✓ Everything shipped — status will move to Dispatched on save</div>
   </div>
-  <div class="drawer-foot">
-    <button class="btn btn-g btn-full" onclick="deleteFromDrawer()" style="flex:0 0 auto;width:auto;padding:0 16px;color:var(--red);border-color:var(--red)">Delete</button>
-    <button class="btn btn-g btn-full" onclick="duplicateOrder()" style="flex:0 0 auto;width:auto;padding:0 16px;color:var(--blue);border-color:var(--blue)">Duplicate</button>
+  <div class="drawer-foot" style="flex-wrap:wrap;gap:8px">
+    <button class="btn btn-g" onclick="addProductToOrder()" style="flex:1 1 100%;color:var(--accent);border-color:var(--accent)">+ Add product</button>
+    <button class="btn btn-g" onclick="deleteFromDrawer()" style="flex:0 0 auto;padding:0 16px;color:var(--red);border-color:var(--red)">Delete</button>
+    <button class="btn btn-g" onclick="duplicateOrder()" style="flex:0 0 auto;padding:0 16px;color:var(--blue);border-color:var(--blue)">Duplicate</button>
     <button class="btn btn-p btn-full" onclick="saveDrawer()">Save changes</button>
   </div>
 </div>
@@ -1844,6 +1845,23 @@ async function duplicateOrder(){
     renderOrders(); renderWorkStatus(); renderProductData();
   }catch(e){
     showToast('Duplicate failed — try again','err');
+  }
+}
+
+async function addProductToOrder(){
+  if(!editId) return;
+  const src=orders.find(o=>o.id===editId); if(!src) return;
+  const row={date:src.date,no:src.no||'',cust:src.cust,prod:'',ply:'',l:0,w:0,h:0,su:src.su||'in',qty:0,joint:'double',disp:src.disp||'',status:'Pending',ready_qty:0,dispatched_qty:0,description:null};
+  try{
+    const res=await db.insert('orders',row);
+    if(!res || !res[0]) throw new Error('Insert failed');
+    orders.unshift(res[0]);
+    closeDrawer();
+    showToast('New product row added — fill in the details','ok');
+    renderOrders(); renderWorkStatus(); renderProductData();
+    openDrawer(res[0].id);
+  }catch(e){
+    showToast('Add failed — try again','err');
   }
 }
 
