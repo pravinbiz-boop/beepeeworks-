@@ -300,6 +300,87 @@ table.t{width:100%;border-collapse:collapse}
 .orow-c2{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .orow-c3{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 
+/* ── ORDERS · desktop table + inline editor (redesign) ── */
+.ol-tablewrap{border:var(--bw) solid var(--line);border-radius:var(--r2);background:var(--surface);overflow-x:auto;margin-top:2px}
+.ol-table{width:100%;border-collapse:collapse;table-layout:fixed;font-family:'DM Sans',sans-serif}
+.ol-table thead th{position:sticky;top:0;z-index:2;background:var(--s2);text-align:left;padding:8px 10px;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);border-bottom:var(--bw) solid var(--line2);vertical-align:top}
+.ol-table thead th.num{text-align:right}
+.ol-th-sel{margin-top:5px;width:100%;height:28px;font-size:11px;padding:0 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink2);font-family:inherit;font-weight:500;text-transform:none;letter-spacing:0}
+.ol-table tbody td{padding:9px 10px;border-bottom:var(--bw) solid var(--line);vertical-align:middle;font-size:12.5px;color:var(--ink2)}
+.ol-row:hover{background:var(--s2)}
+.ol-td-cust{font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ol-td-ono{color:var(--ink3);font-size:12px}
+.ol-td-mut{color:var(--ink3)}
+.ol-td-num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink)}
+.ol-cust-lnk{cursor:pointer}
+.ol-cust-lnk:hover{text-decoration:underline;text-underline-offset:2px}
+
+/* status pill — shared table + card */
+.ol-pill{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;min-width:0}
+.ol-pill-txt{font-weight:700;font-size:12px;white-space:nowrap}
+.ol-pill-txt.pn{color:var(--stat-pend)}
+.ol-pill-txt.rd{color:#B45309}
+.ol-pill-txt.ds{color:var(--stat-disp)}
+.ol-bar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--s2);gap:1px;flex:1;min-width:40px}
+.ol-bar>span{display:block}
+.ol-bar .p{background:var(--stat-pend)}
+.ol-bar .r{background:var(--stat-ready)}
+.ol-bar .d{background:var(--stat-disp)}
+
+/* due */
+.ol-due{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.ol-due-date{color:var(--ink3);font-size:11px;font-variant-numeric:tabular-nums}
+.ol-due-lbl{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;white-space:nowrap}
+.ol-due-lbl.urgent{background:var(--red-bg);color:var(--red)}
+.ol-due-lbl.soon{background:var(--amber-bg);color:var(--amber)}
+.ol-due-lbl.normal{background:var(--s2);color:var(--ink3)}
+.ol-due-lbl.none{color:var(--muted);background:transparent;padding:0}
+
+/* inline editor — shared */
+.ol-editrow{display:none}
+.ol-editrow.open{display:table-row}
+.ol-editrow>td{background:var(--s2);padding:0;border-bottom:var(--bw) solid var(--line)}
+.ol-editor{padding:12px 14px}
+.ol-ed-row{display:flex;gap:8px;margin-bottom:8px}
+.ol-ed-chip{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.ol-ed-chip.p{border-color:rgba(220,38,38,.35)}
+.ol-ed-chip.r{border-color:rgba(245,158,11,.45)}
+.ol-ed-chip.d{border-color:rgba(22,163,74,.35)}
+.ol-ed-chip label{display:block;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
+.ol-ed-chip.p label{color:var(--stat-pend)}
+.ol-ed-chip.r label{color:#B45309}
+.ol-ed-chip.d label{color:var(--stat-disp)}
+.ol-qty{width:100%;border:none;padding:0;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.ol-qty::-webkit-inner-spin-button,.ol-qty::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.ol-qty[type=number]{-moz-appearance:textfield}
+.ol-notes{width:100%;margin-bottom:8px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:12.5px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink)}
+.ol-ed-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ol-sum{font-size:11px;font-weight:600;color:var(--ink3);font-variant-numeric:tabular-nums}
+.ol-sum.bad{color:var(--red)}
+.ol-save{background:var(--accent);color:#fff;border:0;height:32px;padding:0 18px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s}
+.ol-save:disabled{opacity:.45;cursor:not-allowed}
+
+/* mobile cards */
+.ol-cards{display:none;flex-direction:column;gap:6px;margin-top:10px}
+.ol-card{position:relative;background:var(--surface);border:var(--bw) solid var(--line);border-radius:var(--r2);padding:11px 12px 11px 16px;overflow:hidden}
+.ol-card.pn{background:var(--red-bg);border-color:rgba(185,28,28,.08)}
+.ol-card.rd{background:var(--amber-bg);border-color:rgba(180,83,9,.08)}
+.ol-card.ds{background:var(--green-bg);border-color:rgba(21,128,61,.08)}
+.ol-card .ostripe{position:absolute;left:0;top:0;bottom:0;width:4px}
+.ol-chev{position:absolute;top:7px;right:7px;border:0;background:transparent;color:var(--ink3);font-size:14px;line-height:1;cursor:pointer;padding:4px}
+.ol-c-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding-right:22px}
+.ol-c-cust{font-weight:700;font-size:14px;color:var(--ink);word-break:break-word}
+.ol-c-ono{color:var(--ink3);font-size:11px;white-space:nowrap;flex-shrink:0}
+.ol-c-status{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:5px}
+.ol-c-attr{color:var(--ink);font-size:12px;margin-top:5px;font-weight:600;word-break:break-word}
+.ol-c-editor{display:none;margin-top:10px}
+.ol-c-editor.open{display:block}
+
+@media(max-width:720px){
+  .ol-tablewrap{display:none}
+  .ol-cards{display:flex}
+}
+
 /* ── FILTER BAR ── */
 .fbar{display:flex;gap:6px;padding:8px 0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .fbar::-webkit-scrollbar{display:none}
@@ -671,16 +752,50 @@ table.t{width:100%;border-collapse:collapse}
       </div>
     </div>
 
-    <!-- Filter pills -->
-    <div class="fbar" id="ol-filters"></div>
-
-    <!-- Search -->
-    <div style="margin-bottom:12px">
-      <input class="inp" id="ol-search" placeholder="Search customer, order no, size, product, PLY…" oninput="renderOrders()">
+    <!-- Search + clear -->
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input class="inp" id="ol-search" style="flex:1" placeholder="Search customer, order no, size, product, PLY…" oninput="olPage=1;renderOrders()">
+      <button class="btn btn-g" id="ol-clear" onclick="olClearFilters()" style="flex-shrink:0">Clear all</button>
     </div>
 
-    <!-- Saved order cards -->
-    <div class="order-list" id="ol-cards"></div>
+    <!-- DESKTOP: table -->
+    <div class="ol-tablewrap">
+      <table class="ol-table">
+        <colgroup>
+          <col style="width:158px"><col style="width:190px"><col style="width:108px">
+          <col style="width:118px"><col style="width:128px"><col style="width:56px"><col style="width:120px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Status
+              <select class="ol-th-sel" id="olf-status" onchange="olApplyFilters()">
+                <option value="">All</option><option value="pending">Pending</option>
+                <option value="ready">Ready</option><option value="complete">Complete</option>
+              </select>
+            </th>
+            <th>Customer
+              <select class="ol-th-sel" id="olf-cust" onchange="olApplyFilters()"><option value="">All</option></select>
+            </th>
+            <th>Order no.</th>
+            <th>Product
+              <select class="ol-th-sel" id="olf-prod" onchange="olApplyFilters()"><option value="">All</option></select>
+            </th>
+            <th>Size</th>
+            <th class="num">Nos</th>
+            <th>Due
+              <select class="ol-th-sel" id="olf-due" onchange="olApplyFilters()">
+                <option value="">All</option><option value="urgent">&lt; 3 days</option>
+                <option value="soon">&lt; 7 days</option><option value="none">No due</option>
+              </select>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="ol-tbody"></tbody>
+      </table>
+    </div>
+
+    <!-- MOBILE: cards -->
+    <div class="ol-cards" id="ol-cards"></div>
     <div class="pd-pagination" id="ol-pagination" style="display:none"></div>
   </section>
 
@@ -1656,30 +1771,207 @@ function orderMatchesQuery(o,q){
       || String(o.ply||'').toLowerCase().includes(q)
       || (o.description||'').toLowerCase().includes(q);
 }
-function renderOrders(){
-  const q=(document.getElementById('ol-search')?.value||'').toLowerCase().trim();
-  // Pool the search applies to — respects the active status filter (unless 'All')
-  const dSt=x=>deriveStatus(x.qty,x.ready_qty,x.dispatched_qty);
-  const pool=oSF==='All'?orders:orders.filter(x=>dSt(x)===oSF);
-  let list=q?pool.filter(x=>orderMatchesQuery(x,q)):pool;
+// ── ORDERS redesign · derived helpers (display + filter share one logic) ──
+// Bucket split — pending is always derived (no pending column stored).
+function olBuckets(o){
+  const total=Number(o.qty)||0;
+  const r=Math.max(0,Number(o.ready_qty)||0);
+  const d=Math.max(0,Number(o.dispatched_qty)||0);
+  return {total,r,d,p:Math.max(0,total-r-d)};
+}
+// Headline status — pending outranks everything (matches the reference).
+function olStatus(o){
+  const {total,r,d,p}=olBuckets(o);
+  if(p>0)                 return {key:'pending', text:fmt(p)+' pending', cls:'pn'};
+  if(total>0 && d>=total) return {key:'complete',text:'Complete',        cls:'ds'};
+  if(r>0)                 return {key:'ready',   text:fmt(r)+' ready',    cls:'rd'};
+  return {key:'complete',text:'Complete',cls:'ds'};
+}
+function olDaysLeft(o){
+  if(!o.disp) return null;
+  return Math.round((new Date(o.disp+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5);
+}
+// Due label — only meaningful while something is still pending.
+function olDue(o){
+  const {p}=olBuckets(o);
+  if(p===0) return {text:'-',cls:'none',date:''};
+  const dl=olDaysLeft(o);
+  if(dl===null) return {text:'No date',cls:'none',date:''};
+  const date=ddmm(o.disp);
+  if(dl<0)   return {text:'Overdue',  cls:'urgent',date};
+  if(dl===0) return {text:'Due today',cls:'urgent',date};
+  if(dl<3)   return {text:dl+'d left',cls:'urgent',date};
+  if(dl<7)   return {text:dl+'d left',cls:'soon',  date};
+  return {text:dl+'d left',cls:'normal',date};
+}
+function olSize(o){
+  return esc(String(o.l||0))+' x '+esc(String(o.w||0))+(o.prod==='Box'?' x '+esc(String(o.h||0)):'')+' '+(o.su||'in');
+}
+function olBar(o){
+  const {total,r,d,p}=olBuckets(o);
+  const t=total||1;
+  const seg=(c,v)=>v>0?'<span class="'+c+'" style="flex:'+(v/t).toFixed(3)+'"></span>':'';
+  return '<div class="ol-bar" aria-label="'+fmt(p)+' pending, '+fmt(r)+' ready, '+fmt(d)+' dispatched">'+seg('p',p)+seg('r',r)+seg('d',d)+'</div>';
+}
+function olDueHTML(du){
+  return du.cls==='none'
+    ? '<span class="ol-due-lbl none">'+du.text+'</span>'
+    : '<span class="ol-due"><span class="ol-due-date">'+du.date+'</span><span class="ol-due-lbl '+du.cls+'">'+du.text+'</span></span>';
+}
+// Shared inline editor markup (used by both table row + mobile card).
+function olEditorHTML(o){
+  const {total,r,d,p}=olBuckets(o);
+  const chip=(k,lbl,cls,val)=>'<div class="ol-ed-chip '+cls+'"><label>'+lbl+'</label>'
+    +'<input class="ol-qty" type="number" min="0" inputmode="numeric" data-k="'+k+'" value="'+val+'" oninput="olRecompute(this)"></div>';
+  return '<div class="ol-editor" data-total="'+total+'">'
+    +'<div class="ol-ed-row">'+chip('pending','Pending','p',p)+chip('ready','Ready','r',r)+chip('dispatched','Dispatched','d',d)+'</div>'
+    +'<input class="ol-notes" type="text" data-k="notes" value="'+esc(o.description||'')+'" placeholder="Desc.">'
+    +'<div class="ol-ed-foot"><span class="ol-sum">= '+fmt(total)+'/'+fmt(total)+'</span>'
+    +'<button class="ol-save" onclick="olSave(this,'+o.id+')">Save</button></div>'
+  +'</div>';
+}
+// Desktop table row (main + hidden editor row).
+function olRowHTML(o){
+  const st=olStatus(o), du=olDue(o);
+  return '<tr class="ol-row" data-oid="'+o.id+'">'
+    +'<td><div class="ol-pill" onclick="olToggleEditor(this)"><span class="ol-pill-txt '+st.cls+'">'+st.text+'</span>'+olBar(o)+'</div></td>'
+    +'<td class="ol-td-cust"><span class="ol-cust-lnk" onclick="openDrawer('+o.id+')">'+esc(o.cust||'—')+'</span></td>'
+    +'<td class="ol-td-ono">'+esc(o.no||'')+'</td>'
+    +'<td>'+esc(o.prod||'—')+'</td>'
+    +'<td class="ol-td-mut">'+olSize(o)+'</td>'
+    +'<td class="ol-td-num">'+fmt(Number(o.qty)||0)+'</td>'
+    +'<td>'+olDueHTML(du)+'</td>'
+  +'</tr>'
+  +'<tr class="ol-editrow"><td colspan="7"></td></tr>';
+}
+// Mobile card.
+function olCardHTML(o){
+  const st=olStatus(o), du=olDue(o);
+  const detail=esc(String(o.ply||'?'))+' PLY - '+esc(o.prod||'—')+' - '+olSize(o)+' - '+fmt(Number(o.qty)||0)+' Nos';
+  return '<div class="ol-card '+st.cls+'" data-oid="'+o.id+'">'
+    +'<div class="ostripe '+st.cls+'"></div>'
+    +'<button class="ol-chev" aria-label="Toggle editor" onclick="olToggleEditor(this)">&#9662;</button>'
+    +'<div class="ol-c-head"><span class="ol-c-cust ol-cust-lnk" onclick="openDrawer('+o.id+')">'+esc(o.cust||'—')+'</span>'+(o.no?'<span class="ol-c-ono">'+esc(o.no)+'</span>':'')+'</div>'
+    +'<div class="ol-c-status"><span class="ol-pill-txt '+st.cls+'" style="cursor:pointer" onclick="olToggleEditor(this)">'+st.text+'</span>'+olDueHTML(du)+'</div>'
+    +'<div class="ol-c-attr">'+detail+'</div>'
+    +'<div onclick="olToggleEditor(this)" style="cursor:pointer;margin-top:8px">'+olBar(o)+'</div>'
+    +'<div class="ol-c-editor"></div>'
+  +'</div>';
+}
+// Expand/collapse the inline editor for whichever surface the click came from.
+// Editors are built lazily on first open (keeps the initial list DOM light).
+function olToggleEditor(el){
+  const row=el.closest('tr.ol-row');
+  if(row){
+    const er=row.nextElementSibling;
+    if(!er||!er.classList.contains('ol-editrow')) return;
+    const cell=er.firstElementChild;
+    const open=!er.classList.contains('open');
+    if(open && !cell.firstChild){
+      const o=orders.find(x=>x.id===Number(row.dataset.oid));
+      if(o) cell.innerHTML=olEditorHTML(o);
+    }
+    er.classList.toggle('open',open);
+    if(open){const inp=er.querySelector('.ol-qty'); if(inp){inp.focus();inp.select?.();}}
+    return;
+  }
+  const card=el.closest('.ol-card');
+  if(card){
+    const ed=card.querySelector('.ol-c-editor');
+    const open=!ed.classList.contains('open');
+    if(open && !ed.firstChild){
+      const o=orders.find(x=>x.id===Number(card.dataset.oid));
+      if(o) ed.innerHTML=olEditorHTML(o);
+    }
+    ed.classList.toggle('open',open);
+    const chev=card.querySelector('.ol-chev');
+    if(chev) chev.innerHTML=open?'&#9652;':'&#9662;';
+    if(open){const inp=ed.querySelector('.ol-qty'); if(inp){inp.focus();inp.select?.();}}
+  }
+}
+// Live allocation check — Save stays disabled until P+R+D === total.
+function olRecompute(inp){
+  const ed=inp.closest('.ol-editor'); if(!ed) return;
+  const total=Number(ed.dataset.total)||0;
+  let sum=0;
+  ed.querySelectorAll('.ol-qty').forEach(i=>sum+=Math.max(0,parseInt(i.value||'0',10)||0));
+  const chk=ed.querySelector('.ol-sum');
+  chk.textContent='= '+fmt(sum)+'/'+fmt(total);
+  const bad=sum!==total;
+  chk.classList.toggle('bad',bad);
+  ed.querySelector('.ol-save').disabled=bad;
+}
+// Save via the existing optimistic Supabase path (tcPatchOrder): stores the
+// ready/dispatched buckets + notes, re-derives status, rolls back on failure.
+async function olSave(btn,id){
+  const ed=btn.closest('.ol-editor'); if(!ed) return;
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  const total=Number(o.qty)||0;
+  const g=k=>Math.max(0,parseInt(ed.querySelector('.ol-qty[data-k="'+k+'"]').value||'0',10)||0);
+  const p=g('pending'), r=g('ready'), d=g('dispatched');
+  if(p+r+d!==total){showToast('Allocation must total '+fmt(total),'err');return;}
+  const notes=ed.querySelector('input[data-k="notes"]').value.trim();
+  await tcPatchOrder(id,{ready_qty:r,dispatched_qty:d,description:notes,updated_at:new Date().toISOString()},'Saved · '+(o.no||o.cust||'order'));
+}
 
-  // Most recently moved (status updated) first — same rule for every pill
+// Filter state + option sync (header dropdowns; selection preserved across renders).
+let olFStatus='', olFCust='', olFProd='', olFDue='';
+function olApplyFilters(){
+  olFStatus=document.getElementById('olf-status').value;
+  olFCust=document.getElementById('olf-cust').value;
+  olFProd=document.getElementById('olf-prod').value;
+  olFDue=document.getElementById('olf-due').value;
+  olPage=1;renderOrders();
+}
+function olAnyFilter(){
+  const sb=document.getElementById('ol-search');
+  return !!(olFStatus||olFCust||olFProd||olFDue||(sb&&sb.value.trim()));
+}
+// Reset every header filter + the search box.
+function olClearFilters(){
+  olFStatus=olFCust=olFProd=olFDue='';
+  ['olf-status','olf-cust','olf-prod','olf-due'].forEach(id=>{const s=document.getElementById(id); if(s) s.value='';});
+  const sb=document.getElementById('ol-search'); if(sb) sb.value='';
+  olPage=1;renderOrders();
+}
+function olSyncFilterOptions(){
+  const cs=document.getElementById('olf-cust'), ps=document.getElementById('olf-prod');
+  if(!cs||!ps) return;
+  const custs=[...new Set(orders.map(o=>o.cust).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const prods=[...new Set(orders.map(o=>o.prod).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const fill=(sel,vals,cur)=>{sel.innerHTML='<option value="">All</option>'+vals.map(v=>'<option value="'+esc(v)+'"'+(v===cur?' selected':'')+'>'+esc(v)+'</option>').join('');};
+  fill(cs,custs,olFCust); fill(ps,prods,olFProd);
+}
+function olPasses(o){
+  const q=(document.getElementById('ol-search')?.value||'').toLowerCase().trim();
+  if(olFStatus && olStatus(o).key!==olFStatus) return false;
+  if(olFCust && (o.cust||'')!==olFCust) return false;
+  if(olFProd && (o.prod||'')!==olFProd) return false;
+  if(olFDue){
+    const {p}=olBuckets(o); const dl=olDaysLeft(o);
+    if(olFDue==='urgent' && !(p>0 && dl!==null && dl<3)) return false;
+    if(olFDue==='soon'   && !(p>0 && dl!==null && dl<7)) return false;
+    if(olFDue==='none'   && !(p===0 || dl===null))       return false;
+  }
+  if(q && !orderMatchesQuery(o,q)) return false;
+  return true;
+}
+function renderOrders(){
+  olSyncFilterOptions();
+  const clr=document.getElementById('ol-clear');
+  if(clr){const on=olAnyFilter(); clr.disabled=!on; clr.style.opacity=on?'1':'.45';}
+  const list=orders.filter(olPasses);
+  // Recently moved first — preserves the app's ordering convention.
   const mv=o=>o.updated_at||o.created_at||'';
   list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
 
-  // Counts reflect the current search — so pill numbers agree with what you see
-  const searchPool=q?orders.filter(x=>orderMatchesQuery(x,q)):orders;
-  const counts={All:searchPool.length};
-  STATUSES.forEach(s=>counts[s]=searchPool.filter(x=>dSt(x)===s).length);
-  document.getElementById('ol-filters').innerHTML=
-    ['All',...STATUSES].map(s=>{
-      const pc=s==='All'?'':' pill-'+skCls(s);
-      return '<button class="pill'+pc+(oSF===s?' active':'')+'" onclick="olFilter(\''+s+'\')"><span class="pill-edge"></span><span class="pill-lbl">'+s+'</span><span class="pill-count">'+(counts[s]||0)+'</span></button>';
-    }).join('');
-
+  const tbody=document.getElementById('ol-tbody');
+  const cards=document.getElementById('ol-cards');
   if(!list.length){
-    const msg=q?'No orders match your search.':orders.length?(oSF==='All'?'No orders.':'No '+oSF+' orders.'):'No orders yet. Tap + New to add one.';
-    document.getElementById('ol-cards').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+'</div>';
+    const q=(document.getElementById('ol-search')?.value||'').trim();
+    const msg=q?'No orders match your search.':(orders.length?'No orders match the filters.':'No orders yet. Tap + New to add one.');
+    if(tbody) tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted);font-size:13px">'+esc(msg)+'</td></tr>';
+    if(cards) cards.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+'</div>';
     document.getElementById('ol-pagination').style.display='none';
     return;
   }
@@ -1688,7 +1980,8 @@ function renderOrders(){
   if(olPage>totalPages) olPage=totalPages;
   const start=(olPage-1)*PAGE_SIZE;
   const page=list.slice(start,start+PAGE_SIZE);
-  document.getElementById('ol-cards').innerHTML=page.map(o=>orderCardHTML(o)).join('');
+  if(tbody) tbody.innerHTML=page.map(olRowHTML).join('');
+  if(cards) cards.innerHTML=page.map(olCardHTML).join('');
   const pgEl=document.getElementById('ol-pagination');
   if(totalPages>1){
     pgEl.style.display='flex';
@@ -1697,7 +1990,6 @@ function renderOrders(){
   } else pgEl.style.display='none';
 }
 function olGoPage(p){olPage=p;renderOrders();window.scrollTo({top:0,behavior:'smooth'});}
-function olFilter(s){oSF=s;olPage=1;renderOrders();}
 
 // ── DRAWER ───────────────────────────────────────────────
 function toggleH(prefix){
