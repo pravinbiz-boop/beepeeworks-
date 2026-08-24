@@ -300,20 +300,33 @@ table.t{width:100%;border-collapse:collapse}
 .orow-c2{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .orow-c3{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 
-/* ── ORDERS · desktop table + inline editor (redesign) ── */
-.ol-tablewrap{border:var(--bw) solid var(--line);border-radius:var(--r2);background:var(--surface);overflow-x:auto;margin-top:2px}
+/* ── ORDERS · toolbar + status pills + clean 4-column table ── */
+.ol-toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+.ol-toolbar .ol-search{flex:1 1 260px;min-width:200px}
+.ol-f-sel{height:38px;font-size:12.5px;padding:0 10px;min-width:120px;color:var(--ink2);background:var(--surface);border:1px solid var(--line);border-radius:8px;font-family:inherit;flex:0 0 auto}
+.ol-clear-btn{flex-shrink:0}
+.ol-status-pills{padding:0 0 12px;margin-bottom:0}
+.ol-tablewrap{border:var(--bw) solid var(--line);border-radius:var(--r2);background:var(--surface);overflow:hidden;box-shadow:var(--shadow-sm)}
 .ol-table{width:100%;border-collapse:collapse;table-layout:fixed;font-family:'DM Sans',sans-serif}
-.ol-table thead th{position:sticky;top:0;z-index:2;background:var(--s2);text-align:left;padding:8px 10px;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3);border-bottom:var(--bw) solid var(--line2);vertical-align:top}
-.ol-table thead th.num{text-align:right}
-.ol-th-sel{margin-top:5px;width:100%;height:28px;font-size:11px;padding:0 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink2);font-family:inherit;font-weight:500;text-transform:none;letter-spacing:0}
-.ol-table tbody td{padding:9px 10px;border-bottom:var(--bw) solid var(--line);vertical-align:middle;font-size:12.5px;color:var(--ink2)}
+.ol-table thead th{position:sticky;top:0;z-index:2;background:var(--s2);text-align:left;padding:11px 14px;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);border-bottom:var(--bw) solid var(--line2)}
+.ol-th-due{text-align:left}
+.ol-sort-h{display:inline-flex;align-items:center;gap:5px;cursor:pointer;user-select:none;transition:color .15s;padding:3px 6px;margin:-3px -6px;border-radius:6px}
+.ol-sort-h:hover{color:var(--ink);background:rgba(0,0,0,.03)}
+.ol-sort-arr{font-size:12px;color:var(--muted);font-weight:700;transition:color .15s}
+.ol-sort-h:hover .ol-sort-arr,.ol-sort-arr.on{color:var(--accent)}
+.ol-table tbody td{padding:14px;border-bottom:var(--bw) solid var(--line);vertical-align:middle;font-size:12.5px;color:var(--ink2);overflow:hidden}
+.ol-table tbody tr:last-child td{border-bottom:0}
+.ol-row{transition:background .12s}
 .ol-row:hover{background:var(--s2)}
-.ol-td-cust{font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ol-td-ono{color:var(--ink3);font-size:12px}
-.ol-td-mut{color:var(--ink3)}
-.ol-td-num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink)}
+/* Stacked-cell content: primary line (dark, bold) + subtext (muted) */
+.ol-c-main{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35}
+.ol-c-sub{font-size:11.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;margin-top:3px;font-variant-numeric:tabular-nums}
+.ol-c-status-cell{padding-right:16px}
+.ol-c-order .ol-c-main{color:var(--ink);cursor:pointer}
+.ol-c-order .ol-c-main:hover{text-decoration:underline;text-underline-offset:2px}
+.ol-c-due-date{font-size:13px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.35}
+.ol-c-due-lbl{margin-top:4px}
 .ol-cust-lnk{cursor:pointer}
-.ol-cust-lnk:hover{text-decoration:underline;text-underline-offset:2px}
 
 /* status pill — shared table + card */
 .ol-pill{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;min-width:0}
@@ -336,29 +349,42 @@ table.t{width:100%;border-collapse:collapse}
 .ol-due-lbl.normal{background:var(--s2);color:var(--ink3)}
 .ol-due-lbl.none{color:var(--muted);background:transparent;padding:0}
 
-/* inline editor — shared */
+/* inline editor — incremental (mirrors Status page pattern) */
 .ol-editrow{display:none}
 .ol-editrow.open{display:table-row}
 .ol-editrow>td{background:var(--s2);padding:0;border-bottom:var(--bw) solid var(--line)}
-.ol-editor{padding:12px 14px}
-.ol-ed-row{display:flex;gap:8px;margin-bottom:8px}
-.ol-ed-chip{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
-.ol-ed-chip.p{border-color:rgba(220,38,38,.35)}
-.ol-ed-chip.r{border-color:rgba(245,158,11,.45)}
-.ol-ed-chip.d{border-color:rgba(22,163,74,.35)}
-.ol-ed-chip label{display:block;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
-.ol-ed-chip.p label{color:var(--stat-pend)}
-.ol-ed-chip.r label{color:#B45309}
-.ol-ed-chip.d label{color:var(--stat-disp)}
-.ol-qty{width:100%;border:none;padding:0;background:transparent;outline:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
-.ol-qty::-webkit-inner-spin-button,.ol-qty::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
-.ol-qty[type=number]{-moz-appearance:textfield}
-.ol-notes{width:100%;margin-bottom:8px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:12.5px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink)}
-.ol-ed-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.ol-sum{font-size:11px;font-weight:600;color:var(--ink3);font-variant-numeric:tabular-nums}
-.ol-sum.bad{color:var(--red)}
-.ol-save{background:var(--accent);color:#fff;border:0;height:32px;padding:0 18px;border-radius:8px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s}
-.ol-save:disabled{opacity:.45;cursor:not-allowed}
+.ol-editor{padding:10px 14px 12px}
+.ol-ed-readout{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:'DM Sans',sans-serif;font-size:11.5px;color:var(--ink3);margin-bottom:8px;font-variant-numeric:tabular-nums}
+.ol-ed-num{display:inline-flex;align-items:center;gap:5px}
+.ol-ed-num::before{content:"";width:7px;height:7px;border-radius:2px;flex-shrink:0}
+.ol-ed-num.p::before{background:var(--stat-pend)}
+.ol-ed-num.r::before{background:var(--stat-ready)}
+.ol-ed-num.d::before{background:var(--stat-disp)}
+.ol-ed-num.t::before{display:none}
+.ol-ed-num.t{color:var(--ink2);margin-left:2px}
+.ol-ed-num b{color:var(--ink);font-weight:700;font-size:12.5px}
+.ol-ed-sep{color:var(--line2,var(--line));font-weight:400}
+.ol-ed-tabs{display:flex;gap:8px}
+.ol-ed-tab{flex:1;height:32px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:all .15s}
+.ol-ed-tab .ol-ed-plus{font-size:13px;font-weight:700}
+.ol-ed-tab:disabled{opacity:.4;cursor:not-allowed}
+.ol-ed-tab[data-tab="ready"]:not(.on):not(:disabled):hover{background:#fef9c3;border-color:#F59E0B;color:#92400e}
+.ol-ed-tab[data-tab="dispatch"]:not(.on):not(:disabled):hover{background:#dcfce7;border-color:#16A34A;color:#166534}
+.ol-ed-tab[data-tab="ready"].on{background:var(--stat-ready);color:#1F1611;border-color:var(--stat-ready)}
+.ol-ed-tab[data-tab="dispatch"].on{background:var(--stat-disp);color:#fff;border-color:var(--stat-disp)}
+.ol-ed-panel{display:flex;align-items:center;gap:10px;padding:10px 12px;margin-top:8px;background:var(--surface);border:1px solid var(--line);border-radius:8px;flex-wrap:wrap}
+.ol-ed-lbl{font-family:'DM Sans',sans-serif;font-size:11.5px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em}
+.ol-ed-inp{width:80px;height:34px;padding:0 10px;border:1px solid var(--line);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;text-align:right;background:var(--surface);outline:none}
+.ol-ed-inp:focus{border-color:var(--accent)}
+.ol-ed-inp::-webkit-inner-spin-button,.ol-ed-inp::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.ol-ed-inp[type=number]{-moz-appearance:textfield}
+.ol-ed-unit{font-size:11px;color:var(--ink3);font-weight:600}
+.ol-ed-unit.r{color:var(--amber)}
+.ol-ed-unit.d{color:var(--stat-disp)}
+.ol-ed-save{margin-left:auto;height:32px;padding:0 18px;border:0;border-radius:8px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.ol-ed-save.r{background:var(--stat-ready);color:#1F1611}
+.ol-ed-save.d{background:var(--stat-disp)}
+.ol-ed-save:hover{opacity:.9}
 
 /* mobile cards */
 .ol-cards{display:none;flex-direction:column;gap:6px;margin-top:10px}
@@ -367,8 +393,10 @@ table.t{width:100%;border-collapse:collapse}
 .ol-card.rd{background:var(--amber-bg);border-color:rgba(180,83,9,.08)}
 .ol-card.ds{background:var(--green-bg);border-color:rgba(21,128,61,.08)}
 .ol-card .ostripe{position:absolute;left:0;top:0;bottom:0;width:4px}
-.ol-chev{position:absolute;top:7px;right:7px;border:0;background:transparent;color:var(--ink3);font-size:14px;line-height:1;cursor:pointer;padding:4px}
-.ol-c-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding-right:22px}
+.ol-c-summary{cursor:pointer;transition:opacity .15s}
+.ol-c-summary:hover{opacity:.92}
+.ol-c-bar{margin-top:8px}
+.ol-c-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .ol-c-cust{font-weight:700;font-size:14px;color:var(--ink);word-break:break-word}
 .ol-c-ono{color:var(--ink3);font-size:11px;white-space:nowrap;flex-shrink:0}
 .ol-c-status{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:5px}
@@ -752,42 +780,33 @@ table.t{width:100%;border-collapse:collapse}
       </div>
     </div>
 
-    <!-- Search + clear -->
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      <input class="inp" id="ol-search" style="flex:1" placeholder="Search customer, order no, size, product, PLY…" oninput="olPage=1;renderOrders()">
-      <button class="btn btn-g" id="ol-clear" onclick="olClearFilters()" style="flex-shrink:0">Clear all</button>
+    <!-- Toolbar: search + filter dropdowns + clear -->
+    <div class="ol-toolbar">
+      <input class="inp ol-search" id="ol-search" placeholder="Search customer, order no, size, product, PLY…" oninput="olPage=1;renderOrders()">
+      <select class="sel ol-f-sel" id="olf-cust" onchange="olApplyFilters()" aria-label="Filter by customer"><option value="">All customers</option></select>
+      <select class="sel ol-f-sel" id="olf-prod" onchange="olApplyFilters()" aria-label="Filter by product"><option value="">All products</option></select>
+      <select class="sel ol-f-sel" id="olf-due" onchange="olApplyFilters()" aria-label="Filter by due date">
+        <option value="">Any due</option><option value="urgent">&lt; 3 days</option>
+        <option value="soon">&lt; 7 days</option><option value="none">No due</option>
+      </select>
+      <button class="btn btn-g ol-clear-btn" id="ol-clear" onclick="olClearFilters()">Clear all</button>
     </div>
 
-    <!-- DESKTOP: table -->
+    <!-- Status pills — primary filter axis, with live counts -->
+    <div class="fbar ol-status-pills" id="ol-status-pills"></div>
+
+    <!-- DESKTOP: clean 4-column table -->
     <div class="ol-tablewrap">
       <table class="ol-table">
         <colgroup>
-          <col style="width:158px"><col style="width:190px"><col style="width:108px">
-          <col style="width:118px"><col style="width:128px"><col style="width:56px"><col style="width:120px">
+          <col style="width:210px"><col style="width:auto"><col style="width:auto"><col style="width:150px">
         </colgroup>
         <thead>
           <tr>
-            <th>Status
-              <select class="ol-th-sel" id="olf-status" onchange="olApplyFilters()">
-                <option value="">All</option><option value="pending">Pending</option>
-                <option value="ready">Ready</option><option value="complete">Complete</option>
-              </select>
-            </th>
-            <th>Customer
-              <select class="ol-th-sel" id="olf-cust" onchange="olApplyFilters()"><option value="">All</option></select>
-            </th>
-            <th>Order no.</th>
-            <th>Product
-              <select class="ol-th-sel" id="olf-prod" onchange="olApplyFilters()"><option value="">All</option></select>
-            </th>
-            <th>Size</th>
-            <th class="num">Nos</th>
-            <th>Due
-              <select class="ol-th-sel" id="olf-due" onchange="olApplyFilters()">
-                <option value="">All</option><option value="urgent">&lt; 3 days</option>
-                <option value="soon">&lt; 7 days</option><option value="none">No due</option>
-              </select>
-            </th>
+            <th>Status</th>
+            <th>Order</th>
+            <th>Product</th>
+            <th class="ol-th-due"><span class="ol-sort-h" onclick="olToggleDueSort()" title="Sort by due date">Due <span class="ol-sort-arr" id="ol-sort-arr">↕</span></span></th>
           </tr>
         </thead>
         <tbody id="ol-tbody"></tbody>
@@ -1316,7 +1335,7 @@ const DEF_GSM={'Top Paper':150,'Flute 1':120,'Base 1':150,'Flute 2':120,'Base 2'
 
 // ── STATE ────────────────────────────────────────────────
 let parties=[], orders=[], tasks=[];
-let pf='all', oSF='Pending', tSF='All', tMF='All', pdPage=1;
+let pf='all', tSF='All', tMF='All', pdPage=1;
 let olPage=1, woPage=1;
 // Status page: multi-select filter (all statuses visible by default) + sort control
 let woFilterSet=new Set(['Pending','Ready','Dispatched']);
@@ -1749,6 +1768,7 @@ async function tcCommitDispatch(id){
 // (Both Orders and Status pages use .ocard; Status adds .scard for bar/nums/tabs.)
 function updateOrderCardDom(id){
   const o=orders.find(x=>x.id===id); if(!o) return;
+  // Legacy .ocard (Status page toggle cards + any lingering renderer)
   document.querySelectorAll('.ocard[data-oid="'+id+'"]').forEach(el=>{
     const wrap=document.createElement('div');
     if(el.classList.contains('scard')){
@@ -1756,6 +1776,22 @@ function updateOrderCardDom(id){
     } else {
       wrap.innerHTML=orderCardHTML(o);
     }
+    el.replaceWith(wrap.firstElementChild);
+  });
+  // Orders page desktop row (main + editor row pair)
+  document.querySelectorAll('#ol-tbody tr.ol-row[data-oid="'+id+'"]').forEach(tr=>{
+    const er=tr.nextElementSibling;
+    const tmp=document.createElement('tbody');
+    tmp.innerHTML=olRowHTML(o);
+    // Grab BOTH new rows first — replaceWith mutates tmp.children.
+    const newRow=tmp.children[0], newEr=tmp.children[1];
+    tr.replaceWith(newRow);
+    if(er && er.classList.contains('ol-editrow') && newEr) er.replaceWith(newEr);
+  });
+  // Orders page mobile card
+  document.querySelectorAll('.ol-card[data-oid="'+id+'"]').forEach(el=>{
+    const wrap=document.createElement('div');
+    wrap.innerHTML=olCardHTML(o);
     el.replaceWith(wrap.firstElementChild);
   });
 }
@@ -1818,43 +1854,124 @@ function olDueHTML(du){
     ? '<span class="ol-due-lbl none">'+du.text+'</span>'
     : '<span class="ol-due"><span class="ol-due-date">'+du.date+'</span><span class="ol-due-lbl '+du.cls+'">'+du.text+'</span></span>';
 }
-// Shared inline editor markup (used by both table row + mobile card).
+// Inline editor — mirrors the Status page's incremental flow:
+// two tabs (+ Ready / + Dispatch), each opens a delta input pre-filled
+// with the sensible default (pending → ready, ready → dispatched).
 function olEditorHTML(o){
   const {total,r,d,p}=olBuckets(o);
-  const chip=(k,lbl,cls,val)=>'<div class="ol-ed-chip '+cls+'"><label>'+lbl+'</label>'
-    +'<input class="ol-qty" type="number" min="0" inputmode="numeric" data-k="'+k+'" value="'+val+'" oninput="olRecompute(this)"></div>';
-  return '<div class="ol-editor" data-total="'+total+'">'
-    +'<div class="ol-ed-row">'+chip('pending','Pending','p',p)+chip('ready','Ready','r',r)+chip('dispatched','Dispatched','d',d)+'</div>'
-    +'<input class="ol-notes" type="text" data-k="notes" value="'+esc(o.description||'')+'" placeholder="Desc.">'
-    +'<div class="ol-ed-foot"><span class="ol-sum">= '+fmt(total)+'/'+fmt(total)+'</span>'
-    +'<button class="ol-save" onclick="olSave(this,'+o.id+')">Save</button></div>'
+  const readout=
+    '<span class="ol-ed-num p">Pending <b>'+fmt(p)+'</b></span>'
+    +'<span class="ol-ed-sep">·</span>'
+    +'<span class="ol-ed-num r">Ready <b>'+fmt(r)+'</b></span>'
+    +'<span class="ol-ed-sep">·</span>'
+    +'<span class="ol-ed-num d">Dispatched <b>'+fmt(d)+'</b></span>'
+    +'<span class="ol-ed-sep">·</span>'
+    +'<span class="ol-ed-num t">Total <b>'+fmt(total)+'</b></span>';
+  return '<div class="ol-editor" data-oid="'+o.id+'">'
+    +'<div class="ol-ed-readout">'+readout+'</div>'
+    +'<div class="ol-ed-tabs" role="tablist">'
+      +'<button class="ol-ed-tab" role="tab" data-tab="ready" onclick="olTabToggle(this,\'ready\')" '+(p===0?'disabled title="Nothing pending"':'')+'><span class="ol-ed-plus">+</span>Ready</button>'
+      +'<button class="ol-ed-tab" role="tab" data-tab="dispatch" onclick="olTabToggle(this,\'dispatch\')" '+(r===0?'disabled title="Nothing ready"':'')+'><span class="ol-ed-plus">+</span>Dispatch</button>'
+    +'</div>'
+    +'<div class="ol-ed-panel" style="display:none"></div>'
   +'</div>';
 }
+// Build the tab's panel — pre-fills with the full sensible default so
+// "mark all remaining ready" or "ship the whole ready buffer" is one click.
+function olPanelHTML(id, tabName){
+  const o=orders.find(x=>x.id===id); if(!o) return '';
+  const {r,p}=olBuckets(o);
+  if(tabName==='ready'){
+    return '<span class="ol-ed-lbl">Mark ready</span>'
+      +'<input class="ol-ed-inp" type="number" inputmode="numeric" min="1" max="'+p+'" data-role="delta" value="'+p+'">'
+      +'<span class="ol-ed-unit r">nos</span>'
+      +'<button class="ol-ed-save r" onclick="olCommit(this,'+id+',\'ready\')">Save</button>';
+  }
+  return '<span class="ol-ed-lbl">Dispatch now</span>'
+    +'<input class="ol-ed-inp" type="number" inputmode="numeric" min="1" max="'+r+'" data-role="delta" value="'+r+'">'
+    +'<span class="ol-ed-unit d">nos</span>'
+    +'<button class="ol-ed-save d" onclick="olCommit(this,'+id+',\'dispatch\')">Save</button>';
+}
+// Toggle a tab open/closed (same tab twice = collapse). Scoped to the
+// editor element so multiple open editors don't collide.
+function olTabToggle(btn, tabName){
+  const ed=btn.closest('.ol-editor'); if(!ed) return;
+  const id=Number(ed.dataset.oid);
+  const active=ed.dataset.activeTab||'';
+  const panel=ed.querySelector('.ol-ed-panel');
+  ed.querySelectorAll('.ol-ed-tab').forEach(t=>t.classList.remove('on'));
+  if(active===tabName){
+    ed.dataset.activeTab='';
+    panel.style.display='none';
+    panel.innerHTML='';
+    return;
+  }
+  ed.dataset.activeTab=tabName;
+  btn.classList.add('on');
+  panel.style.display='';
+  panel.innerHTML=olPanelHTML(id,tabName);
+  const inp=panel.querySelector('.ol-ed-inp');
+  if(inp){
+    inp.focus();inp.select?.();
+    inp.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){e.preventDefault();panel.querySelector('.ol-ed-save').click();}
+      if(e.key==='Escape'){e.preventDefault();olTabToggle(btn,tabName);}
+    });
+  }
+}
+// Commit a delta — routes through the same tcPatchOrder used by Status
+// (optimistic + rollback + toast + status re-derived from the buckets).
+async function olCommit(btn, id, tabName){
+  const ed=btn.closest('.ol-editor'); if(!ed) return;
+  const inp=ed.querySelector('.ol-ed-inp'); if(!inp) return;
+  const delta=parseInt(inp.value,10);
+  if(isNaN(delta)||delta<=0){showToast('Enter a positive number','err');inp.focus();return;}
+  const o=orders.find(x=>x.id===id); if(!o) return;
+  const {total,r,d,p}=olBuckets(o);
+  if(tabName==='ready'){
+    if(delta>p){showToast('Only '+fmt(p)+' pending — cannot mark '+fmt(delta)+' ready','err');inp.focus();inp.select();return;}
+    await tcPatchOrder(id,{ready_qty:r+delta,updated_at:new Date().toISOString()},'Ready + '+fmt(delta)+' → '+fmt(r+delta));
+    return;
+  }
+  if(delta>r){showToast('Only '+fmt(r)+' ready — mark more as ready first','err');inp.focus();inp.select();return;}
+  const newD=d+delta;
+  const okMsg=(newD>=total && total>0)?'Fully dispatched · '+fmt(total)+'/'+fmt(total):'Dispatch + '+fmt(delta)+' → '+fmt(newD)+' (Ready now '+fmt(r-delta)+')';
+  await tcPatchOrder(id,{ready_qty:r-delta,dispatched_qty:newD,updated_at:new Date().toISOString()},okMsg);
+}
 // Desktop table row (main + hidden editor row).
+// Four rich cells:
+//   1) Status  — pill (text + segmented bar)
+//   2) Order   — customer (bold) + order no (muted) stacked
+//   3) Product — PLY · Product + Size · Qty stacked
+//   4) Due     — date + urgency label stacked
 function olRowHTML(o){
   const st=olStatus(o), du=olDue(o);
+  const total=Number(o.qty)||0;
+  const specTop=esc(String(o.ply||'?'))+' PLY · '+esc(o.prod||'—');
+  const specSub=olSize(o)+' · '+fmt(total)+' nos';
+  const orderSub=o.no?'<div class="ol-c-sub">'+esc(o.no)+'</div>':'';
+  const dueTop=du.date||(du.cls==='none'?'—':'');
   return '<tr class="ol-row" data-oid="'+o.id+'">'
-    +'<td><div class="ol-pill" onclick="olToggleEditor(this)"><span class="ol-pill-txt '+st.cls+'">'+st.text+'</span>'+olBar(o)+'</div></td>'
-    +'<td class="ol-td-cust"><span class="ol-cust-lnk" onclick="openDrawer('+o.id+')">'+esc(o.cust||'—')+'</span></td>'
-    +'<td class="ol-td-ono">'+esc(o.no||'')+'</td>'
-    +'<td>'+esc(o.prod||'—')+'</td>'
-    +'<td class="ol-td-mut">'+olSize(o)+'</td>'
-    +'<td class="ol-td-num">'+fmt(Number(o.qty)||0)+'</td>'
-    +'<td>'+olDueHTML(du)+'</td>'
+    +'<td class="ol-c-status-cell"><div class="ol-pill" onclick="olToggleEditor(this)"><span class="ol-pill-txt '+st.cls+'">'+st.text+'</span>'+olBar(o)+'</div></td>'
+    +'<td class="ol-c-order"><div class="ol-c-main ol-cust-lnk" onclick="openDrawer('+o.id+')">'+esc(o.cust||'—')+'</div>'+orderSub+'</td>'
+    +'<td class="ol-c-product"><div class="ol-c-main">'+specTop+'</div><div class="ol-c-sub">'+specSub+'</div></td>'
+    +'<td class="ol-c-due"><div class="ol-c-due-date">'+esc(dueTop)+'</div>'+(du.cls==='none'?'':'<div class="ol-c-due-lbl"><span class="ol-due-lbl '+du.cls+'">'+du.text+'</span></div>')+'</td>'
   +'</tr>'
-  +'<tr class="ol-editrow"><td colspan="7"></td></tr>';
+  +'<tr class="ol-editrow"><td colspan="4"></td></tr>';
 }
-// Mobile card.
+// Mobile card — whole summary block is clickable; editor sits alongside as a
+// sibling so its inner clicks (tabs, inputs, buttons) don't re-trigger toggle.
 function olCardHTML(o){
   const st=olStatus(o), du=olDue(o);
   const detail=esc(String(o.ply||'?'))+' PLY - '+esc(o.prod||'—')+' - '+olSize(o)+' - '+fmt(Number(o.qty)||0)+' Nos';
   return '<div class="ol-card '+st.cls+'" data-oid="'+o.id+'">'
     +'<div class="ostripe '+st.cls+'"></div>'
-    +'<button class="ol-chev" aria-label="Toggle editor" onclick="olToggleEditor(this)">&#9662;</button>'
-    +'<div class="ol-c-head"><span class="ol-c-cust ol-cust-lnk" onclick="openDrawer('+o.id+')">'+esc(o.cust||'—')+'</span>'+(o.no?'<span class="ol-c-ono">'+esc(o.no)+'</span>':'')+'</div>'
-    +'<div class="ol-c-status"><span class="ol-pill-txt '+st.cls+'" style="cursor:pointer" onclick="olToggleEditor(this)">'+st.text+'</span>'+olDueHTML(du)+'</div>'
-    +'<div class="ol-c-attr">'+detail+'</div>'
-    +'<div onclick="olToggleEditor(this)" style="cursor:pointer;margin-top:8px">'+olBar(o)+'</div>'
+    +'<div class="ol-c-summary" onclick="olToggleEditor(this)">'
+      +'<div class="ol-c-head"><span class="ol-c-cust ol-cust-lnk" onclick="event.stopPropagation();openDrawer('+o.id+')">'+esc(o.cust||'—')+'</span>'+(o.no?'<span class="ol-c-ono">'+esc(o.no)+'</span>':'')+'</div>'
+      +'<div class="ol-c-status"><span class="ol-pill-txt '+st.cls+'">'+st.text+'</span>'+olDueHTML(du)+'</div>'
+      +'<div class="ol-c-attr">'+detail+'</div>'
+      +'<div class="ol-c-bar">'+olBar(o)+'</div>'
+    +'</div>'
     +'<div class="ol-c-editor"></div>'
   +'</div>';
 }
@@ -1872,7 +1989,6 @@ function olToggleEditor(el){
       if(o) cell.innerHTML=olEditorHTML(o);
     }
     er.classList.toggle('open',open);
-    if(open){const inp=er.querySelector('.ol-qty'); if(inp){inp.focus();inp.select?.();}}
     return;
   }
   const card=el.closest('.ol-card');
@@ -1884,53 +2000,34 @@ function olToggleEditor(el){
       if(o) ed.innerHTML=olEditorHTML(o);
     }
     ed.classList.toggle('open',open);
-    const chev=card.querySelector('.ol-chev');
-    if(chev) chev.innerHTML=open?'&#9652;':'&#9662;';
-    if(open){const inp=ed.querySelector('.ol-qty'); if(inp){inp.focus();inp.select?.();}}
+    card.classList.toggle('open',open);
   }
 }
-// Live allocation check — Save stays disabled until P+R+D === total.
-function olRecompute(inp){
-  const ed=inp.closest('.ol-editor'); if(!ed) return;
-  const total=Number(ed.dataset.total)||0;
-  let sum=0;
-  ed.querySelectorAll('.ol-qty').forEach(i=>sum+=Math.max(0,parseInt(i.value||'0',10)||0));
-  const chk=ed.querySelector('.ol-sum');
-  chk.textContent='= '+fmt(sum)+'/'+fmt(total);
-  const bad=sum!==total;
-  chk.classList.toggle('bad',bad);
-  ed.querySelector('.ol-save').disabled=bad;
-}
-// Save via the existing optimistic Supabase path (tcPatchOrder): stores the
-// ready/dispatched buckets + notes, re-derives status, rolls back on failure.
-async function olSave(btn,id){
-  const ed=btn.closest('.ol-editor'); if(!ed) return;
-  const o=orders.find(x=>x.id===id); if(!o) return;
-  const total=Number(o.qty)||0;
-  const g=k=>Math.max(0,parseInt(ed.querySelector('.ol-qty[data-k="'+k+'"]').value||'0',10)||0);
-  const p=g('pending'), r=g('ready'), d=g('dispatched');
-  if(p+r+d!==total){showToast('Allocation must total '+fmt(total),'err');return;}
-  const notes=ed.querySelector('input[data-k="notes"]').value.trim();
-  await tcPatchOrder(id,{ready_qty:r,dispatched_qty:d,description:notes,updated_at:new Date().toISOString()},'Saved · '+(o.no||o.cust||'order'));
-}
-
 // Filter state + option sync (header dropdowns; selection preserved across renders).
 let olFStatus='', olFCust='', olFProd='', olFDue='';
+// Due-date sort cycle: '' (default = recently moved) → 'asc' (oldest first)
+//                    → 'desc' (latest first) → back to ''.
+let olSortDue='';
+function olToggleDueSort(){
+  olSortDue = olSortDue==='' ? 'asc' : olSortDue==='asc' ? 'desc' : '';
+  olPage=1; renderOrders();
+}
 function olApplyFilters(){
-  olFStatus=document.getElementById('olf-status').value;
   olFCust=document.getElementById('olf-cust').value;
   olFProd=document.getElementById('olf-prod').value;
   olFDue=document.getElementById('olf-due').value;
   olPage=1;renderOrders();
 }
+// Status filter is now a pill row (was a header <select> pre-redesign).
+function olSetStatus(v){olFStatus=v;olPage=1;renderOrders();}
 function olAnyFilter(){
   const sb=document.getElementById('ol-search');
-  return !!(olFStatus||olFCust||olFProd||olFDue||(sb&&sb.value.trim()));
+  return !!(olFStatus||olFCust||olFProd||olFDue||olSortDue||(sb&&sb.value.trim()));
 }
-// Reset every header filter + the search box.
+// Reset all filters + search + due-date sort back to defaults.
 function olClearFilters(){
-  olFStatus=olFCust=olFProd=olFDue='';
-  ['olf-status','olf-cust','olf-prod','olf-due'].forEach(id=>{const s=document.getElementById(id); if(s) s.value='';});
+  olFStatus=olFCust=olFProd=olFDue=olSortDue='';
+  ['olf-cust','olf-prod','olf-due'].forEach(id=>{const s=document.getElementById(id); if(s) s.value='';});
   const sb=document.getElementById('ol-search'); if(sb) sb.value='';
   olPage=1;renderOrders();
 }
@@ -1960,17 +2057,55 @@ function renderOrders(){
   olSyncFilterOptions();
   const clr=document.getElementById('ol-clear');
   if(clr){const on=olAnyFilter(); clr.disabled=!on; clr.style.opacity=on?'1':'.45';}
+
+  // Status pills — counts reflect the OTHER active filters + search
+  // (so counts always match "what filtering by this pill would give you").
+  const pillHost=document.getElementById('ol-status-pills');
+  if(pillHost){
+    const savedStatus=olFStatus; olFStatus='';
+    const basePool=orders.filter(olPasses);
+    olFStatus=savedStatus;
+    const counts={'':basePool.length};
+    ['pending','ready','complete'].forEach(k=>counts[k]=basePool.filter(o=>olStatus(o).key===k).length);
+    const pill=(k,lbl,cls)=>{
+      const on=olFStatus===k;
+      const pc=cls?' pill-'+cls:'';
+      return '<button class="pill'+pc+(on?' active':'')+'" onclick="olSetStatus(\''+k+'\')">'
+        +'<span class="pill-edge"></span><span class="pill-lbl">'+lbl+'</span>'
+        +'<span class="pill-count">'+(counts[k]||0)+'</span></button>';
+    };
+    pillHost.innerHTML=pill('','All','')+pill('pending','Pending','pn')+pill('ready','Ready','rd')+pill('complete','Complete','ds');
+  }
+
   const list=orders.filter(olPasses);
-  // Recently moved first — preserves the app's ordering convention.
   const mv=o=>o.updated_at||o.created_at||'';
-  list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
+  if(olSortDue==='asc' || olSortDue==='desc'){
+    // Due-date sort. Undated orders always go last.
+    const dir = olSortDue==='asc' ? 1 : -1;
+    list.sort((a,b)=>{
+      const ad=a.disp||'', bd=b.disp||'';
+      if(!ad && !bd) return 0;
+      if(!ad) return 1;
+      if(!bd) return -1;
+      return dir * ad.localeCompare(bd);
+    });
+  } else {
+    // Recently moved first — preserves the app's default ordering.
+    list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
+  }
+  // Reflect the sort state on the header arrow.
+  const arr=document.getElementById('ol-sort-arr');
+  if(arr){
+    arr.textContent = olSortDue==='asc' ? '↑' : olSortDue==='desc' ? '↓' : '↕';
+    arr.classList.toggle('on', olSortDue!=='');
+  }
 
   const tbody=document.getElementById('ol-tbody');
   const cards=document.getElementById('ol-cards');
   if(!list.length){
     const q=(document.getElementById('ol-search')?.value||'').trim();
     const msg=q?'No orders match your search.':(orders.length?'No orders match the filters.':'No orders yet. Tap + New to add one.');
-    if(tbody) tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted);font-size:13px">'+esc(msg)+'</td></tr>';
+    if(tbody) tbody.innerHTML='<tr><td colspan="4" style="text-align:center;padding:32px;color:var(--muted);font-size:13px">'+esc(msg)+'</td></tr>';
     if(cards) cards.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+'</div>';
     document.getElementById('ol-pagination').style.display='none';
     return;
