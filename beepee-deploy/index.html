@@ -300,20 +300,45 @@ table.t{width:100%;border-collapse:collapse}
 .orow-c2{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .orow-c3{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 
-/* ── ORDERS · toolbar + status pills + clean 4-column table ── */
-.ol-toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
-.ol-toolbar .ol-search{flex:1 1 260px;min-width:200px}
-.ol-f-sel{height:38px;font-size:12.5px;padding:0 10px;min-width:120px;color:var(--ink2);background:var(--surface);border:1px solid var(--line);border-radius:8px;font-family:inherit;flex:0 0 auto}
+/* ── ORDERS · toolbar + in-thead column-aligned filters + clean 4-column table ── */
+.ol-toolbar{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+.ol-toolbar .ol-search{flex:1;min-width:200px}
 .ol-clear-btn{flex-shrink:0}
-.ol-status-pills{padding:0 0 12px;margin-bottom:0}
+
 .ol-tablewrap{border:var(--bw) solid var(--line);border-radius:var(--r2);background:var(--surface);overflow:hidden;box-shadow:var(--shadow-sm)}
 .ol-table{width:100%;border-collapse:collapse;table-layout:fixed;font-family:'DM Sans',sans-serif}
-.ol-table thead th{position:sticky;top:0;z-index:2;background:var(--s2);text-align:left;padding:11px 14px;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);border-bottom:var(--bw) solid var(--line2)}
+
+/* Filter row inside thead — each cell aligns with its column */
+.ol-filter-row td{background:var(--surface);padding:10px 12px;border-bottom:var(--bw) solid var(--line);vertical-align:middle}
+.ol-col-sel{width:100%;height:34px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink2);font-family:inherit;font-size:12.5px;font-weight:500;cursor:pointer;outline:none;transition:border-color .15s}
+.ol-col-sel:hover{border-color:var(--line2)}
+.ol-col-sel:focus{border-color:var(--accent)}
+
+/* Segmented control — status filter tabs above the Status column.
+   Tabs size to their own content so every label + count stays fully visible. */
+.ol-seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface);height:34px}
+.ol-seg-btn{flex:0 0 auto;border:0;background:transparent;padding:0 12px;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--ink3);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-right:1px solid var(--line);white-space:nowrap}
+.ol-seg-btn:last-child{border-right:0}
+.ol-seg-btn:hover:not(.on){background:var(--s2);color:var(--ink2)}
+.ol-seg-lbl{white-space:nowrap}
+.ol-seg-count{font-size:10px;font-weight:800;background:rgba(0,0,0,.06);color:var(--ink3);padding:1px 5px;border-radius:4px;min-width:18px;text-align:center;font-variant-numeric:tabular-nums;flex-shrink:0}
+/* Active tab — semantic fill matching the status ramp */
+.ol-seg-btn.on[data-key=""]{background:var(--accent);color:#fff}
+.ol-seg-btn.on[data-key="pending"]{background:var(--stat-pend);color:#fff}
+.ol-seg-btn.on[data-key="ready"]{background:var(--stat-ready);color:#1F1611}
+.ol-seg-btn.on[data-key="complete"]{background:var(--stat-disp);color:#fff}
+.ol-seg-btn.on .ol-seg-count{background:rgba(255,255,255,.28);color:#fff}
+.ol-seg-btn.on[data-key="ready"] .ol-seg-count{background:rgba(0,0,0,.22);color:#1F1611}
+
+/* Column headers */
+.ol-header-row th{position:sticky;top:0;z-index:2;background:var(--s2);text-align:left;padding:10px 14px;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);border-bottom:var(--bw) solid var(--line2)}
 .ol-th-due{text-align:left}
-.ol-sort-h{display:inline-flex;align-items:center;gap:5px;cursor:pointer;user-select:none;transition:color .15s;padding:3px 6px;margin:-3px -6px;border-radius:6px}
+.ol-sort-h{display:inline-flex;align-items:center;gap:5px;cursor:pointer;user-select:none;transition:all .15s;padding:3px 6px;margin:-3px -6px;border-radius:6px}
 .ol-sort-h:hover{color:var(--ink);background:rgba(0,0,0,.03)}
 .ol-sort-arr{font-size:12px;color:var(--muted);font-weight:700;transition:color .15s}
 .ol-sort-h:hover .ol-sort-arr,.ol-sort-arr.on{color:var(--accent)}
+
+/* Body cells */
 .ol-table tbody td{padding:14px;border-bottom:var(--bw) solid var(--line);vertical-align:middle;font-size:12.5px;color:var(--ink2);overflow:hidden}
 .ol-table tbody tr:last-child td{border-bottom:0}
 .ol-row{transition:background .12s}
@@ -322,6 +347,10 @@ table.t{width:100%;border-collapse:collapse}
 .ol-c-main{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35}
 .ol-c-sub{font-size:11.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;margin-top:3px;font-variant-numeric:tabular-nums}
 .ol-c-status-cell{padding-right:16px}
+/* Status cell — stack qty+text on top, bar below (desktop only; mobile stays horizontal) */
+.ol-c-status-cell .ol-pill{flex-direction:column;align-items:stretch;gap:8px;cursor:pointer}
+.ol-c-status-cell .ol-pill-txt{font-size:13px}
+.ol-c-status-cell .ol-bar{width:100%;flex:none;height:6px}
 .ol-c-order .ol-c-main{color:var(--ink);cursor:pointer}
 .ol-c-order .ol-c-main:hover{text-decoration:underline;text-underline-offset:2px}
 .ol-c-due-date{font-size:13px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.35}
@@ -780,29 +809,29 @@ table.t{width:100%;border-collapse:collapse}
       </div>
     </div>
 
-    <!-- Toolbar: search + filter dropdowns + clear -->
+    <!-- Toolbar: search + clear -->
     <div class="ol-toolbar">
       <input class="inp ol-search" id="ol-search" placeholder="Search customer, order no, size, product, PLY…" oninput="olPage=1;renderOrders()">
-      <select class="sel ol-f-sel" id="olf-cust" onchange="olApplyFilters()" aria-label="Filter by customer"><option value="">All customers</option></select>
-      <select class="sel ol-f-sel" id="olf-prod" onchange="olApplyFilters()" aria-label="Filter by product"><option value="">All products</option></select>
-      <select class="sel ol-f-sel" id="olf-due" onchange="olApplyFilters()" aria-label="Filter by due date">
-        <option value="">Any due</option><option value="urgent">&lt; 3 days</option>
-        <option value="soon">&lt; 7 days</option><option value="none">No due</option>
-      </select>
       <button class="btn btn-g ol-clear-btn" id="ol-clear" onclick="olClearFilters()">Clear all</button>
     </div>
 
-    <!-- Status pills — primary filter axis, with live counts -->
-    <div class="fbar ol-status-pills" id="ol-status-pills"></div>
-
-    <!-- DESKTOP: clean 4-column table -->
+    <!-- DESKTOP: clean 4-column table with column-aligned filters in thead -->
     <div class="ol-tablewrap">
       <table class="ol-table">
         <colgroup>
-          <col style="width:210px"><col style="width:auto"><col style="width:auto"><col style="width:150px">
+          <col style="width:400px"><col style="width:auto"><col style="width:auto"><col style="width:150px">
         </colgroup>
         <thead>
-          <tr>
+          <tr class="ol-filter-row">
+            <td><div class="ol-seg" id="ol-status-pills" role="tablist" aria-label="Filter by status"></div></td>
+            <td><select class="sel ol-col-sel" id="olf-cust" onchange="olApplyFilters()" aria-label="Filter by customer"><option value="">All customers</option></select></td>
+            <td><select class="sel ol-col-sel" id="olf-prod" onchange="olApplyFilters()" aria-label="Filter by product"><option value="">All products</option></select></td>
+            <td><select class="sel ol-col-sel" id="olf-due" onchange="olApplyFilters()" aria-label="Filter by due date">
+              <option value="">Any due</option><option value="urgent">&lt; 3 days</option>
+              <option value="soon">&lt; 7 days</option><option value="none">No due</option>
+            </select></td>
+          </tr>
+          <tr class="ol-header-row">
             <th>Status</th>
             <th>Order</th>
             <th>Product</th>
@@ -1819,9 +1848,9 @@ function olBuckets(o){
 function olStatus(o){
   const {total,r,d,p}=olBuckets(o);
   if(p>0)                 return {key:'pending', text:fmt(p)+' pending', cls:'pn'};
-  if(total>0 && d>=total) return {key:'complete',text:'Complete',        cls:'ds'};
+  if(total>0 && d>=total) return {key:'complete',text:'Dispatched',        cls:'ds'};
   if(r>0)                 return {key:'ready',   text:fmt(r)+' ready',    cls:'rd'};
-  return {key:'complete',text:'Complete',cls:'ds'};
+  return {key:'complete',text:'Dispatched',cls:'ds'};
 }
 function olDaysLeft(o){
   if(!o.disp) return null;
@@ -2058,23 +2087,23 @@ function renderOrders(){
   const clr=document.getElementById('ol-clear');
   if(clr){const on=olAnyFilter(); clr.disabled=!on; clr.style.opacity=on?'1':'.45';}
 
-  // Status pills — counts reflect the OTHER active filters + search
-  // (so counts always match "what filtering by this pill would give you").
-  const pillHost=document.getElementById('ol-status-pills');
-  if(pillHost){
+  // Status filter — segmented control above the Status column.
+  // Counts reflect the OTHER active filters + search (so a count is always
+  // "what clicking this tab would show").
+  const segHost=document.getElementById('ol-status-pills');
+  if(segHost){
     const savedStatus=olFStatus; olFStatus='';
     const basePool=orders.filter(olPasses);
     olFStatus=savedStatus;
     const counts={'':basePool.length};
     ['pending','ready','complete'].forEach(k=>counts[k]=basePool.filter(o=>olStatus(o).key===k).length);
-    const pill=(k,lbl,cls)=>{
+    const tab=(k,lbl)=>{
       const on=olFStatus===k;
-      const pc=cls?' pill-'+cls:'';
-      return '<button class="pill'+pc+(on?' active':'')+'" onclick="olSetStatus(\''+k+'\')">'
-        +'<span class="pill-edge"></span><span class="pill-lbl">'+lbl+'</span>'
-        +'<span class="pill-count">'+(counts[k]||0)+'</span></button>';
+      return '<button class="ol-seg-btn'+(on?' on':'')+'" data-key="'+k+'" role="tab" aria-pressed="'+on+'" onclick="olSetStatus(\''+k+'\')">'
+        +'<span class="ol-seg-lbl">'+lbl+'</span>'
+        +'<span class="ol-seg-count">'+(counts[k]||0)+'</span></button>';
     };
-    pillHost.innerHTML=pill('','All','')+pill('pending','Pending','pn')+pill('ready','Ready','rd')+pill('complete','Complete','ds');
+    segHost.innerHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('complete','Dispatched');
   }
 
   const list=orders.filter(olPasses);
