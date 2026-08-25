@@ -70,9 +70,14 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,-appl
   .main{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
   .bottomnav{
     display:flex;position:fixed;bottom:0;left:0;right:0;z-index:30;
-    background:rgba(255,255,255,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    /* Solid background — backdrop-filter on a fixed element causes repaint jitter that
+       reads as the nav "moving" during scroll on iOS Safari. Keep it flat and stable. */
+    background:var(--surface);
     border-top:var(--bw) solid var(--line);
     padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px));justify-content:space-around;
+    /* Force a compositor layer so the nav doesn't get pulled by the URL-bar animation
+       on iOS Safari when the viewport height changes during scroll. */
+    will-change:transform;transform:translateZ(0);-webkit-transform:translateZ(0);
   }
   .bn{
     flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -356,6 +361,50 @@ table.t{width:100%;border-collapse:collapse}
 .ol-c-due-date{font-size:13px;font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.35}
 .ol-c-due-lbl{margin-top:4px}
 .ol-cust-lnk{cursor:pointer}
+
+/* Page-header subtitle (order counts summary) */
+.ol-psub{font-size:11.5px;color:var(--ink3);margin-top:2px;font-variant-numeric:tabular-nums}
+
+/* Mobile-only filter bar (hidden on desktop, where in-thead filters do the job) */
+.ol-mobile-filters{display:none;flex-direction:column;gap:8px;margin-bottom:10px}
+.ol-mf-row{display:flex;gap:8px}
+.ol-mf-row>*{flex:1;min-width:0}
+.ol-mf-sort{white-space:nowrap;font-size:12px;padding:0 12px}
+.ol-mf-sort span{color:var(--accent);font-weight:700;margin-right:4px}
+.ol-mf-sort span.on{color:var(--accent)}
+
+@media(max-width:720px){
+  /* Reveal the mobile filter bar */
+  .ol-mobile-filters{display:flex}
+  /* Segmented control on mobile — tighter so all 4 tabs fit at 375px */
+  .ol-mobile-filters .ol-seg{width:100%}
+  .ol-mobile-filters .ol-seg-btn{flex:1;padding:0 6px;font-size:11px;gap:4px;justify-content:center;min-width:0}
+  .ol-mobile-filters .ol-seg-lbl{overflow:hidden;text-overflow:ellipsis}
+  .ol-mobile-filters .ol-seg-count{font-size:9px;padding:1px 4px;min-width:16px}
+  /* Bump tap targets to ≥44px on touch surfaces */
+  .ol-toolbar .inp,.ol-toolbar .btn,.ph .btn-p{height:44px;min-height:44px}
+  .ol-col-sel{height:42px}
+  .ol-mf-sort{height:42px}
+  .ol-mobile-filters .ol-seg{height:42px}
+  .ol-ed-tab{height:40px;font-size:12.5px}
+  .ol-ed-inp{height:40px;font-size:16px}
+  .ol-ed-save{height:40px;padding:0 20px;font-size:13.5px}
+  /* Tighten the New Order product row so 2+ products don't require a long scroll */
+  .no-prow{padding:10px !important;gap:6px !important}
+  .no-prow .fg2,.no-prow .fg3,.no-prow .frow{gap:6px !important}
+  .no-prow .no-f,.no-prow .sel{height:38px}
+  /* Keep field pairs side-by-side inside product rows on mobile (overrides the app's global .fg2 stacking) */
+  .no-prow .fg2{grid-template-columns:1fr 1fr}
+  .no-prow .fg3{grid-template-columns:1fr 1fr 1fr}
+  /* New Order form is inline (can grow tall with multiple products) — pin the primary
+     Save button just above the bottom nav so users don't have to scroll to reach it. */
+  #new-order-form #no-save-btn{
+    position:sticky;
+    bottom:calc(72px + env(safe-area-inset-bottom,0px));
+    z-index:5;
+    box-shadow:0 -6px 16px rgba(0,0,0,.06);
+  }
+}
 
 /* status pill — shared table + card */
 .ol-pill{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;min-width:0}
@@ -658,7 +707,7 @@ table.t{width:100%;border-collapse:collapse}
 /* ── DRAWER (bottom sheet on mobile, right on desktop) ── */
 .drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:40;display:none;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .drawer-backdrop.open{display:block}
-.drawer{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:20px 20px 0 0;z-index:50;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.12)}
+.drawer{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:20px 20px 0 0;z-index:50;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:88vh;max-height:88dvh;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.12);padding-bottom:env(safe-area-inset-bottom,0px)}
 .drawer.open{transform:translateY(0)}
 .drawer-handle{width:40px;height:4px;background:var(--line2);border-radius:2px;margin:12px auto 4px}
 .drawer-head{padding:14px 20px;border-bottom:var(--bw) solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
@@ -778,7 +827,7 @@ table.t{width:100%;border-collapse:collapse}
   <!-- ORDERS -->
   <section id="view-orders" class="view">
     <div class="ph">
-      <div><div class="ptitle">Orders</div></div>
+      <div><div class="ptitle">Orders</div><div class="ol-psub" id="ol-summary"></div></div>
       <button class="btn btn-p" onclick="showNewOrderForm()">+ New</button>
     </div>
 
@@ -840,6 +889,22 @@ table.t{width:100%;border-collapse:collapse}
         </thead>
         <tbody id="ol-tbody"></tbody>
       </table>
+    </div>
+
+    <!-- MOBILE: filter bar (hidden on desktop, where the in-thead filters do the job) -->
+    <div class="ol-mobile-filters" id="ol-mobile-filters">
+      <div class="ol-seg" id="ol-status-pills-mobile" role="tablist" aria-label="Filter by status"></div>
+      <div class="ol-mf-row">
+        <select class="sel ol-col-sel" id="olf-cust-mobile" onchange="olSetCust(this.value)" aria-label="Filter by customer"><option value="">All customers</option></select>
+        <select class="sel ol-col-sel" id="olf-prod-mobile" onchange="olSetProd(this.value)" aria-label="Filter by product"><option value="">All products</option></select>
+      </div>
+      <div class="ol-mf-row">
+        <select class="sel ol-col-sel" id="olf-due-mobile" onchange="olSetDue(this.value)" aria-label="Filter by due date">
+          <option value="">Any due</option><option value="urgent">&lt; 3 days</option>
+          <option value="soon">&lt; 7 days</option><option value="none">No due</option>
+        </select>
+        <button class="btn btn-g ol-mf-sort" onclick="olToggleDueSort()" aria-label="Sort by due date"><span id="ol-sort-arr-mobile">↕</span> Sort · due date</button>
+      </div>
     </div>
 
     <!-- MOBILE: cards -->
@@ -2047,8 +2112,11 @@ function olApplyFilters(){
   olFDue=document.getElementById('olf-due').value;
   olPage=1;renderOrders();
 }
-// Status filter is now a pill row (was a header <select> pre-redesign).
+// State-based setters — used by mobile filter bar so desktop and mobile controls stay in sync via renderOrders.
 function olSetStatus(v){olFStatus=v;olPage=1;renderOrders();}
+function olSetCust(v){olFCust=v;olPage=1;renderOrders();}
+function olSetProd(v){olFProd=v;olPage=1;renderOrders();}
+function olSetDue(v){olFDue=v;olPage=1;renderOrders();}
 function olAnyFilter(){
   const sb=document.getElementById('ol-search');
   return !!(olFStatus||olFCust||olFProd||olFDue||olSortDue||(sb&&sb.value.trim()));
@@ -2056,17 +2124,22 @@ function olAnyFilter(){
 // Reset all filters + search + due-date sort back to defaults.
 function olClearFilters(){
   olFStatus=olFCust=olFProd=olFDue=olSortDue='';
-  ['olf-cust','olf-prod','olf-due'].forEach(id=>{const s=document.getElementById(id); if(s) s.value='';});
+  ['olf-cust','olf-prod','olf-due','olf-cust-mobile','olf-prod-mobile','olf-due-mobile'].forEach(id=>{const s=document.getElementById(id); if(s) s.value='';});
   const sb=document.getElementById('ol-search'); if(sb) sb.value='';
   olPage=1;renderOrders();
 }
 function olSyncFilterOptions(){
-  const cs=document.getElementById('olf-cust'), ps=document.getElementById('olf-prod');
-  if(!cs||!ps) return;
   const custs=[...new Set(orders.map(o=>o.cust).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   const prods=[...new Set(orders.map(o=>o.prod).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-  const fill=(sel,vals,cur)=>{sel.innerHTML='<option value="">All</option>'+vals.map(v=>'<option value="'+esc(v)+'"'+(v===cur?' selected':'')+'>'+esc(v)+'</option>').join('');};
-  fill(cs,custs,olFCust); fill(ps,prods,olFProd);
+  const fill=(id,vals,cur,allLbl)=>{const s=document.getElementById(id); if(!s) return;
+    s.innerHTML='<option value="">'+allLbl+'</option>'+vals.map(v=>'<option value="'+esc(v)+'"'+(v===cur?' selected':'')+'>'+esc(v)+'</option>').join('');};
+  // Desktop and mobile dropdown sets — kept in sync from single state.
+  fill('olf-cust',custs,olFCust,'All customers');
+  fill('olf-prod',prods,olFProd,'All products');
+  fill('olf-cust-mobile',custs,olFCust,'All customers');
+  fill('olf-prod-mobile',prods,olFProd,'All products');
+  // Sync the Due dropdown values (options are static, only .value needs updating).
+  ['olf-due','olf-due-mobile'].forEach(id=>{const s=document.getElementById(id); if(s) s.value=olFDue;});
 }
 function olPasses(o){
   const q=(document.getElementById('ol-search')?.value||'').toLowerCase().trim();
@@ -2087,24 +2160,26 @@ function renderOrders(){
   const clr=document.getElementById('ol-clear');
   if(clr){const on=olAnyFilter(); clr.disabled=!on; clr.style.opacity=on?'1':'.45';}
 
-  // Status filter — segmented control above the Status column.
-  // Counts reflect the OTHER active filters + search (so a count is always
-  // "what clicking this tab would show").
-  const segHost=document.getElementById('ol-status-pills');
-  if(segHost){
-    const savedStatus=olFStatus; olFStatus='';
-    const basePool=orders.filter(olPasses);
-    olFStatus=savedStatus;
-    const counts={'':basePool.length};
-    ['pending','ready','complete'].forEach(k=>counts[k]=basePool.filter(o=>olStatus(o).key===k).length);
-    const tab=(k,lbl)=>{
-      const on=olFStatus===k;
-      return '<button class="ol-seg-btn'+(on?' on':'')+'" data-key="'+k+'" role="tab" aria-pressed="'+on+'" onclick="olSetStatus(\''+k+'\')">'
-        +'<span class="ol-seg-lbl">'+lbl+'</span>'
-        +'<span class="ol-seg-count">'+(counts[k]||0)+'</span></button>';
-    };
-    segHost.innerHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('complete','Dispatched');
-  }
+  // Status filter — segmented control above the Status column (desktop),
+  // duplicated inside the mobile filter bar. Counts reflect the OTHER active
+  // filters + search (so a count always matches "what clicking will show").
+  const savedStatus=olFStatus; olFStatus='';
+  const basePool=orders.filter(olPasses);
+  olFStatus=savedStatus;
+  const counts={'':basePool.length};
+  ['pending','ready','complete'].forEach(k=>counts[k]=basePool.filter(o=>olStatus(o).key===k).length);
+  const tab=(k,lbl)=>{
+    const on=olFStatus===k;
+    return '<button class="ol-seg-btn'+(on?' on':'')+'" data-key="'+k+'" role="tab" aria-pressed="'+on+'" onclick="olSetStatus(\''+k+'\')">'
+      +'<span class="ol-seg-lbl">'+lbl+'</span>'
+      +'<span class="ol-seg-count">'+(counts[k]||0)+'</span></button>';
+  };
+  const segHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('complete','Dispatched');
+  ['ol-status-pills','ol-status-pills-mobile'].forEach(id=>{const h=document.getElementById(id); if(h) h.innerHTML=segHTML;});
+
+  // Page-header summary strip — useful on mobile where filters are separate.
+  const summaryEl=document.getElementById('ol-summary');
+  if(summaryEl) summaryEl.textContent=orders.length+' orders · '+counts.pending+' pending · '+counts.ready+' ready · '+counts.complete+' dispatched';
 
   const list=orders.filter(olPasses);
   const mv=o=>o.updated_at||o.created_at||'';
@@ -2122,12 +2197,12 @@ function renderOrders(){
     // Recently moved first — preserves the app's default ordering.
     list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
   }
-  // Reflect the sort state on the header arrow.
-  const arr=document.getElementById('ol-sort-arr');
-  if(arr){
-    arr.textContent = olSortDue==='asc' ? '↑' : olSortDue==='desc' ? '↓' : '↕';
-    arr.classList.toggle('on', olSortDue!=='');
-  }
+  // Reflect the sort state on both the desktop header arrow and the mobile button.
+  const arrChar = olSortDue==='asc' ? '↑' : olSortDue==='desc' ? '↓' : '↕';
+  ['ol-sort-arr','ol-sort-arr-mobile'].forEach(id=>{
+    const arr=document.getElementById(id);
+    if(arr){ arr.textContent=arrChar; arr.classList.toggle('on', olSortDue!==''); }
+  });
 
   const tbody=document.getElementById('ol-tbody');
   const cards=document.getElementById('ol-cards');
