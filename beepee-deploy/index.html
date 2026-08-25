@@ -504,6 +504,20 @@ table.t{width:100%;border-collapse:collapse}
 
 /* ── WORK STATUS CARDS ── */
 .wo-list{display:flex;flex-direction:column;gap:6px}
+/* Status page filter row — mirrors Orders page: segmented status control + dropdowns */
+.wo-filter-row{display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.wo-filter-row .ol-seg{flex:0 0 auto}
+.wo-filter-selects{display:flex;gap:8px;flex:1;min-width:0;flex-wrap:wrap}
+.wo-filter-selects .ol-col-sel{flex:1;min-width:130px}
+@media(max-width:720px){
+  .wo-filter-row{gap:8px}
+  .wo-filter-row .ol-seg{width:100%}
+  .wo-filter-row .ol-seg-btn{flex:1;padding:0 6px;font-size:11px;gap:4px;justify-content:center;min-width:0;height:42px}
+  .wo-filter-row .ol-seg-lbl{overflow:hidden;text-overflow:ellipsis}
+  .wo-filter-row .ol-seg-count{font-size:9px;padding:1px 4px;min-width:16px}
+  .wo-filter-selects{flex-basis:100%}
+  .wo-filter-selects .ol-col-sel{flex:1 1 45%;min-width:130px;height:42px}
+}
 .wo-card{background:var(--surface);border-radius:var(--r2);display:flex;overflow:hidden;border:var(--bw) solid var(--line);transition:box-shadow .15s,transform .15s;cursor:pointer}
 .wo-card:hover{box-shadow:var(--shadow);transform:translateY(-1px)}
 .wo-card:active{transform:translateY(0)}
@@ -926,17 +940,29 @@ table.t{width:100%;border-collapse:collapse}
   <!-- WORK STATUS -->
   <section id="view-workstatus" class="view">
     <div class="ph">
-      <div><div class="ptitle">Work Status</div></div>
+      <div><div class="ptitle">Work Status</div><div class="ol-psub" id="wo-summary"></div></div>
     </div>
-    <div class="fbar" id="wo-filters"></div>
-    <div class="wo-sort-wrap">
-      <input class="inp" id="wo-search" placeholder="Search customer, order no, size, product, PLY…" oninput="renderWorkStatus()">
-      <select class="wo-sort" id="wo-sort" onchange="woSortChange(this.value)" aria-label="Sort orders">
-        <option value="due">Sort: due date</option>
-        <option value="moved">Sort: recently moved</option>
-        <option value="cust">Sort: customer A–Z</option>
-      </select>
+
+    <!-- Toolbar: search + clear (mirrors Orders page) -->
+    <div class="ol-toolbar">
+      <input class="inp ol-search" id="wo-search" placeholder="Search customer, order no, size, product, PLY…" oninput="woPage=1;renderWorkStatus()">
+      <button class="btn btn-g ol-clear-btn" id="wo-clear" onclick="woClearFilters()">Clear all</button>
     </div>
+
+    <!-- Filter row: status segmented control + Customer + Product + Sort -->
+    <div class="wo-filter-row">
+      <div class="ol-seg" id="wo-status-pills" role="tablist" aria-label="Filter by status"></div>
+      <div class="wo-filter-selects">
+        <select class="sel ol-col-sel" id="wof-cust" onchange="woSetCust(this.value)" aria-label="Filter by customer"><option value="">All customers</option></select>
+        <select class="sel ol-col-sel" id="wof-prod" onchange="woSetProd(this.value)" aria-label="Filter by product"><option value="">All products</option></select>
+        <select class="sel ol-col-sel" id="wo-sort" onchange="woSortChange(this.value)" aria-label="Sort orders">
+          <option value="due">Sort · due date</option>
+          <option value="moved">Sort · recently moved</option>
+          <option value="cust">Sort · customer A-Z</option>
+        </select>
+      </div>
+    </div>
+
     <div class="wo-list" id="wo-list"></div>
     <div class="pd-pagination" id="wo-pagination" style="display:none"></div>
   </section>
@@ -1443,7 +1469,10 @@ let parties=[], orders=[], tasks=[];
 let pf='all', tSF='All', tMF='All', pdPage=1;
 let olPage=1, woPage=1;
 // Status page: multi-select filter (all statuses visible by default) + sort control
-let woFilterSet=new Set(['Pending','Ready','Dispatched']);
+// Single-select status filter (matches Orders page). '' = All. Bucket keys:
+// 'pending' (has pending qty), 'ready' (has ready qty), 'dispatched' (has any dispatched).
+let woFStatus='';
+let woFCust='', woFProd='';
 let woSort='due';
 const PAGE_SIZE=50;
 const PD_PAGE_SIZE=50;
@@ -2415,43 +2444,77 @@ function addProductToOrder(){
 // Bucket-based filter: chips match "has any qty in this bucket", not status.
 // One order can appear on multiple chips — e.g. a Ready order with pending qty
 // > 0 shows under both "Pending" and "Ready".
-function woBucketMatch(o, chip){
+// Bucket match — an order is "in" a bucket if that bucket's qty > 0. This lets an
+// in-progress order (some pending + some ready + some dispatched) show under whichever
+// tab you're looking at, which is what production planning actually needs.
+function woBucketMatch(o, key){
   const t=Number(o.qty)||0, r=Number(o.ready_qty)||0, d=Number(o.dispatched_qty)||0;
-  if(chip==='Pending')    return Math.max(0,t-r-d)>0;
-  if(chip==='Ready')      return r>0;
-  if(chip==='Dispatched') return d>0;
-  return false;
+  if(key==='pending')    return Math.max(0,t-r-d)>0;
+  if(key==='ready')      return r>0;
+  if(key==='dispatched') return d>0;
+  return true; // '' = All
+}
+// Per-order predicate — search + status + customer + product all applied.
+function woPasses(o){
+  const q=(document.getElementById('wo-search')?.value||'').toLowerCase().trim();
+  if(woFStatus && !woBucketMatch(o, woFStatus)) return false;
+  if(woFCust && (o.cust||'') !== woFCust) return false;
+  if(woFProd && (o.prod||'') !== woFProd) return false;
+  if(q && !orderMatchesQuery(o, q)) return false;
+  return true;
+}
+function woSyncFilterOptions(){
+  const custs=[...new Set(orders.map(o=>o.cust).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const prods=[...new Set(orders.map(o=>o.prod).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const fill=(id,vals,cur,allLbl)=>{const s=document.getElementById(id); if(!s) return;
+    s.innerHTML='<option value="">'+allLbl+'</option>'+vals.map(v=>'<option value="'+esc(v)+'"'+(v===cur?' selected':'')+'>'+esc(v)+'</option>').join('');};
+  fill('wof-cust',custs,woFCust,'All customers');
+  fill('wof-prod',prods,woFProd,'All products');
+}
+function woAnyFilter(){
+  const sb=document.getElementById('wo-search');
+  return !!(woFStatus||woFCust||woFProd||(sb&&sb.value.trim()));
 }
 function renderWorkStatus(){
-  const q=(document.getElementById('wo-search')?.value||'').toLowerCase().trim();
-  // Filter: any bucket in the active set has qty > 0 for this order
-  const pool=orders.filter(x=>{
-    for(const chip of woFilterSet){ if(woBucketMatch(x,chip)) return true; }
-    return false;
-  });
-  let list=q?pool.filter(x=>orderMatchesQuery(x,q)):pool;
-  // Sort per current selection
+  woSyncFilterOptions();
+  const clr=document.getElementById('wo-clear');
+  if(clr){const on=woAnyFilter(); clr.disabled=!on; clr.style.opacity=on?'1':'.45';}
+
+  // Status segmented control — counts reflect the OTHER active filters + search.
+  const savedStatus=woFStatus; woFStatus='';
+  const basePool=orders.filter(woPasses);
+  woFStatus=savedStatus;
+  const counts={
+    '':basePool.length,
+    pending:  basePool.filter(o=>woBucketMatch(o,'pending')).length,
+    ready:    basePool.filter(o=>woBucketMatch(o,'ready')).length,
+    dispatched: basePool.filter(o=>woBucketMatch(o,'dispatched')).length
+  };
+  const tab=(k,lbl)=>{
+    const on=woFStatus===k;
+    return '<button class="ol-seg-btn'+(on?' on':'')+'" data-key="'+k+'" role="tab" aria-pressed="'+on+'" onclick="woSetStatus(\''+k+'\')">'
+      +'<span class="ol-seg-lbl">'+lbl+'</span>'
+      +'<span class="ol-seg-count">'+(counts[k]||0)+'</span></button>';
+  };
+  const segHost=document.getElementById('wo-status-pills');
+  if(segHost) segHost.innerHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('dispatched','Dispatched');
+
+  // Summary strip
+  const summ=document.getElementById('wo-summary');
+  if(summ) summ.textContent=orders.length+' orders · '+counts.pending+' with pending · '+counts.ready+' with ready · '+counts.dispatched+' with dispatched';
+
+  const list=orders.filter(woPasses);
   const mv=o=>o.updated_at||o.created_at||'';
   if(woSort==='due')       list.sort((a,b)=>(a.disp||'9999').localeCompare(b.disp||'9999') || (b.id-a.id));
-  else if(woSort==='moved') list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
-  else if(woSort==='cust')  list.sort((a,b)=>(a.cust||'').localeCompare(b.cust||''));
-  // Chip counts reflect the current search AND bucket rule (an order can count in multiple chips)
-  const searchPool=q?orders.filter(x=>orderMatchesQuery(x,q)):orders;
-  const counts={};
-  STATUSES.forEach(s=>counts[s]=searchPool.filter(x=>woBucketMatch(x,s)).length);
-  document.getElementById('wo-filters').innerHTML=
-    STATUSES.map(s=>{
-      const on=woFilterSet.has(s);
-      const pc=' pill-'+skCls(s);
-      return '<button class="pill'+pc+(on?' active':'')+'" onclick="woFilterToggle(\''+s+'\')" aria-pressed="'+on+'"><span class="pill-edge"></span><span class="pill-lbl">'+s+'</span><span class="pill-count">'+counts[s]+'</span></button>';
-    }).join('');
-  // Sync sort select
+  else if(woSort==='moved')list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
+  else if(woSort==='cust') list.sort((a,b)=>(a.cust||'').localeCompare(b.cust||''));
+
   const sortSel=document.getElementById('wo-sort'); if(sortSel && sortSel.value!==woSort) sortSel.value=woSort;
+
   if(!list.length){
-    const anyFilter=woFilterSet.size<STATUSES.length;
-    const msg=q?'No orders match your search.':(anyFilter?'No orders in the selected buckets.':'No orders yet.');
-    const clearBtn=(anyFilter||q)?'<div style="margin-top:10px"><button class="pill" onclick="woFilterAll()">Show all</button></div>':'';
-    document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+clearBtn+'</div>';
+    const q=(document.getElementById('wo-search')?.value||'').trim();
+    const msg=q?'No orders match your search.':(woAnyFilter()?'No orders match the filters.':'No orders yet.');
+    document.getElementById('wo-list').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+'</div>';
     document.getElementById('wo-pagination').style.display='none';
     return;
   }
@@ -2467,23 +2530,18 @@ function renderWorkStatus(){
       +'<div class="pd-pg-btns">'+pdPagerHTML(woPage,totalPages,'woGoPage')+'</div>';
   } else pgEl.style.display='none';
 }
-// Toggle a bucket chip. Empty set not allowed — clicking the last remaining chip re-selects it.
 function woGoPage(p){woPage=p;renderWorkStatus();window.scrollTo({top:0,behavior:'smooth'});}
-function woFilterToggle(s){
-  if(woFilterSet.has(s)){
-    if(woFilterSet.size===1) return;
-    woFilterSet.delete(s);
-  } else {
-    woFilterSet.add(s);
-  }
-  woPage=1;renderWorkStatus();
-}
-function woFilterAll(){
-  woFilterSet=new Set(STATUSES);
-  const sb=document.getElementById('wo-search');if(sb)sb.value='';
-  woPage=1;renderWorkStatus();
-}
+function woSetStatus(v){woFStatus=v;woPage=1;renderWorkStatus();}
+function woSetCust(v){woFCust=v;woPage=1;renderWorkStatus();}
+function woSetProd(v){woFProd=v;woPage=1;renderWorkStatus();}
 function woSortChange(v){woSort=v;woPage=1;renderWorkStatus();}
+function woClearFilters(){
+  woFStatus=woFCust=woFProd='';
+  woSort='due';
+  ['wof-cust','wof-prod','wo-sort'].forEach(id=>{const s=document.getElementById(id); if(s) s.value=id==='wo-sort'?'due':'';});
+  const sb=document.getElementById('wo-search'); if(sb) sb.value='';
+  woPage=1;renderWorkStatus();
+}
 // woStatusChange removed — status is derived from buckets under sequential-flow model.
 // Direct qty edits happen via the Toggle Card's + Ready / + Dispatch / ✎ Qty tabs.
 
