@@ -508,6 +508,10 @@ table.t{width:100%;border-collapse:collapse}
 .sc-due{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;margin-left:auto}
 .sc-due-date{font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
 .sc-due-empty{margin-left:auto;color:var(--muted);font-size:11px}
+/* Collapsed-by-default expander for the P/R/D readout + action tabs. */
+.sc-expand{display:none}
+.sc-expand.open{display:block}
+.sc-toggle{cursor:pointer}
 /* Status page filter row — mirrors Orders page: segmented status control + dropdowns */
 .wo-filter-row{display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
 .wo-filter-row .ol-seg{flex:0 0 auto}
@@ -1762,25 +1766,36 @@ function statusCardHTML(ord){
         +descHtml
         +dueChipHTML
       +'</div>'
-      +'<div class="tc-bar" aria-label="Progress: '+fmt(pending)+' pending, '+fmt(rq)+' ready, '+fmt(dq)+' dispatched">'
+      // Bar is always visible and doubles as the tap target to expand actions.
+      +'<div class="tc-bar sc-toggle" onclick="scToggle(this)" aria-label="Progress: '+fmt(pending)+' pending, '+fmt(rq)+' ready, '+fmt(dq)+' dispatched — tap to expand">'
         +seg('p',pending,pFlex)
         +seg('r',rq,rFlex)
         +seg('d',dq,dFlex)
       +'</div>'
-      +'<div class="tc-nums">'
-        +'<span class="tc-num p">P <b>'+fmt(pending)+'</b></span>'
-        +'<span class="tc-sep">·</span>'
-        +'<span class="tc-num r">R <b>'+fmt(rq)+'</b></span>'
-        +'<span class="tc-sep">·</span>'
-        +'<span class="tc-num d">D <b>'+fmt(dq)+'</b></span>'
+      // Collapsed by default (Option A) — click the bar to reveal P/R/D + action tabs.
+      +'<div class="sc-expand">'
+        +'<div class="tc-nums">'
+          +'<span class="tc-num p">P <b>'+fmt(pending)+'</b></span>'
+          +'<span class="tc-sep">·</span>'
+          +'<span class="tc-num r">R <b>'+fmt(rq)+'</b></span>'
+          +'<span class="tc-sep">·</span>'
+          +'<span class="tc-num d">D <b>'+fmt(dq)+'</b></span>'
+        +'</div>'
+        +'<div class="tc-tabs" role="tablist">'
+          +'<button class="tc-tab" role="tab" data-tab="ready"    onclick="tcTabToggle(this,\'ready\')"><span class="tc-glyph">+</span>Ready</button>'
+          +'<button class="tc-tab" role="tab" data-tab="dispatch" onclick="tcTabToggle(this,\'dispatch\')"><span class="tc-glyph">+</span>Dispatch</button>'
+        +'</div>'
+        +'<div class="tc-panel" style="display:none"></div>'
       +'</div>'
-      +'<div class="tc-tabs" role="tablist">'
-        +'<button class="tc-tab" role="tab" data-tab="ready"    onclick="tcTabToggle(this,\'ready\')"><span class="tc-glyph">+</span>Ready</button>'
-        +'<button class="tc-tab" role="tab" data-tab="dispatch" onclick="tcTabToggle(this,\'dispatch\')"><span class="tc-glyph">+</span>Dispatch</button>'
-      +'</div>'
-      +'<div class="tc-panel" style="display:none"></div>'
     +'</div>'
   +'</div>';
+}
+// Expand/collapse the P/R/D readout + action tabs on a Status card.
+// Kept separate from tcTabToggle so tab clicks don't accidentally re-collapse.
+function scToggle(el){
+  const card=el.closest('.ocard.scard'); if(!card) return;
+  const exp=card.querySelector('.sc-expand'); if(!exp) return;
+  exp.classList.toggle('open');
 }
 
 // Toggle the active action tab on a card. Same tab twice = collapse.
@@ -2097,18 +2112,15 @@ function olRowHTML(o){
   const specSub=olSize(o)+' · '+fmt(b.total)+' nos';
   const orderSub=o.no?'<div class="ol-c-sub">'+esc(o.no)+'</div>':'';
   const dueTop=du.date||(du.cls==='none'?'—':'');
-  // Option B: auto-open the editor on rows that still have actionable buckets
-  // (any pending or any ready qty). Fully-dispatched rows stay collapsed.
-  const canAction=b.p>0 || b.r>0;
-  const editrowCls=canAction ? 'ol-editrow open' : 'ol-editrow';
-  const editorHTML=canAction ? olEditorHTML(o) : '';
+  // Editor is collapsed by default (Option A). Click the status pill to expand it —
+  // it lazily populates on first open via olToggleEditor.
   return '<tr class="ol-row" data-oid="'+o.id+'">'
     +'<td class="ol-c-status-cell"><div class="ol-pill" onclick="olToggleEditor(this)"><span class="ol-pill-txt '+st.cls+'">'+st.text+'</span>'+olBar(o)+'</div></td>'
     +'<td class="ol-c-order"><div class="ol-c-main ol-cust-lnk" onclick="openDrawer('+o.id+')">'+esc(o.cust||'—')+'</div>'+orderSub+'</td>'
     +'<td class="ol-c-product"><div class="ol-c-main">'+specTop+'</div><div class="ol-c-sub">'+specSub+'</div></td>'
     +'<td class="ol-c-due"><div class="ol-c-due-date">'+esc(dueTop)+'</div>'+(du.cls==='none'?'':'<div class="ol-c-due-lbl"><span class="ol-due-lbl '+du.cls+'">'+du.text+'</span></div>')+'</td>'
   +'</tr>'
-  +'<tr class="'+editrowCls+'"><td colspan="4">'+editorHTML+'</td></tr>';
+  +'<tr class="ol-editrow"><td colspan="4"></td></tr>';
 }
 // Mobile card — whole summary block is clickable; editor sits alongside as a
 // sibling so its inner clicks (tabs, inputs, buttons) don't re-trigger toggle.
@@ -2117,9 +2129,7 @@ function olCardHTML(o){
   const b=olBuckets(o);
   // Uniform separator: middle-dot + × in dimensions (matches Status card + Orders desktop row).
   const detail=esc(String(o.ply||'?'))+' PLY · '+esc(o.prod||'—')+' · '+olSize(o)+' · '+fmt(b.total)+' nos';
-  const canAction=b.p>0 || b.r>0;
-  const editorCls=canAction ? 'ol-c-editor open' : 'ol-c-editor';
-  const editorHTML=canAction ? olEditorHTML(o) : '';
+  // Collapsed by default (Option A) — tap the summary to expand the editor.
   return '<div class="ol-card '+st.cls+'" data-oid="'+o.id+'">'
     +'<div class="ostripe '+st.cls+'"></div>'
     +'<div class="ol-c-summary" onclick="olToggleEditor(this)">'
@@ -2128,7 +2138,7 @@ function olCardHTML(o){
       +'<div class="ol-c-attr">'+detail+'</div>'
       +'<div class="ol-c-bar">'+olBar(o)+'</div>'
     +'</div>'
-    +'<div class="'+editorCls+'">'+editorHTML+'</div>'
+    +'<div class="ol-c-editor"></div>'
   +'</div>';
 }
 // Expand/collapse the inline editor for whichever surface the click came from.
