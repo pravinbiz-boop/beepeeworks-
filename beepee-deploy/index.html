@@ -511,16 +511,10 @@ table.t{width:100%;border-collapse:collapse}
 /* Collapsed-by-default expander for the P/R/D readout + action tabs. */
 .sc-expand{display:none}
 .sc-expand.open{display:block}
-.sc-toggle{cursor:pointer}
-/* Chevron affordance shared by Orders + Status cards. Rotates when open. */
-.ol-chev,.sc-chev{display:inline-block;font-size:11px;color:var(--ink3);margin-left:6px;transition:transform .18s ease}
-.ol-c-status-cell .ol-pill:hover .ol-chev,.ol-card:hover .ol-chev,.sc-toggle:hover .sc-chev{color:var(--ink)}
-tr.ol-row.open .ol-chev,.ol-card.open .ol-chev,.ocard.scard.open .sc-chev{transform:rotate(180deg);color:var(--accent)}
-.ol-pill-line{display:flex;align-items:center;justify-content:space-between;gap:4px}
-/* Status bar wrapper — bar takes remaining space, chevron sits on the right */
-.sc-bar-wrap{display:flex;align-items:center;gap:10px;margin:6px 0 6px}
-.sc-bar-wrap .tc-bar{flex:1;margin:0}
-.sc-bar-wrap .sc-chev{margin-left:0;flex-shrink:0}
+/* Whole-card click surfaces — visible pointer + subtle hover on non-link elements */
+.ocard.scard{cursor:pointer}
+tr.ol-row{cursor:pointer}
+tr.ol-row:hover{background:var(--s2)}
 /* Status page filter row — mirrors Orders page: segmented status control + dropdowns */
 .wo-filter-row{display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
 .wo-filter-row .ol-seg{flex:0 0 auto}
@@ -550,7 +544,7 @@ tr.ol-row.open .ol-chev,.ol-card.open .ol-chev,.ocard.scard.open .sc-chev{transf
 /* Palette: Pending = red, Ready = amber, Dispatched = green. Fonts: Manrope
    (matches every other list card in the app); Outfit is reserved for page titles. */
 /* ── STATUS CARD (scard) — uses .ocard shell, adds bar/nums/tabs below ── */
-.ocard.scard{cursor:default}
+.ocard.scard{cursor:pointer}
 .ocard.scard .obody-c{padding-bottom:0}
 .sc-body{flex-direction:column;align-items:stretch}
 .sc-head{flex-wrap:wrap}
@@ -1765,27 +1759,26 @@ function statusCardHTML(ord){
   const descHtml=ord.description?'<span class="o-desc">'+esc(ord.description)+'</span>':'';
   const pFlex=total>0?pending/total:1, rFlex=total>0?rq/total:0, dFlex=total>0?dq/total:0;
   const seg=(cls,val,flex)=>flex>0?'<span class="'+cls+'" style="flex:'+flex.toFixed(3)+'"></span>':'';
-  return '<div class="ocard scard '+sk+'" data-oid="'+ord.id+'">'
+  // Whole card is the click target (except Customer name → drawer, and editor
+  // panel → stops propagating so its inner clicks don't collapse the card).
+  return '<div class="ocard scard '+sk+'" data-oid="'+ord.id+'" onclick="scToggle(this)">'
     +'<div class="ostripe '+sk+'"></div>'
     +'<div class="obody-c sc-body">'
-      +'<div class="o-left sc-head" onclick="openDrawer('+ord.id+')" style="cursor:pointer">'
-        +'<span class="o-cust">'+esc(ord.cust||'—')+'</span>'
+      +'<div class="o-left sc-head">'
+        +'<span class="o-cust ol-cust-lnk" onclick="event.stopPropagation();openDrawer('+ord.id+')">'+esc(ord.cust||'—')+'</span>'
         +onoHtml
         +'<span class="o-detail">'+detail+'</span>'
         +descHtml
         +dueChipHTML
       +'</div>'
-      // Bar is always visible; the wrapper is the tap target with a chevron affordance.
-      +'<div class="sc-bar-wrap sc-toggle" onclick="scToggle(this)" title="Tap to mark ready / dispatch" aria-label="Progress: '+fmt(pending)+' pending, '+fmt(rq)+' ready, '+fmt(dq)+' dispatched — tap to expand">'
-        +'<div class="tc-bar">'
-          +seg('p',pending,pFlex)
-          +seg('r',rq,rFlex)
-          +seg('d',dq,dFlex)
-        +'</div>'
-        +'<span class="sc-chev" aria-hidden="true">▾</span>'
+      // Bar is always visible.
+      +'<div class="tc-bar" aria-label="Progress: '+fmt(pending)+' pending, '+fmt(rq)+' ready, '+fmt(dq)+' dispatched">'
+        +seg('p',pending,pFlex)
+        +seg('r',rq,rFlex)
+        +seg('d',dq,dFlex)
       +'</div>'
-      // Collapsed by default (Option A) — click the bar to reveal P/R/D + action tabs.
-      +'<div class="sc-expand">'
+      // Collapsed by default (Option A) — tap the card to reveal.
+      +'<div class="sc-expand" onclick="event.stopPropagation()">'
         +'<div class="tc-nums">'
           +'<span class="tc-num p">P <b>'+fmt(pending)+'</b></span>'
           +'<span class="tc-sep">·</span>'
@@ -2127,13 +2120,14 @@ function olRowHTML(o){
   const dueTop=du.date||(du.cls==='none'?'—':'');
   // Editor is collapsed by default (Option A). Click the status pill to expand it —
   // it lazily populates on first open via olToggleEditor.
-  return '<tr class="ol-row" data-oid="'+o.id+'">'
-    +'<td class="ol-c-status-cell"><div class="ol-pill" onclick="olToggleEditor(this)" title="Tap to mark ready / dispatch"><span class="ol-pill-line"><span class="ol-pill-txt '+st.cls+'">'+st.text+'</span><span class="ol-chev" aria-hidden="true">▾</span></span>'+olBar(o)+'</div></td>'
-    +'<td class="ol-c-order"><div class="ol-c-main ol-cust-lnk" onclick="openDrawer('+o.id+')">'+esc(o.cust||'—')+'</div>'+orderSub+'</td>'
+  // Whole row is the click target (except the Customer name, which opens the drawer).
+  return '<tr class="ol-row" data-oid="'+o.id+'" onclick="olToggleEditor(this)">'
+    +'<td class="ol-c-status-cell"><div class="ol-pill"><span class="ol-pill-txt '+st.cls+'">'+st.text+'</span>'+olBar(o)+'</div></td>'
+    +'<td class="ol-c-order"><div class="ol-c-main ol-cust-lnk" onclick="event.stopPropagation();openDrawer('+o.id+')">'+esc(o.cust||'—')+'</div>'+orderSub+'</td>'
     +'<td class="ol-c-product"><div class="ol-c-main">'+specTop+'</div><div class="ol-c-sub">'+specSub+'</div></td>'
     +'<td class="ol-c-due"><div class="ol-c-due-date">'+esc(dueTop)+'</div>'+(du.cls==='none'?'':'<div class="ol-c-due-lbl"><span class="ol-due-lbl '+du.cls+'">'+du.text+'</span></div>')+'</td>'
   +'</tr>'
-  +'<tr class="ol-editrow"><td colspan="4"></td></tr>';
+  +'<tr class="ol-editrow" onclick="event.stopPropagation()"><td colspan="4"></td></tr>';
 }
 // Mobile card — whole summary block is clickable; editor sits alongside as a
 // sibling so its inner clicks (tabs, inputs, buttons) don't re-trigger toggle.
@@ -2147,7 +2141,7 @@ function olCardHTML(o){
     +'<div class="ostripe '+st.cls+'"></div>'
     +'<div class="ol-c-summary" onclick="olToggleEditor(this)">'
       +'<div class="ol-c-head"><span class="ol-c-cust ol-cust-lnk" onclick="event.stopPropagation();openDrawer('+o.id+')">'+esc(o.cust||'—')+'</span>'+(o.no?'<span class="ol-c-ono">'+esc(o.no)+'</span>':'')+'</div>'
-      +'<div class="ol-c-status"><span class="ol-pill-txt '+st.cls+'">'+st.text+' <span class="ol-chev" aria-hidden="true">▾</span></span>'+olDueHTML(du)+'</div>'
+      +'<div class="ol-c-status"><span class="ol-pill-txt '+st.cls+'">'+st.text+'</span>'+olDueHTML(du)+'</div>'
       +'<div class="ol-c-attr">'+detail+'</div>'
       +'<div class="ol-c-bar">'+olBar(o)+'</div>'
     +'</div>'
