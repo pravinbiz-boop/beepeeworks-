@@ -504,6 +504,10 @@ table.t{width:100%;border-collapse:collapse}
 
 /* ── WORK STATUS CARDS ── */
 .wo-list{display:flex;flex-direction:column;gap:6px}
+/* Status card — due chip formatted like Orders (date + urgency label) */
+.sc-due{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;margin-left:auto}
+.sc-due-date{font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.sc-due-empty{margin-left:auto;color:var(--muted);font-size:11px}
 /* Status page filter row — mirrors Orders page: segmented status control + dropdowns */
 .wo-filter-row{display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
 .wo-filter-row .ol-seg{flex:0 0 auto}
@@ -955,6 +959,10 @@ table.t{width:100%;border-collapse:collapse}
       <div class="wo-filter-selects">
         <select class="sel ol-col-sel" id="wof-cust" onchange="woSetCust(this.value)" aria-label="Filter by customer"><option value="">All customers</option></select>
         <select class="sel ol-col-sel" id="wof-prod" onchange="woSetProd(this.value)" aria-label="Filter by product"><option value="">All products</option></select>
+        <select class="sel ol-col-sel" id="wof-due" onchange="woSetDue(this.value)" aria-label="Filter by due date">
+          <option value="">Any due</option><option value="urgent">&lt; 3 days</option>
+          <option value="soon">&lt; 7 days</option><option value="none">No due</option>
+        </select>
         <select class="sel ol-col-sel" id="wo-sort" onchange="woSortChange(this.value)" aria-label="Sort orders">
           <option value="due">Sort · due date</option>
           <option value="moved">Sort · recently moved</option>
@@ -1472,7 +1480,7 @@ let olPage=1, woPage=1;
 // Single-select status filter (matches Orders page). '' = All. Bucket keys:
 // 'pending' (has pending qty), 'ready' (has ready qty), 'dispatched' (has any dispatched).
 let woFStatus='';
-let woFCust='', woFProd='';
+let woFCust='', woFProd='', woFDue='';
 let woSort='due';
 const PAGE_SIZE=50;
 const PD_PAGE_SIZE=50;
@@ -1733,11 +1741,13 @@ function statusCardHTML(ord){
   const pending=Math.max(0,total-rq-dq);
   const derived=deriveStatus(ord.qty,ord.ready_qty,ord.dispatched_qty);
   const sk=skCls(derived);
-  const dm=dispMeta(ord.disp,derived);
-  const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' - '+dm.label:'No date';
-  const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
-  const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
-  const detail=esc(String(ord.ply||'?'))+' PLY - '+esc(ord.prod||'—')+' - '+size+' - '+fmt(total)+' nos.';
+  // Use Orders' due helper so the date + urgency chip is identical on both pages.
+  const du=olDue(ord);
+  const dueChipHTML = du.cls==='none'
+    ? '<span class="sc-due-empty">—</span>'
+    : '<span class="sc-due"><span class="sc-due-date">'+du.date+'</span><span class="ol-due-lbl '+du.cls+'">'+du.text+'</span></span>';
+  // Middle-dot separator + × for dimensions (uniform with Orders).
+  const detail=esc(String(ord.ply||'?'))+' PLY · '+esc(ord.prod||'—')+' · '+olSize(ord)+' · '+fmt(total)+' nos';
   const onoHtml=ord.no?'<span class="o-ono">'+esc(ord.no)+'</span>':'';
   const descHtml=ord.description?'<span class="o-desc">'+esc(ord.description)+'</span>':'';
   const pFlex=total>0?pending/total:1, rFlex=total>0?rq/total:0, dFlex=total>0?dq/total:0;
@@ -1750,7 +1760,7 @@ function statusCardHTML(ord){
         +onoHtml
         +'<span class="o-detail">'+detail+'</span>'
         +descHtml
-        +'<span class="'+dispCls+'">'+esc(dispTxt)+'</span>'
+        +dueChipHTML
       +'</div>'
       +'<div class="tc-bar" aria-label="Progress: '+fmt(pending)+' pending, '+fmt(rq)+' ready, '+fmt(dq)+' dispatched">'
         +seg('p',pending,pFlex)
@@ -1975,7 +1985,9 @@ function olDue(o){
   return {text:dl+'d left',cls:'normal',date};
 }
 function olSize(o){
-  return esc(String(o.l||0))+' x '+esc(String(o.w||0))+(o.prod==='Box'?' x '+esc(String(o.h||0)):'')+' '+(o.su||'in');
+  // Use the multiplication sign (×) for dimensions — typographically correct and reads
+  // cleaner than a lowercase x. Shared by Orders and Status renderers.
+  return esc(String(o.l||0))+' × '+esc(String(o.w||0))+(o.prod==='Box'?' × '+esc(String(o.h||0)):'')+' '+(o.su||'in');
 }
 function olBar(o){
   const {total,r,d,p}=olBuckets(o);
@@ -2080,24 +2092,34 @@ async function olCommit(btn, id, tabName){
 //   4) Due     — date + urgency label stacked
 function olRowHTML(o){
   const st=olStatus(o), du=olDue(o);
-  const total=Number(o.qty)||0;
+  const b=olBuckets(o);
   const specTop=esc(String(o.ply||'?'))+' PLY · '+esc(o.prod||'—');
-  const specSub=olSize(o)+' · '+fmt(total)+' nos';
+  const specSub=olSize(o)+' · '+fmt(b.total)+' nos';
   const orderSub=o.no?'<div class="ol-c-sub">'+esc(o.no)+'</div>':'';
   const dueTop=du.date||(du.cls==='none'?'—':'');
+  // Option B: auto-open the editor on rows that still have actionable buckets
+  // (any pending or any ready qty). Fully-dispatched rows stay collapsed.
+  const canAction=b.p>0 || b.r>0;
+  const editrowCls=canAction ? 'ol-editrow open' : 'ol-editrow';
+  const editorHTML=canAction ? olEditorHTML(o) : '';
   return '<tr class="ol-row" data-oid="'+o.id+'">'
     +'<td class="ol-c-status-cell"><div class="ol-pill" onclick="olToggleEditor(this)"><span class="ol-pill-txt '+st.cls+'">'+st.text+'</span>'+olBar(o)+'</div></td>'
     +'<td class="ol-c-order"><div class="ol-c-main ol-cust-lnk" onclick="openDrawer('+o.id+')">'+esc(o.cust||'—')+'</div>'+orderSub+'</td>'
     +'<td class="ol-c-product"><div class="ol-c-main">'+specTop+'</div><div class="ol-c-sub">'+specSub+'</div></td>'
     +'<td class="ol-c-due"><div class="ol-c-due-date">'+esc(dueTop)+'</div>'+(du.cls==='none'?'':'<div class="ol-c-due-lbl"><span class="ol-due-lbl '+du.cls+'">'+du.text+'</span></div>')+'</td>'
   +'</tr>'
-  +'<tr class="ol-editrow"><td colspan="4"></td></tr>';
+  +'<tr class="'+editrowCls+'"><td colspan="4">'+editorHTML+'</td></tr>';
 }
 // Mobile card — whole summary block is clickable; editor sits alongside as a
 // sibling so its inner clicks (tabs, inputs, buttons) don't re-trigger toggle.
 function olCardHTML(o){
   const st=olStatus(o), du=olDue(o);
-  const detail=esc(String(o.ply||'?'))+' PLY - '+esc(o.prod||'—')+' - '+olSize(o)+' - '+fmt(Number(o.qty)||0)+' Nos';
+  const b=olBuckets(o);
+  // Uniform separator: middle-dot + × in dimensions (matches Status card + Orders desktop row).
+  const detail=esc(String(o.ply||'?'))+' PLY · '+esc(o.prod||'—')+' · '+olSize(o)+' · '+fmt(b.total)+' nos';
+  const canAction=b.p>0 || b.r>0;
+  const editorCls=canAction ? 'ol-c-editor open' : 'ol-c-editor';
+  const editorHTML=canAction ? olEditorHTML(o) : '';
   return '<div class="ol-card '+st.cls+'" data-oid="'+o.id+'">'
     +'<div class="ostripe '+st.cls+'"></div>'
     +'<div class="ol-c-summary" onclick="olToggleEditor(this)">'
@@ -2106,7 +2128,7 @@ function olCardHTML(o){
       +'<div class="ol-c-attr">'+detail+'</div>'
       +'<div class="ol-c-bar">'+olBar(o)+'</div>'
     +'</div>'
-    +'<div class="ol-c-editor"></div>'
+    +'<div class="'+editorCls+'">'+editorHTML+'</div>'
   +'</div>';
 }
 // Expand/collapse the inline editor for whichever surface the click came from.
@@ -2217,9 +2239,15 @@ function renderOrders(){
   const segHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('complete','Dispatched');
   ['ol-status-pills','ol-status-pills-mobile'].forEach(id=>{const h=document.getElementById(id); if(h) h.innerHTML=segHTML;});
 
-  // Page-header summary strip — useful on mobile where filters are separate.
+  // Page-header summary strip — bucket counts (order can appear in multiple), so the
+  // numbers agree with the Status page and reflect real production state.
   const summaryEl=document.getElementById('ol-summary');
-  if(summaryEl) summaryEl.textContent=orders.length+' orders · '+counts.pending+' pending · '+counts.ready+' ready · '+counts.complete+' dispatched';
+  if(summaryEl){
+    const bp=orders.filter(o=>{const t=Number(o.qty)||0,r=Number(o.ready_qty)||0,d=Number(o.dispatched_qty)||0;return Math.max(0,t-r-d)>0;}).length;
+    const br=orders.filter(o=>(Number(o.ready_qty)||0)>0).length;
+    const bd=orders.filter(o=>(Number(o.dispatched_qty)||0)>0).length;
+    summaryEl.textContent=orders.length+' Orders · '+bp+' Pending · '+br+' Ready · '+bd+' Dispatched';
+  }
 
   const list=orders.filter(olPasses);
   const mv=o=>o.updated_at||o.created_at||'';
@@ -2460,6 +2488,16 @@ function woPasses(o){
   if(woFStatus && !woBucketMatch(o, woFStatus)) return false;
   if(woFCust && (o.cust||'') !== woFCust) return false;
   if(woFProd && (o.prod||'') !== woFProd) return false;
+  if(woFDue){
+    // Same rule as Orders: an order matches urgent/soon only if it still has pending qty
+    // (nothing to be "due" about once dispatched).
+    const t=Number(o.qty)||0, r=Number(o.ready_qty)||0, d=Number(o.dispatched_qty)||0;
+    const p=Math.max(0,t-r-d);
+    const dl=o.disp ? Math.round((new Date(o.disp+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5) : null;
+    if(woFDue==='urgent' && !(p>0 && dl!==null && dl<3)) return false;
+    if(woFDue==='soon'   && !(p>0 && dl!==null && dl<7)) return false;
+    if(woFDue==='none'   && !(p===0 || dl===null))       return false;
+  }
   if(q && !orderMatchesQuery(o, q)) return false;
   return true;
 }
@@ -2470,10 +2508,11 @@ function woSyncFilterOptions(){
     s.innerHTML='<option value="">'+allLbl+'</option>'+vals.map(v=>'<option value="'+esc(v)+'"'+(v===cur?' selected':'')+'>'+esc(v)+'</option>').join('');};
   fill('wof-cust',custs,woFCust,'All customers');
   fill('wof-prod',prods,woFProd,'All products');
+  const dueSel=document.getElementById('wof-due'); if(dueSel) dueSel.value=woFDue;
 }
 function woAnyFilter(){
   const sb=document.getElementById('wo-search');
-  return !!(woFStatus||woFCust||woFProd||(sb&&sb.value.trim()));
+  return !!(woFStatus||woFCust||woFProd||woFDue||(sb&&sb.value.trim()));
 }
 function renderWorkStatus(){
   woSyncFilterOptions();
@@ -2499,9 +2538,9 @@ function renderWorkStatus(){
   const segHost=document.getElementById('wo-status-pills');
   if(segHost) segHost.innerHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('dispatched','Dispatched');
 
-  // Summary strip
+  // Summary strip — matches Orders page format for uniformity
   const summ=document.getElementById('wo-summary');
-  if(summ) summ.textContent=orders.length+' orders · '+counts.pending+' with pending · '+counts.ready+' with ready · '+counts.dispatched+' with dispatched';
+  if(summ) summ.textContent=orders.length+' Orders · '+counts.pending+' Pending · '+counts.ready+' Ready · '+counts.dispatched+' Dispatched';
 
   const list=orders.filter(woPasses);
   const mv=o=>o.updated_at||o.created_at||'';
@@ -2534,11 +2573,12 @@ function woGoPage(p){woPage=p;renderWorkStatus();window.scrollTo({top:0,behavior
 function woSetStatus(v){woFStatus=v;woPage=1;renderWorkStatus();}
 function woSetCust(v){woFCust=v;woPage=1;renderWorkStatus();}
 function woSetProd(v){woFProd=v;woPage=1;renderWorkStatus();}
+function woSetDue(v){woFDue=v;woPage=1;renderWorkStatus();}
 function woSortChange(v){woSort=v;woPage=1;renderWorkStatus();}
 function woClearFilters(){
-  woFStatus=woFCust=woFProd='';
+  woFStatus=woFCust=woFProd=woFDue='';
   woSort='due';
-  ['wof-cust','wof-prod','wo-sort'].forEach(id=>{const s=document.getElementById(id); if(s) s.value=id==='wo-sort'?'due':'';});
+  ['wof-cust','wof-prod','wof-due','wo-sort'].forEach(id=>{const s=document.getElementById(id); if(s) s.value=id==='wo-sort'?'due':'';});
   const sb=document.getElementById('wo-search'); if(sb) sb.value='';
   woPage=1;renderWorkStatus();
 }
