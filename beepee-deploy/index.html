@@ -3051,13 +3051,15 @@ function renderProductData(){
   const pageDisp=pageList.reduce((s,o)=>s+dqOf(o),0);
   const totalDisp=list.reduce((s,o)=>s+dqOf(o),0);
   // Column count for the footer's leading blank span — data cols before Qty/Dispatched
-  const leadCols=(showCust?5:4);
+  // (Dt. + [Customer?] + Order + Product + PLY + Size)
+  const leadCols=(showCust?6:5);
 
   document.getElementById('pd-list').innerHTML=
     '<div class="pd-tbl-wrap"><table class="pd-tbl">'
     +'<thead><tr>'
     +'<th>Dt. of Dispatch</th>'
     +(showCust?'<th>Customer</th>':'')
+    +'<th>Order</th>'
     +'<th>Product</th><th>PLY</th><th>Size</th>'
     +'<th class="r">Qty</th><th class="r">Dispatched</th>'
     +'</tr></thead><tbody>'
@@ -3070,9 +3072,11 @@ function renderProductData(){
       const dispCell=isPartial
         ? '<td class="r" style="color:var(--red);font-weight:700">'+fmt(dq)+'</td>'
         : '<td class="r">'+fmt(dq)+'</td>';
+      const orderCell=ord.no?'<td style="color:var(--ink3);font-size:12px">'+esc(ord.no)+'</td>':'<td class="muted">—</td>';
       return '<tr>'
         +'<td class="pd-date">'+fmtTs(ord.updated_at)+'</td>'
         +(showCust?'<td style="font-weight:500">'+esc(ord.cust||'—')+'</td>':'')
+        +orderCell
         +'<td><span class="c-chip c-chip-prod">'+esc(ord.prod||'—')+'</span></td>'
         +'<td><span class="c-chip c-chip-ply">'+esc(String(ord.ply||'?'))+' PLY</span></td>'
         +'<td class="muted">'+size+'</td>'
