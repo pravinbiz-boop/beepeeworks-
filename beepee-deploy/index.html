@@ -3042,51 +3042,42 @@ function renderProductData(){
     return;
   }
 
+  // Date formatters: fmtDate expects "YYYY-MM-DD"; fmtTs expects a full ISO timestamp.
   const fmtDate=d=>{if(!d)return '—';const dt=new Date(d+'T00:00:00');return dt.getDate()+' '+dt.toLocaleString('en-IN',{month:'short'})+' '+dt.getFullYear();};
+  const fmtTs=ts=>{if(!ts)return '—';const dt=new Date(ts);if(isNaN(dt))return '—';return dt.getDate()+' '+dt.toLocaleString('en-IN',{month:'short'})+' '+dt.getFullYear();};
   const showCust=!custSel.value;
   const dqOf=o=>deriveStatus(o.qty,o.ready_qty,o.dispatched_qty)==='Dispatched'?(Number(o.qty)||0):(Number(o.dispatched_qty)||0);
-  const rqOf=o=>deriveStatus(o.qty,o.ready_qty,o.dispatched_qty)==='Dispatched'?0:(Number(o.ready_qty)||0);
   const pageQty =pageList.reduce((s,o)=>s+(o.qty||0),0);
-  const pageRdy =pageList.reduce((s,o)=>s+rqOf(o),0);
   const pageDisp=pageList.reduce((s,o)=>s+dqOf(o),0);
-  const pagePend=pageList.reduce((s,o)=>s+Math.max(0,(o.qty||0)-rqOf(o)-dqOf(o)),0);
-  const totalRdy =list.reduce((s,o)=>s+rqOf(o),0);
   const totalDisp=list.reduce((s,o)=>s+dqOf(o),0);
-  const totalPend=list.reduce((s,o)=>s+Math.max(0,(o.qty||0)-rqOf(o)-dqOf(o)),0);
-  // Column count for the footer's leading blank span — data cols before Qty/Ready/Dispatched/Pending
+  // Column count for the footer's leading blank span — data cols before Qty/Dispatched
   const leadCols=(showCust?5:4);
 
   document.getElementById('pd-list').innerHTML=
     '<div class="pd-tbl-wrap"><table class="pd-tbl">'
     +'<thead><tr>'
-    +'<th>Dispatch date</th>'
+    +'<th>Dt. of Dispatch</th>'
     +(showCust?'<th>Customer</th>':'')
     +'<th>Product</th><th>PLY</th><th>Size</th>'
-    +'<th class="r">Qty</th><th class="r">Ready</th><th class="r">Dispatched</th><th class="r">Pending</th>'
-    +'<th>Status</th>'
+    +'<th class="r">Qty</th><th class="r">Dispatched</th>'
     +'</tr></thead><tbody>'
     +pageList.map(ord=>{
-      const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
+      const size=esc(String(ord.l||0))+' × '+esc(String(ord.w||0))+(ord.prod==='Box'?' × '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
       const total=Number(ord.qty)||0;
-      const rq=rqOf(ord), dq=dqOf(ord);
-      const pend=Math.max(0,total-rq-dq);
-      const pendCell=pend>0
-        ? '<td class="r" style="color:var(--amber);font-weight:700">'+fmt(pend)+'</td>'
-        : '<td class="r muted">—</td>';
-      const rdyCell=rq>0
-        ? '<td class="r" style="color:var(--green);font-weight:700">'+fmt(rq)+'</td>'
-        : '<td class="r muted">—</td>';
+      const dq=dqOf(ord);
+      // Red highlight when the order is only partially dispatched (more still coming).
+      const isPartial=dq>0 && dq<total;
+      const dispCell=isPartial
+        ? '<td class="r" style="color:var(--red);font-weight:700">'+fmt(dq)+'</td>'
+        : '<td class="r">'+fmt(dq)+'</td>';
       return '<tr>'
-        +'<td class="pd-date">'+fmtDate(ord.disp)+'</td>'
+        +'<td class="pd-date">'+fmtTs(ord.updated_at)+'</td>'
         +(showCust?'<td style="font-weight:500">'+esc(ord.cust||'—')+'</td>':'')
         +'<td><span class="c-chip c-chip-prod">'+esc(ord.prod||'—')+'</span></td>'
         +'<td><span class="c-chip c-chip-ply">'+esc(String(ord.ply||'?'))+' PLY</span></td>'
         +'<td class="muted">'+size+'</td>'
         +'<td class="r">'+fmt(total)+'</td>'
-        +rdyCell
-        +'<td class="r">'+fmt(dq)+'</td>'
-        +pendCell
-        +'<td>'+badge(deriveStatus(ord.qty,ord.ready_qty,ord.dispatched_qty))+'</td>'
+        +dispCell
         +'</tr>';
     }).join('')
     // Footer with page total (and grand total when more than one page)
@@ -3095,18 +3086,12 @@ function renderProductData(){
         +(totalPages>1?'Page total':'Total')
       +'</td>'
       +'<td class="r">'+fmt(pageQty)+'</td>'
-      +'<td class="r">'+fmt(pageRdy)+'</td>'
       +'<td class="r">'+fmt(pageDisp)+'</td>'
-      +'<td class="r">'+fmt(pagePend)+'</td>'
-      +'<td></td>'
     +'</tr>'
     +(totalPages>1?'<tr style="background:var(--s2);font-weight:700">'
       +'<td colspan="'+leadCols+'" style="text-align:right;color:var(--ink3);font-size:11px;text-transform:uppercase;letter-spacing:.04em">Grand total</td>'
       +'<td class="r">'+fmt(totalQty)+'</td>'
-      +'<td class="r">'+fmt(totalRdy)+'</td>'
       +'<td class="r">'+fmt(totalDisp)+'</td>'
-      +'<td class="r">'+fmt(totalPend)+'</td>'
-      +'<td></td>'
     +'</tr>':'')
     +'</tfoot>'
     +'</table></div>';
@@ -3141,15 +3126,15 @@ function pdClear(){
 function pdExportCsv(){
   const list=pdComputeList();
   if(!list.length){showToast('Nothing to export — apply filters that return orders','err');return;}
-  const head=['Dispatch date','Order date','Customer','Order no','Product','PLY','L','W','H','Unit','Qty','Ready','Dispatched','Pending','Status'];
+  // CSV matches the on-screen report: Dt. of Dispatch (from updated_at), Customer,
+  // Order no, Product, PLY, dimensions, Unit, Qty, Dispatched.
+  const head=['Dt. of Dispatch','Order date','Customer','Order no','Product','PLY','L','W','H','Unit','Qty','Dispatched'];
   const q=v=>{const s=(v==null?'':String(v));return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
   const dqOf=o=>deriveStatus(o.qty,o.ready_qty,o.dispatched_qty)==='Dispatched'?(Number(o.qty)||0):(Number(o.dispatched_qty)||0);
-  const rqOf=o=>deriveStatus(o.qty,o.ready_qty,o.dispatched_qty)==='Dispatched'?0:(Number(o.ready_qty)||0);
+  const dispDate=o=>{if(!o.updated_at)return '';const dt=new Date(o.updated_at);return isNaN(dt)?'':dt.toISOString().slice(0,10);};
   const rows=list.map(o=>{
     const total=Number(o.qty)||0;
-    const rq=rqOf(o), dq=dqOf(o);
-    const pend=Math.max(0,total-rq-dq);
-    return [o.disp,o.date,o.cust,o.no,o.prod,o.ply,o.l,o.w,o.h,o.su,total,rq,dq,pend,deriveStatus(o.qty,o.ready_qty,o.dispatched_qty)].map(q).join(',');
+    return [dispDate(o),o.date,o.cust,o.no,o.prod,o.ply,o.l,o.w,o.h,o.su,total,dqOf(o)].map(q).join(',');
   });
   // Excel-friendly: UTF-8 BOM + CRLF
   const csv='﻿'+[head.join(','),...rows].join('\r\n');
