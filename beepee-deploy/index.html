@@ -1994,8 +1994,10 @@ function olDaysLeft(o){
 }
 // Due label — only meaningful while something is still pending.
 function olDue(o){
-  const {p}=olBuckets(o);
-  if(p===0) return {text:'-',cls:'none',date:''};
+  // Show the due chip for anything not yet fully dispatched — Pending needs it
+  // for production planning, Ready needs it for dispatch scheduling.
+  const {total,d}=olBuckets(o);
+  if(total>0 && d>=total) return {text:'-',cls:'none',date:''};
   const dl=olDaysLeft(o);
   if(dl===null) return {text:'No date',cls:'none',date:''};
   const date=ddmm(o.disp);
@@ -2227,10 +2229,13 @@ function olPasses(o){
   if(olFCust && (o.cust||'')!==olFCust) return false;
   if(olFProd && (o.prod||'')!==olFProd) return false;
   if(olFDue){
-    const {p}=olBuckets(o); const dl=olDaysLeft(o);
-    if(olFDue==='urgent' && !(p>0 && dl!==null && dl<3)) return false;
-    if(olFDue==='soon'   && !(p>0 && dl!==null && dl<7)) return false;
-    if(olFDue==='none'   && !(p===0 || dl===null))       return false;
+    // Match any not-fully-dispatched order (pending OR ready) — the due chip now
+    // applies to both, so the filter should too.
+    const b=olBuckets(o); const dl=olDaysLeft(o);
+    const inWork = !(b.total>0 && b.d>=b.total);
+    if(olFDue==='urgent' && !(inWork && dl!==null && dl<3)) return false;
+    if(olFDue==='soon'   && !(inWork && dl!==null && dl<7)) return false;
+    if(olFDue==='none'   && !(!inWork || dl===null))         return false;
   }
   if(q && !orderMatchesQuery(o,q)) return false;
   return true;
@@ -2507,14 +2512,13 @@ function woPasses(o){
   if(woFCust && (o.cust||'') !== woFCust) return false;
   if(woFProd && (o.prod||'') !== woFProd) return false;
   if(woFDue){
-    // Same rule as Orders: an order matches urgent/soon only if it still has pending qty
-    // (nothing to be "due" about once dispatched).
-    const t=Number(o.qty)||0, r=Number(o.ready_qty)||0, d=Number(o.dispatched_qty)||0;
-    const p=Math.max(0,t-r-d);
+    // Same rule as Orders: match any not-fully-dispatched order (pending OR ready).
+    const t=Number(o.qty)||0, d=Number(o.dispatched_qty)||0;
+    const inWork = !(t>0 && d>=t);
     const dl=o.disp ? Math.round((new Date(o.disp+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5) : null;
-    if(woFDue==='urgent' && !(p>0 && dl!==null && dl<3)) return false;
-    if(woFDue==='soon'   && !(p>0 && dl!==null && dl<7)) return false;
-    if(woFDue==='none'   && !(p===0 || dl===null))       return false;
+    if(woFDue==='urgent' && !(inWork && dl!==null && dl<3)) return false;
+    if(woFDue==='soon'   && !(inWork && dl!==null && dl<7)) return false;
+    if(woFDue==='none'   && !(!inWork || dl===null))         return false;
   }
   if(q && !orderMatchesQuery(o, q)) return false;
   return true;
