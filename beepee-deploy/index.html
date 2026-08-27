@@ -349,12 +349,12 @@ table.t{width:100%;border-collapse:collapse}
 .ol-seg-btn.on[data-key=""]{background:var(--accent);color:#fff}
 .ol-seg-btn.on[data-key="pending"]{background:var(--stat-pend);color:#fff}
 .ol-seg-btn.on[data-key="ready"]{background:var(--stat-ready);color:#1F1611}
-.ol-seg-btn.on[data-key="complete"]{background:var(--stat-disp);color:#fff}
+.ol-seg-btn.on[data-key="dispatched"]{background:var(--stat-disp);color:#fff}
 /* Active count uses the tab's semantic color as ink on the opaque badge — high contrast on any bg */
 .ol-seg-btn.on[data-key=""] .ol-seg-count{color:var(--accent)}
 .ol-seg-btn.on[data-key="pending"] .ol-seg-count{color:var(--stat-pend)}
 .ol-seg-btn.on[data-key="ready"] .ol-seg-count{color:#8A4B00}
-.ol-seg-btn.on[data-key="complete"] .ol-seg-count{color:var(--stat-disp)}
+.ol-seg-btn.on[data-key="dispatched"] .ol-seg-count{color:var(--stat-disp)}
 
 /* Column headers */
 .ol-header-row th{position:sticky;top:0;z-index:2;background:var(--s2);text-align:left;padding:10px 14px;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);border-bottom:var(--bw) solid var(--line2)}
@@ -511,9 +511,11 @@ tr.ol-row:hover{background:var(--s2)}
 @media(max-width:720px){
   .wo-filter-row{gap:8px}
   .wo-filter-row .ol-seg{width:100%}
-  .wo-filter-row .ol-seg-btn{flex:1;padding:0 6px;font-size:11px;gap:4px;justify-content:center;min-width:0;height:42px}
+  .wo-filter-row .ol-seg-btn{flex:1;padding:0 6px;font-size:11px;gap:5px;justify-content:center;min-width:0;height:42px}
   .wo-filter-row .ol-seg-lbl{overflow:hidden;text-overflow:ellipsis}
-  .wo-filter-row .ol-seg-count{font-size:9px;padding:1px 4px;min-width:16px}
+  /* Keep the badge centering + solid background from the base rule on mobile;
+     only nudge the font a touch smaller so 3-digit counts still fit. */
+  .wo-filter-row .ol-seg-count{font-size:10px;min-width:22px}
   .wo-filter-selects{flex-basis:100%}
   .wo-filter-selects .ol-col-sel{flex:1 1 45%;min-width:130px;height:42px}
 }
@@ -1965,9 +1967,9 @@ function olBuckets(o){
 function olStatus(o){
   const {total,r,d,p}=olBuckets(o);
   if(p>0)                 return {key:'pending', text:fmt(p)+' pending', cls:'pn'};
-  if(total>0 && d>=total) return {key:'complete',text:'Dispatched',        cls:'ds'};
+  if(total>0 && d>=total) return {key:'dispatched',text:'Dispatched',        cls:'ds'};
   if(r>0)                 return {key:'ready',   text:fmt(r)+' ready',    cls:'rd'};
-  return {key:'complete',text:'Dispatched',cls:'ds'};
+  return {key:'dispatched',text:'Dispatched',cls:'ds'};
 }
 function olDaysLeft(o){
   if(!o.disp) return null;
@@ -2223,7 +2225,7 @@ function renderOrders(){
   const basePool=orders.filter(olPasses);
   olFStatus=savedStatus;
   const counts={'':basePool.length};
-  ['pending','ready','complete'].forEach(k=>counts[k]=basePool.filter(o=>olStatus(o).key===k).length);
+  ['pending','ready','dispatched'].forEach(k=>counts[k]=basePool.filter(o=>olStatus(o).key===k).length);
   const tab=(k,lbl)=>{
     const on=olFStatus===k;
     return '<button class="ol-seg-btn'+(on?' on':'')+'" data-key="'+k+'" role="tab" aria-pressed="'+on+'" onclick="olSetStatus(\''+k+'\')">'
@@ -2231,7 +2233,7 @@ function renderOrders(){
       +'<span class="ol-seg-count">'+(counts[k]||0)+'</span></button>';
   };
   const segHost=document.getElementById('ol-status-pills');
-  if(segHost) segHost.innerHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('complete','Dispatched');
+  if(segHost) segHost.innerHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('dispatched','Dispatched');
 
   // Page-header summary strip — bucket counts (order can appear in multiple), so the
   // numbers agree with the Status page and reflect real production state.
@@ -2246,7 +2248,7 @@ function renderOrders(){
   const list=orders.filter(olPasses);
   // Sort — same 3 dimensions as the Status page for uniformity.
   const mv=o=>o.updated_at||o.created_at||'';
-  if(olSort==='due')       list.sort((a,b)=>(a.disp||'9999').localeCompare(b.disp||'9999') || (b.id-a.id));
+  if(olSort==='due')       list.sort((a,b)=>{const ad=a.disp||'',bd=b.disp||''; if(!ad&&!bd)return b.id-a.id; if(!ad)return 1; if(!bd)return -1; return ad.localeCompare(bd) || (b.id-a.id);});
   else if(olSort==='moved') list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
   else if(olSort==='cust')  list.sort((a,b)=>(a.cust||'').localeCompare(b.cust||''));
 
@@ -2521,7 +2523,7 @@ function renderWorkStatus(){
 
   const list=orders.filter(woPasses);
   const mv=o=>o.updated_at||o.created_at||'';
-  if(woSort==='due')       list.sort((a,b)=>(a.disp||'9999').localeCompare(b.disp||'9999') || (b.id-a.id));
+  if(woSort==='due')       list.sort((a,b)=>{const ad=a.disp||'',bd=b.disp||''; if(!ad&&!bd)return b.id-a.id; if(!ad)return 1; if(!bd)return -1; return ad.localeCompare(bd) || (b.id-a.id);});
   else if(woSort==='moved')list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
   else if(woSort==='cust') list.sort((a,b)=>(a.cust||'').localeCompare(b.cust||''));
 
