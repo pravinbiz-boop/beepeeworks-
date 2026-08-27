@@ -335,26 +335,22 @@ table.t{width:100%;border-collapse:collapse}
 .ol-seg-btn:last-child{border-right:0}
 .ol-seg-btn:hover:not(.on){background:var(--s2);color:var(--ink2)}
 .ol-seg-lbl{white-space:nowrap}
-/* Count badge — solid opaque background + dark text so it's clearly visible on
-   any active-tab background colour. Centre-aligned inside a fixed-min pill. */
-.ol-seg-count{
-  display:inline-flex;align-items:center;justify-content:center;
-  min-width:24px;height:18px;padding:0 6px;box-sizing:border-box;
-  border-radius:9px;background:var(--surface);
-  font-size:10.5px;font-weight:800;color:var(--ink);
-  font-variant-numeric:tabular-nums;flex-shrink:0;
-  box-shadow:0 0 0 1px rgba(15,23,42,.08);
-}
 /* Active tab — semantic fill matching the status ramp */
 .ol-seg-btn.on[data-key=""]{background:var(--accent);color:#fff}
 .ol-seg-btn.on[data-key="pending"]{background:var(--stat-pend);color:#fff}
 .ol-seg-btn.on[data-key="ready"]{background:var(--stat-ready);color:#1F1611}
 .ol-seg-btn.on[data-key="dispatched"]{background:var(--stat-disp);color:#fff}
-/* Active count uses the tab's semantic color as ink on the opaque badge — high contrast on any bg */
-.ol-seg-btn.on[data-key=""] .ol-seg-count{color:var(--accent)}
-.ol-seg-btn.on[data-key="pending"] .ol-seg-count{color:var(--stat-pend)}
-.ol-seg-btn.on[data-key="ready"] .ol-seg-count{color:#8A4B00}
-.ol-seg-btn.on[data-key="dispatched"] .ol-seg-count{color:var(--stat-disp)}
+
+/* Result-count line — big number + semantic label, updates with the active status
+   tab. Same treatment on Orders + Status pages so the count for the current
+   selection reads at a glance above the list. */
+.result-count{display:flex;align-items:baseline;gap:8px;margin:8px 4px 12px;font-family:'DM Sans',sans-serif}
+.rc-num{font-family:'Outfit',sans-serif;font-size:22px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1;letter-spacing:-.01em}
+.rc-lbl{font-size:12px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
+.rc-lbl.pn{color:var(--stat-pend)}
+.rc-lbl.rd{color:#8A4B00}
+.rc-lbl.ds{color:var(--stat-disp)}
+.rc-lbl.accent{color:var(--accent)}
 
 /* Column headers */
 .ol-header-row th{position:sticky;top:0;z-index:2;background:var(--s2);text-align:left;padding:10px 14px;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);border-bottom:var(--bw) solid var(--line2)}
@@ -516,11 +512,10 @@ tr.ol-row:hover{background:var(--s2)}
 @media(max-width:720px){
   .wo-filter-row{gap:8px}
   .wo-filter-row .ol-seg{width:100%}
-  .wo-filter-row .ol-seg-btn{flex:1;padding:0 6px;font-size:11px;gap:5px;justify-content:center;min-width:0;height:42px}
-  .wo-filter-row .ol-seg-lbl{overflow:hidden;text-overflow:ellipsis}
-  /* Keep the badge centering + solid background from the base rule on mobile;
-     only nudge the font a touch smaller so 3-digit counts still fit. */
-  .wo-filter-row .ol-seg-count{font-size:10px;min-width:22px}
+  /* Labels-only tabs — enough breathing room for "Dispatched" at 375px viewport.
+     Font is 11.5px so all four labels fit inside their own tab with padding. */
+  .wo-filter-row .ol-seg-btn{flex:1;padding:0 4px;font-size:11.5px;gap:0;justify-content:center;min-width:0;height:42px;font-weight:600}
+  .wo-filter-row .ol-seg-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .wo-filter-selects{flex-basis:100%}
   .wo-filter-selects .ol-col-sel{flex:1 1 45%;min-width:130px;height:42px}
 }
@@ -899,18 +894,21 @@ tr.ol-row:hover{background:var(--s2)}
     <div class="wo-filter-row">
       <div class="ol-seg" id="ol-status-pills" role="tablist" aria-label="Filter by status"></div>
       <div class="wo-filter-selects">
-        <select class="sel ol-col-sel" id="olf-cust" onchange="olApplyFilters()" aria-label="Filter by customer"><option value="">All customers</option></select>
-        <select class="sel ol-col-sel" id="olf-prod" onchange="olApplyFilters()" aria-label="Filter by product"><option value="">All products</option></select>
+        <select class="sel ol-col-sel" id="olf-cust" onchange="olApplyFilters()" aria-label="Filter by customer"><option value="">All Customers</option></select>
+        <select class="sel ol-col-sel" id="olf-prod" onchange="olApplyFilters()" aria-label="Filter by product"><option value="">All Products</option></select>
         <select class="sel ol-col-sel" id="olf-due" onchange="olApplyFilters()" aria-label="Filter by due date">
-          <option value="">Any due</option><option value="urgent">&lt; 3 days</option>
-          <option value="soon">&lt; 7 days</option><option value="none">No due</option>
+          <option value="">Any Due</option><option value="urgent">&lt; 3 Days</option>
+          <option value="soon">&lt; 7 Days</option><option value="none">No Due</option>
         </select>
         <select class="sel ol-col-sel" id="ol-sort" onchange="olSortChange(this.value)" aria-label="Sort orders">
-          <option value="due">Sort · due date</option>
-          <option value="moved">Sort · recently moved</option>
+          <option value="due">Sort · Due Date</option>
+          <option value="moved">Sort · Recently Moved</option>
         </select>
       </div>
     </div>
+
+    <!-- Result-count line — updates with the active status filter (All / Pending / Ready / Dispatched) -->
+    <div class="result-count" id="ol-result-count"></div>
 
     <!-- DESKTOP: table -->
     <div class="ol-tablewrap">
@@ -951,18 +949,21 @@ tr.ol-row:hover{background:var(--s2)}
     <div class="wo-filter-row">
       <div class="ol-seg" id="wo-status-pills" role="tablist" aria-label="Filter by status"></div>
       <div class="wo-filter-selects">
-        <select class="sel ol-col-sel" id="wof-cust" onchange="woApplyFilters()" aria-label="Filter by customer"><option value="">All customers</option></select>
-        <select class="sel ol-col-sel" id="wof-prod" onchange="woApplyFilters()" aria-label="Filter by product"><option value="">All products</option></select>
+        <select class="sel ol-col-sel" id="wof-cust" onchange="woApplyFilters()" aria-label="Filter by customer"><option value="">All Customers</option></select>
+        <select class="sel ol-col-sel" id="wof-prod" onchange="woApplyFilters()" aria-label="Filter by product"><option value="">All Products</option></select>
         <select class="sel ol-col-sel" id="wof-due" onchange="woApplyFilters()" aria-label="Filter by due date">
-          <option value="">Any due</option><option value="urgent">&lt; 3 days</option>
-          <option value="soon">&lt; 7 days</option><option value="none">No due</option>
+          <option value="">Any Due</option><option value="urgent">&lt; 3 Days</option>
+          <option value="soon">&lt; 7 Days</option><option value="none">No Due</option>
         </select>
         <select class="sel ol-col-sel" id="wo-sort" onchange="woSortChange(this.value)" aria-label="Sort orders">
-          <option value="due">Sort · due date</option>
-          <option value="moved">Sort · recently moved</option>
+          <option value="due">Sort · Due Date</option>
+          <option value="moved">Sort · Recently Moved</option>
         </select>
       </div>
     </div>
+
+    <!-- Result-count line — updates with the active status filter -->
+    <div class="result-count" id="wo-result-count"></div>
 
     <div class="wo-list" id="wo-list"></div>
     <div class="pd-pagination" id="wo-pagination" style="display:none"></div>
@@ -1951,6 +1952,19 @@ function bucketMatch(o, key){
   if(key==='dispatched') return b.total>0 && b.d>0;
   return true; // '' = All
 }
+// Result-count strip that sits above the first card — big number + semantic label.
+// Same helper on both pages so the visual treatment stays uniform.
+function renderResultCount(hostId, activeStatus, counts){
+  const el=document.getElementById(hostId); if(!el) return;
+  const map={
+    '':         {n:counts[''],         lbl:'Orders',     cls:'accent'},
+    'pending':  {n:counts.pending,     lbl:'Pending',    cls:'pn'},
+    'ready':    {n:counts.ready,       lbl:'Ready',      cls:'rd'},
+    'dispatched':{n:counts.dispatched, lbl:'Dispatched', cls:'ds'}
+  };
+  const info=map[activeStatus]||map[''];
+  el.innerHTML='<span class="rc-num">'+fmt(info.n||0)+'</span><span class="rc-lbl '+info.cls+'">'+info.lbl+'</span>';
+}
 // Headline status — pending outranks everything (matches the reference).
 function olStatus(o){
   const {total,r,d,p}=olBuckets(o);
@@ -2171,8 +2185,8 @@ function olSyncFilterOptions(){
   const prods=[...new Set(orders.map(o=>o.prod).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   const fill=(id,vals,cur,allLbl)=>{const s=document.getElementById(id); if(!s) return;
     s.innerHTML='<option value="">'+allLbl+'</option>'+vals.map(v=>'<option value="'+esc(v)+'"'+(v===cur?' selected':'')+'>'+esc(v)+'</option>').join('');};
-  fill('olf-cust',custs,olFCust,'All customers');
-  fill('olf-prod',prods,olFProd,'All products');
+  fill('olf-cust',custs,olFCust,'All Customers');
+  fill('olf-prod',prods,olFProd,'All Products');
   // Sync the Due filter + sort dropdown values.
   const dueSel=document.getElementById('olf-due'); if(dueSel) dueSel.value=olFDue;
   const sortSel=document.getElementById('ol-sort'); if(sortSel && sortSel.value!==olSort) sortSel.value=olSort;
@@ -2217,11 +2231,13 @@ function renderOrders(){
   const tab=(k,lbl)=>{
     const on=olFStatus===k;
     return '<button class="ol-seg-btn'+(on?' on':'')+'" data-key="'+k+'" role="tab" aria-pressed="'+on+'" onclick="olSetStatus(\''+k+'\')">'
-      +'<span class="ol-seg-lbl">'+lbl+'</span>'
-      +'<span class="ol-seg-count">'+(counts[k]||0)+'</span></button>';
+      +'<span class="ol-seg-lbl">'+lbl+'</span></button>';
   };
   const segHost=document.getElementById('ol-status-pills');
   if(segHost) segHost.innerHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('dispatched','Dispatched');
+
+  // Result-count line — big number + semantic label for the currently-active status filter.
+  renderResultCount('ol-result-count', olFStatus, counts);
 
   // Summary strip — uses the SAME bucket counts as the tabs and respects the
   // active filters, so the header line always agrees with the tab numbers.
@@ -2462,8 +2478,8 @@ function woSyncFilterOptions(){
   const prods=[...new Set(orders.map(o=>o.prod).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   const fill=(id,vals,cur,allLbl)=>{const s=document.getElementById(id); if(!s) return;
     s.innerHTML='<option value="">'+allLbl+'</option>'+vals.map(v=>'<option value="'+esc(v)+'"'+(v===cur?' selected':'')+'>'+esc(v)+'</option>').join('');};
-  fill('wof-cust',custs,woFCust,'All customers');
-  fill('wof-prod',prods,woFProd,'All products');
+  fill('wof-cust',custs,woFCust,'All Customers');
+  fill('wof-prod',prods,woFProd,'All Products');
   const dueSel=document.getElementById('wof-due'); if(dueSel) dueSel.value=woFDue;
 }
 function woAnyFilter(){
@@ -2488,11 +2504,13 @@ function renderWorkStatus(){
   const tab=(k,lbl)=>{
     const on=woFStatus===k;
     return '<button class="ol-seg-btn'+(on?' on':'')+'" data-key="'+k+'" role="tab" aria-pressed="'+on+'" onclick="woSetStatus(\''+k+'\')">'
-      +'<span class="ol-seg-lbl">'+lbl+'</span>'
-      +'<span class="ol-seg-count">'+(counts[k]||0)+'</span></button>';
+      +'<span class="ol-seg-lbl">'+lbl+'</span></button>';
   };
   const segHost=document.getElementById('wo-status-pills');
   if(segHost) segHost.innerHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('dispatched','Dispatched');
+
+  // Result-count line — matches Orders page pattern.
+  renderResultCount('wo-result-count', woFStatus, counts);
 
   // Summary strip — matches Orders page format for uniformity
   const summ=document.getElementById('wo-summary');
