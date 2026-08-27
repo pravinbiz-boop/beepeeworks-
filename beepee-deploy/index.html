@@ -369,7 +369,7 @@ table.t{width:100%;border-collapse:collapse}
 .ol-c-sub{font-size:11.5px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4;margin-top:3px;font-variant-numeric:tabular-nums}
 .ol-c-status-cell{padding-right:16px}
 /* Status cell — stack qty+text on top, bar below (desktop only; mobile stays horizontal) */
-.ol-c-status-cell .ol-pill{flex-direction:column;align-items:stretch;gap:8px;cursor:pointer}
+.ol-c-status-cell .ol-pill{flex-direction:column;align-items:stretch;gap:8px}
 .ol-c-status-cell .ol-pill-txt{font-size:13px}
 .ol-c-status-cell .ol-bar{width:100%;flex:none;height:6px}
 .ol-c-order .ol-c-main{color:var(--ink);cursor:pointer}
@@ -403,6 +403,11 @@ table.t{width:100%;border-collapse:collapse}
     z-index:5;
     box-shadow:0 -6px 16px rgba(0,0,0,.06);
   }
+  /* Center-align filter dropdown text on mobile (both pages).
+     text-align-last handles the closed-select state; padding rebalances so
+     the label sits visually centered rather than shifted left by the native
+     dropdown arrow's inset. */
+  .ol-col-sel{text-align:center;text-align-last:center;padding:0 4px}
 }
 
 /* status pill — shared table + card */
@@ -903,7 +908,6 @@ tr.ol-row:hover{background:var(--s2)}
         <select class="sel ol-col-sel" id="ol-sort" onchange="olSortChange(this.value)" aria-label="Sort orders">
           <option value="due">Sort · due date</option>
           <option value="moved">Sort · recently moved</option>
-          <option value="cust">Sort · customer A-Z</option>
         </select>
       </div>
     </div>
@@ -947,16 +951,15 @@ tr.ol-row:hover{background:var(--s2)}
     <div class="wo-filter-row">
       <div class="ol-seg" id="wo-status-pills" role="tablist" aria-label="Filter by status"></div>
       <div class="wo-filter-selects">
-        <select class="sel ol-col-sel" id="wof-cust" onchange="woSetCust(this.value)" aria-label="Filter by customer"><option value="">All customers</option></select>
-        <select class="sel ol-col-sel" id="wof-prod" onchange="woSetProd(this.value)" aria-label="Filter by product"><option value="">All products</option></select>
-        <select class="sel ol-col-sel" id="wof-due" onchange="woSetDue(this.value)" aria-label="Filter by due date">
+        <select class="sel ol-col-sel" id="wof-cust" onchange="woApplyFilters()" aria-label="Filter by customer"><option value="">All customers</option></select>
+        <select class="sel ol-col-sel" id="wof-prod" onchange="woApplyFilters()" aria-label="Filter by product"><option value="">All products</option></select>
+        <select class="sel ol-col-sel" id="wof-due" onchange="woApplyFilters()" aria-label="Filter by due date">
           <option value="">Any due</option><option value="urgent">&lt; 3 days</option>
           <option value="soon">&lt; 7 days</option><option value="none">No due</option>
         </select>
         <select class="sel ol-col-sel" id="wo-sort" onchange="woSortChange(this.value)" aria-label="Sort orders">
           <option value="due">Sort · due date</option>
           <option value="moved">Sort · recently moved</option>
-          <option value="cust">Sort · customer A-Z</option>
         </select>
       </div>
     </div>
@@ -1690,35 +1693,6 @@ async function saveNewOrder(){
 }
 
 // Shared card renderer — used by both Orders and Work Status pages.
-// edit=true renders the Work Status variant (adds inline status dropdown).
-// Renders an Orders-page card. Work Status uses statusCardHTML (Toggle Card) instead.
-function orderCardHTML(ord){
-  const derived=deriveStatus(ord.qty,ord.ready_qty,ord.dispatched_qty);
-  const dm=dispMeta(ord.disp,derived);
-  const sk=skCls(derived);
-  const dispTxt=dm.cls==='done'?'Dispatched':ord.disp?ddmm(ord.disp)+' - '+dm.label:'No date set';
-  const dispCls='c-disp '+(dm.cls==='done'?'done':dm.cls==='overdue'?'overdue':dm.cls==='today'?'today':ord.disp?'ok':'nodate');
-  const size=esc(String(ord.l||0))+' x '+esc(String(ord.w||0))+(ord.prod==='Box'?' x '+esc(String(ord.h||0)):'')+' '+(ord.su||'in');
-  const total=Number(ord.qty)||0;
-  const detail=esc(String(ord.ply||'?'))+' PLY - '+esc(ord.prod||'—')+' - '+size+' - '+fmt(total)+' nos.';
-  const onoHtml=ord.no?'<span class="o-ono">'+esc(ord.no)+'</span>':'';
-  const descHtml=ord.description?'<span class="o-desc">'+esc(ord.description)+'</span>':'';
-  return '<div class="ocard '+sk+'" data-oid="'+ord.id+'" tabindex="0" role="button" aria-label="Open order '+esc(ord.no||ord.cust||'')+'" onclick="openDrawer('+ord.id+')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openDrawer('+ord.id+');}">'
-    +'<div class="ostripe '+sk+'"></div>'
-    +'<div class="obody-c">'
-      +'<div class="o-left">'
-        +'<span class="o-cust">'+esc(ord.cust||'—')+'</span>'
-        +onoHtml
-        +'<span class="o-detail">'+detail+'</span>'
-        +descHtml
-      +'</div>'
-      +'<div class="o-right">'
-        +'<span class="'+dispCls+'">'+esc(dispTxt)+'</span>'
-        +'<span class="o-stat '+sk+'">'+esc(derived)+'</span>'
-      +'</div>'
-    +'</div>'
-  +'</div>';
-}
 // ── LEDGER · Status page bucket card ───────────────────────────
 // Renders one order as a Toggle Card: header + bucket bar + 4-tab action strip.
 // Variant A — bar + compact nums, 2 tabs (+ Ready / + Dispatch).
@@ -1868,48 +1842,52 @@ async function tcPatchOrder(id, patch, successMsg){
   }
 }
 
-// + Ready X: pulls X from Pending; adds X to Ready. Guardrail: X ≤ Pending.
-// Input is scoped to the button's own card so two open editors don't collide.
+// Shared commit helpers — both Orders' and Status's inline editors call these.
+// Returns {ok:true} on success, {ok:false, reason} when a guardrail rejects.
+// Caller keeps its focus/select behaviour after a failure via the returned flag.
+async function commitReady(id, delta){
+  if(isNaN(delta)||delta<=0) return {ok:false, reason:'positive'};
+  const o=orders.find(x=>x.id===id); if(!o) return {ok:false, reason:'not-found'};
+  const {r,p}=olBuckets(o);
+  if(delta>p){showToast('Only '+fmt(p)+' pending — cannot mark '+fmt(delta)+' ready','err'); return {ok:false, reason:'guardrail'};}
+  const newR=r+delta;
+  await tcPatchOrder(id,{ready_qty:newR, updated_at:new Date().toISOString()},'Ready + '+fmt(delta)+' → '+fmt(newR));
+  return {ok:true};
+}
+async function commitDispatch(id, delta){
+  if(isNaN(delta)||delta<=0) return {ok:false, reason:'positive'};
+  const o=orders.find(x=>x.id===id); if(!o) return {ok:false, reason:'not-found'};
+  const {total,r,d}=olBuckets(o);
+  if(delta>r){showToast('Only '+fmt(r)+' ready — mark more as ready first','err'); return {ok:false, reason:'guardrail'};}
+  const newR=r-delta, newD=d+delta;
+  const okMsg=(newD>=total && total>0)
+    ? 'Fully dispatched · '+fmt(total)+'/'+fmt(total)
+    : 'Dispatch + '+fmt(delta)+' → '+fmt(newD)+' (Ready now '+fmt(newR)+')';
+  await tcPatchOrder(id,{ready_qty:newR, dispatched_qty:newD, updated_at:new Date().toISOString()}, okMsg);
+  return {ok:true};
+}
+
+// Status editor wrappers — parse the card-scoped input, call the shared helper,
+// keep focus on failure so the user can correct the value.
 async function tcCommitReady(btn, id){
   const card=btn.closest('.ocard.scard'); if(!card) return;
   const inp=card.querySelector('.tc-inp-ready'); if(!inp) return;
   const delta=parseInt(inp.value,10);
-  if(isNaN(delta)||delta<=0){showToast('Enter a positive number','err');inp.focus();return;}
-  const o=orders.find(x=>x.id===id); if(!o) return;
-  const total=Number(o.qty)||0;
-  const rq=Number(o.ready_qty)||0;
-  const dq=Number(o.dispatched_qty)||0;
-  const pending=Math.max(0,total-rq-dq);
-  if(delta>pending){
-    showToast('Only '+fmt(pending)+' pending — cannot mark '+fmt(delta)+' ready','err');
-    inp.focus();inp.select();return;
+  const res=await commitReady(id, delta);
+  if(!res.ok){
+    if(res.reason==='positive'){ showToast('Enter a positive number','err'); }
+    inp.focus(); inp.select?.();
   }
-  const newR=rq+delta;
-  await tcPatchOrder(id, {ready_qty:newR, updated_at:new Date().toISOString()},
-    'Ready + '+fmt(delta)+' → '+fmt(newR));
 }
-
-// + Dispatch X: pulls X from Ready; adds X to Dispatched. Pending unchanged.
-// Guardrail: X ≤ Ready.
 async function tcCommitDispatch(btn, id){
   const card=btn.closest('.ocard.scard'); if(!card) return;
   const inp=card.querySelector('.tc-inp-dispatch'); if(!inp) return;
   const delta=parseInt(inp.value,10);
-  if(isNaN(delta)||delta<=0){showToast('Enter a positive number','err');inp.focus();return;}
-  const o=orders.find(x=>x.id===id); if(!o) return;
-  const total=Number(o.qty)||0;
-  const rq=Number(o.ready_qty)||0;
-  const dq=Number(o.dispatched_qty)||0;
-  if(delta>rq){
-    showToast('Only '+fmt(rq)+' ready — mark more as ready first','err');
-    inp.focus();inp.select();return;
+  const res=await commitDispatch(id, delta);
+  if(!res.ok){
+    if(res.reason==='positive'){ showToast('Enter a positive number','err'); }
+    inp.focus(); inp.select?.();
   }
-  const newR=rq-delta;
-  const newD=dq+delta;
-  const okMsg=(newD>=total && total>0)
-    ? 'Fully dispatched · '+fmt(total)+'/'+fmt(total)
-    : 'Dispatch + '+fmt(delta)+' → '+fmt(newD)+' (Ready now '+fmt(newR)+')';
-  await tcPatchOrder(id, {ready_qty:newR, dispatched_qty:newD, updated_at:new Date().toISOString()}, okMsg);
 }
 
 // Edit Qty removed from the Toggle Card — total qty is edited from the drawer
@@ -1919,14 +1897,10 @@ async function tcCommitDispatch(btn, id){
 // (Both Orders and Status pages use .ocard; Status adds .scard for bar/nums/tabs.)
 function updateOrderCardDom(id){
   const o=orders.find(x=>x.id===id); if(!o) return;
-  // Legacy .ocard (Status page toggle cards + any lingering renderer)
-  document.querySelectorAll('.ocard[data-oid="'+id+'"]').forEach(el=>{
+  // Status page toggle cards (.ocard.scard)
+  document.querySelectorAll('.ocard.scard[data-oid="'+id+'"]').forEach(el=>{
     const wrap=document.createElement('div');
-    if(el.classList.contains('scard')){
-      wrap.innerHTML=statusCardHTML(o);
-    } else {
-      wrap.innerHTML=orderCardHTML(o);
-    }
+    wrap.innerHTML=statusCardHTML(o);
     el.replaceWith(wrap.firstElementChild);
   });
   // Orders page desktop row (main + editor row pair)
@@ -2085,24 +2059,17 @@ function olTabToggle(btn, tabName){
     });
   }
 }
-// Commit a delta — routes through the same tcPatchOrder used by Status
-// (optimistic + rollback + toast + status re-derived from the buckets).
+// Orders editor wrapper — parse the editor-scoped input, delegate to the
+// shared commit helper, keep focus on failure so the user can correct.
 async function olCommit(btn, id, tabName){
   const ed=btn.closest('.ol-editor'); if(!ed) return;
   const inp=ed.querySelector('.ol-ed-inp'); if(!inp) return;
   const delta=parseInt(inp.value,10);
-  if(isNaN(delta)||delta<=0){showToast('Enter a positive number','err');inp.focus();return;}
-  const o=orders.find(x=>x.id===id); if(!o) return;
-  const {total,r,d,p}=olBuckets(o);
-  if(tabName==='ready'){
-    if(delta>p){showToast('Only '+fmt(p)+' pending — cannot mark '+fmt(delta)+' ready','err');inp.focus();inp.select();return;}
-    await tcPatchOrder(id,{ready_qty:r+delta,updated_at:new Date().toISOString()},'Ready + '+fmt(delta)+' → '+fmt(r+delta));
-    return;
+  const res=await (tabName==='ready' ? commitReady(id, delta) : commitDispatch(id, delta));
+  if(!res.ok){
+    if(res.reason==='positive'){ showToast('Enter a positive number','err'); }
+    inp.focus(); inp.select?.();
   }
-  if(delta>r){showToast('Only '+fmt(r)+' ready — mark more as ready first','err');inp.focus();inp.select();return;}
-  const newD=d+delta;
-  const okMsg=(newD>=total && total>0)?'Fully dispatched · '+fmt(total)+'/'+fmt(total):'Dispatch + '+fmt(delta)+' → '+fmt(newD)+' (Ready now '+fmt(r-delta)+')';
-  await tcPatchOrder(id,{ready_qty:r-delta,dispatched_qty:newD,updated_at:new Date().toISOString()},okMsg);
 }
 // Desktop table row (main + hidden editor row).
 // Four rich cells:
@@ -2266,7 +2233,6 @@ function renderOrders(){
   const mv=o=>o.updated_at||o.created_at||'';
   if(olSort==='due')       list.sort((a,b)=>{const ad=a.disp||'',bd=b.disp||''; if(!ad&&!bd)return b.id-a.id; if(!ad)return 1; if(!bd)return -1; return ad.localeCompare(bd) || (b.id-a.id);});
   else if(olSort==='moved') list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
-  else if(olSort==='cust')  list.sort((a,b)=>(a.cust||'').localeCompare(b.cust||''));
 
   const tbody=document.getElementById('ol-tbody');
   const cards=document.getElementById('ol-cards');
@@ -2536,7 +2502,6 @@ function renderWorkStatus(){
   const mv=o=>o.updated_at||o.created_at||'';
   if(woSort==='due')       list.sort((a,b)=>{const ad=a.disp||'',bd=b.disp||''; if(!ad&&!bd)return b.id-a.id; if(!ad)return 1; if(!bd)return -1; return ad.localeCompare(bd) || (b.id-a.id);});
   else if(woSort==='moved')list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
-  else if(woSort==='cust') list.sort((a,b)=>(a.cust||'').localeCompare(b.cust||''));
 
   const sortSel=document.getElementById('wo-sort'); if(sortSel && sortSel.value!==woSort) sortSel.value=woSort;
 
@@ -2561,9 +2526,13 @@ function renderWorkStatus(){
 }
 function woGoPage(p){woPage=p;renderWorkStatus();window.scrollTo({top:0,behavior:'smooth'});}
 function woSetStatus(v){woFStatus=v;woPage=1;renderWorkStatus();}
-function woSetCust(v){woFCust=v;woPage=1;renderWorkStatus();}
-function woSetProd(v){woFProd=v;woPage=1;renderWorkStatus();}
-function woSetDue(v){woFDue=v;woPage=1;renderWorkStatus();}
+// Mirror Orders' olApplyFilters: dropdowns read state from the DOM in one place.
+function woApplyFilters(){
+  woFCust=document.getElementById('wof-cust').value;
+  woFProd=document.getElementById('wof-prod').value;
+  woFDue=document.getElementById('wof-due').value;
+  woPage=1;renderWorkStatus();
+}
 function woSortChange(v){woSort=v;woPage=1;renderWorkStatus();}
 function woClearFilters(){
   woFStatus=woFCust=woFProd=woFDue='';
