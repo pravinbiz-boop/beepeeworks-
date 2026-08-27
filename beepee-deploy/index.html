@@ -324,35 +324,40 @@ table.t{width:100%;border-collapse:collapse}
 .ol-tablewrap{border:var(--bw) solid var(--line);border-radius:var(--r2);background:var(--surface);overflow:hidden;box-shadow:var(--shadow-sm)}
 .ol-table{width:100%;border-collapse:collapse;table-layout:fixed;font-family:'DM Sans',sans-serif}
 
-/* Filter row inside thead — each cell aligns with its column */
-.ol-filter-row td{background:var(--surface);padding:10px 12px;border-bottom:var(--bw) solid var(--line);vertical-align:middle}
+/* Shared filter dropdowns (used by Orders + Status filter rows). */
 .ol-col-sel{width:100%;height:34px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink2);font-family:inherit;font-size:12.5px;font-weight:500;cursor:pointer;outline:none;transition:border-color .15s}
 .ol-col-sel:hover{border-color:var(--line2)}
 .ol-col-sel:focus{border-color:var(--accent)}
 
-/* Segmented control — status filter tabs above the Status column.
-   Tabs size to their own content so every label + count stays fully visible. */
+/* Segmented status control — auto-width tabs stay fully readable on any label length. */
 .ol-seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface);height:34px}
 .ol-seg-btn{flex:0 0 auto;border:0;background:transparent;padding:0 12px;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--ink3);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-right:1px solid var(--line);white-space:nowrap}
 .ol-seg-btn:last-child{border-right:0}
 .ol-seg-btn:hover:not(.on){background:var(--s2);color:var(--ink2)}
 .ol-seg-lbl{white-space:nowrap}
-.ol-seg-count{font-size:10px;font-weight:800;background:rgba(0,0,0,.06);color:var(--ink3);padding:1px 5px;border-radius:4px;min-width:18px;text-align:center;font-variant-numeric:tabular-nums;flex-shrink:0}
+/* Count badge — solid opaque background + dark text so it's clearly visible on
+   any active-tab background colour. Centre-aligned inside a fixed-min pill. */
+.ol-seg-count{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:24px;height:18px;padding:0 6px;box-sizing:border-box;
+  border-radius:9px;background:var(--surface);
+  font-size:10.5px;font-weight:800;color:var(--ink);
+  font-variant-numeric:tabular-nums;flex-shrink:0;
+  box-shadow:0 0 0 1px rgba(15,23,42,.08);
+}
 /* Active tab — semantic fill matching the status ramp */
 .ol-seg-btn.on[data-key=""]{background:var(--accent);color:#fff}
 .ol-seg-btn.on[data-key="pending"]{background:var(--stat-pend);color:#fff}
 .ol-seg-btn.on[data-key="ready"]{background:var(--stat-ready);color:#1F1611}
 .ol-seg-btn.on[data-key="complete"]{background:var(--stat-disp);color:#fff}
-.ol-seg-btn.on .ol-seg-count{background:rgba(255,255,255,.28);color:#fff}
-.ol-seg-btn.on[data-key="ready"] .ol-seg-count{background:rgba(0,0,0,.22);color:#1F1611}
+/* Active count uses the tab's semantic color as ink on the opaque badge — high contrast on any bg */
+.ol-seg-btn.on[data-key=""] .ol-seg-count{color:var(--accent)}
+.ol-seg-btn.on[data-key="pending"] .ol-seg-count{color:var(--stat-pend)}
+.ol-seg-btn.on[data-key="ready"] .ol-seg-count{color:#8A4B00}
+.ol-seg-btn.on[data-key="complete"] .ol-seg-count{color:var(--stat-disp)}
 
 /* Column headers */
 .ol-header-row th{position:sticky;top:0;z-index:2;background:var(--s2);text-align:left;padding:10px 14px;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);border-bottom:var(--bw) solid var(--line2)}
-.ol-th-due{text-align:left}
-.ol-sort-h{display:inline-flex;align-items:center;gap:5px;cursor:pointer;user-select:none;transition:all .15s;padding:3px 6px;margin:-3px -6px;border-radius:6px}
-.ol-sort-h:hover{color:var(--ink);background:rgba(0,0,0,.03)}
-.ol-sort-arr{font-size:12px;color:var(--muted);font-weight:700;transition:color .15s}
-.ol-sort-h:hover .ol-sort-arr,.ol-sort-arr.on{color:var(--accent)}
 
 /* Body cells */
 .ol-table tbody td{padding:14px;border-bottom:var(--bw) solid var(--line);vertical-align:middle;font-size:12.5px;color:var(--ink2);overflow:hidden}
@@ -376,27 +381,10 @@ table.t{width:100%;border-collapse:collapse}
 /* Page-header subtitle (order counts summary) */
 .ol-psub{font-size:11.5px;color:var(--ink3);margin-top:2px;font-variant-numeric:tabular-nums}
 
-/* Mobile-only filter bar (hidden on desktop, where in-thead filters do the job) */
-.ol-mobile-filters{display:none;flex-direction:column;gap:8px;margin-bottom:10px}
-.ol-mf-row{display:flex;gap:8px}
-.ol-mf-row>*{flex:1;min-width:0}
-.ol-mf-sort{white-space:nowrap;font-size:12px;padding:0 12px}
-.ol-mf-sort span{color:var(--accent);font-weight:700;margin-right:4px}
-.ol-mf-sort span.on{color:var(--accent)}
-
 @media(max-width:720px){
-  /* Reveal the mobile filter bar */
-  .ol-mobile-filters{display:flex}
-  /* Segmented control on mobile — tighter so all 4 tabs fit at 375px */
-  .ol-mobile-filters .ol-seg{width:100%}
-  .ol-mobile-filters .ol-seg-btn{flex:1;padding:0 6px;font-size:11px;gap:4px;justify-content:center;min-width:0}
-  .ol-mobile-filters .ol-seg-lbl{overflow:hidden;text-overflow:ellipsis}
-  .ol-mobile-filters .ol-seg-count{font-size:9px;padding:1px 4px;min-width:16px}
   /* Bump tap targets to ≥44px on touch surfaces */
   .ol-toolbar .inp,.ol-toolbar .btn,.ph .btn-p{height:44px;min-height:44px}
   .ol-col-sel{height:42px}
-  .ol-mf-sort{height:42px}
-  .ol-mobile-filters .ol-seg{height:42px}
   .ol-ed-tab{height:40px;font-size:12.5px}
   .ol-ed-inp{height:40px;font-size:16px}
   .ol-ed-save{height:40px;padding:0 20px;font-size:13.5px}
@@ -900,47 +888,40 @@ tr.ol-row:hover{background:var(--s2)}
       <button class="btn btn-g ol-clear-btn" id="ol-clear" onclick="olClearFilters()">Clear all</button>
     </div>
 
-    <!-- DESKTOP: clean 4-column table with column-aligned filters in thead -->
+    <!-- Filter row — identical pattern to the Status page (segmented status + 3 dropdowns + sort). -->
+    <div class="wo-filter-row">
+      <div class="ol-seg" id="ol-status-pills" role="tablist" aria-label="Filter by status"></div>
+      <div class="wo-filter-selects">
+        <select class="sel ol-col-sel" id="olf-cust" onchange="olApplyFilters()" aria-label="Filter by customer"><option value="">All customers</option></select>
+        <select class="sel ol-col-sel" id="olf-prod" onchange="olApplyFilters()" aria-label="Filter by product"><option value="">All products</option></select>
+        <select class="sel ol-col-sel" id="olf-due" onchange="olApplyFilters()" aria-label="Filter by due date">
+          <option value="">Any due</option><option value="urgent">&lt; 3 days</option>
+          <option value="soon">&lt; 7 days</option><option value="none">No due</option>
+        </select>
+        <select class="sel ol-col-sel" id="ol-sort" onchange="olSortChange(this.value)" aria-label="Sort orders">
+          <option value="due">Sort · due date</option>
+          <option value="moved">Sort · recently moved</option>
+          <option value="cust">Sort · customer A-Z</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- DESKTOP: table -->
     <div class="ol-tablewrap">
       <table class="ol-table">
         <colgroup>
           <col style="width:400px"><col style="width:auto"><col style="width:auto"><col style="width:150px">
         </colgroup>
         <thead>
-          <tr class="ol-filter-row">
-            <td><div class="ol-seg" id="ol-status-pills" role="tablist" aria-label="Filter by status"></div></td>
-            <td><select class="sel ol-col-sel" id="olf-cust" onchange="olApplyFilters()" aria-label="Filter by customer"><option value="">All customers</option></select></td>
-            <td><select class="sel ol-col-sel" id="olf-prod" onchange="olApplyFilters()" aria-label="Filter by product"><option value="">All products</option></select></td>
-            <td><select class="sel ol-col-sel" id="olf-due" onchange="olApplyFilters()" aria-label="Filter by due date">
-              <option value="">Any due</option><option value="urgent">&lt; 3 days</option>
-              <option value="soon">&lt; 7 days</option><option value="none">No due</option>
-            </select></td>
-          </tr>
           <tr class="ol-header-row">
             <th>Status</th>
             <th>Order</th>
             <th>Product</th>
-            <th class="ol-th-due"><span class="ol-sort-h" onclick="olToggleDueSort()" title="Sort by due date">Due <span class="ol-sort-arr" id="ol-sort-arr">↕</span></span></th>
+            <th>Due</th>
           </tr>
         </thead>
         <tbody id="ol-tbody"></tbody>
       </table>
-    </div>
-
-    <!-- MOBILE: filter bar (hidden on desktop, where the in-thead filters do the job) -->
-    <div class="ol-mobile-filters" id="ol-mobile-filters">
-      <div class="ol-seg" id="ol-status-pills-mobile" role="tablist" aria-label="Filter by status"></div>
-      <div class="ol-mf-row">
-        <select class="sel ol-col-sel" id="olf-cust-mobile" onchange="olSetCust(this.value)" aria-label="Filter by customer"><option value="">All customers</option></select>
-        <select class="sel ol-col-sel" id="olf-prod-mobile" onchange="olSetProd(this.value)" aria-label="Filter by product"><option value="">All products</option></select>
-      </div>
-      <div class="ol-mf-row">
-        <select class="sel ol-col-sel" id="olf-due-mobile" onchange="olSetDue(this.value)" aria-label="Filter by due date">
-          <option value="">Any due</option><option value="urgent">&lt; 3 days</option>
-          <option value="soon">&lt; 7 days</option><option value="none">No due</option>
-        </select>
-        <button class="btn btn-g ol-mf-sort" onclick="olToggleDueSort()" aria-label="Sort by due date"><span id="ol-sort-arr-mobile">↕</span> Sort · due date</button>
-      </div>
     </div>
 
     <!-- MOBILE: cards -->
@@ -2179,34 +2160,26 @@ function olToggleEditor(el){
     card.classList.toggle('open',open);
   }
 }
-// Filter state + option sync (header dropdowns; selection preserved across renders).
+// Filter + sort state (single set of controls now — same pattern as Status page).
 let olFStatus='', olFCust='', olFProd='', olFDue='';
-// Due-date sort cycle: '' (default = recently moved) → 'asc' (oldest first)
-//                    → 'desc' (latest first) → back to ''.
-let olSortDue='';
-function olToggleDueSort(){
-  olSortDue = olSortDue==='' ? 'asc' : olSortDue==='asc' ? 'desc' : '';
-  olPage=1; renderOrders();
-}
+// Sort options match Status: 'due' | 'moved' | 'cust'. Default: due-date ascending.
+let olSort='due';
 function olApplyFilters(){
   olFCust=document.getElementById('olf-cust').value;
   olFProd=document.getElementById('olf-prod').value;
   olFDue=document.getElementById('olf-due').value;
   olPage=1;renderOrders();
 }
-// State-based setters — used by mobile filter bar so desktop and mobile controls stay in sync via renderOrders.
 function olSetStatus(v){olFStatus=v;olPage=1;renderOrders();}
-function olSetCust(v){olFCust=v;olPage=1;renderOrders();}
-function olSetProd(v){olFProd=v;olPage=1;renderOrders();}
-function olSetDue(v){olFDue=v;olPage=1;renderOrders();}
+function olSortChange(v){olSort=v;olPage=1;renderOrders();}
 function olAnyFilter(){
   const sb=document.getElementById('ol-search');
-  return !!(olFStatus||olFCust||olFProd||olFDue||olSortDue||(sb&&sb.value.trim()));
+  return !!(olFStatus||olFCust||olFProd||olFDue||olSort!=='due'||(sb&&sb.value.trim()));
 }
-// Reset all filters + search + due-date sort back to defaults.
 function olClearFilters(){
-  olFStatus=olFCust=olFProd=olFDue=olSortDue='';
-  ['olf-cust','olf-prod','olf-due','olf-cust-mobile','olf-prod-mobile','olf-due-mobile'].forEach(id=>{const s=document.getElementById(id); if(s) s.value='';});
+  olFStatus=olFCust=olFProd=olFDue='';
+  olSort='due';
+  ['olf-cust','olf-prod','olf-due','ol-sort'].forEach(id=>{const s=document.getElementById(id); if(s) s.value=id==='ol-sort'?'due':'';});
   const sb=document.getElementById('ol-search'); if(sb) sb.value='';
   olPage=1;renderOrders();
 }
@@ -2215,13 +2188,11 @@ function olSyncFilterOptions(){
   const prods=[...new Set(orders.map(o=>o.prod).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
   const fill=(id,vals,cur,allLbl)=>{const s=document.getElementById(id); if(!s) return;
     s.innerHTML='<option value="">'+allLbl+'</option>'+vals.map(v=>'<option value="'+esc(v)+'"'+(v===cur?' selected':'')+'>'+esc(v)+'</option>').join('');};
-  // Desktop and mobile dropdown sets — kept in sync from single state.
   fill('olf-cust',custs,olFCust,'All customers');
   fill('olf-prod',prods,olFProd,'All products');
-  fill('olf-cust-mobile',custs,olFCust,'All customers');
-  fill('olf-prod-mobile',prods,olFProd,'All products');
-  // Sync the Due dropdown values (options are static, only .value needs updating).
-  ['olf-due','olf-due-mobile'].forEach(id=>{const s=document.getElementById(id); if(s) s.value=olFDue;});
+  // Sync the Due filter + sort dropdown values.
+  const dueSel=document.getElementById('olf-due'); if(dueSel) dueSel.value=olFDue;
+  const sortSel=document.getElementById('ol-sort'); if(sortSel && sortSel.value!==olSort) sortSel.value=olSort;
 }
 function olPasses(o){
   const q=(document.getElementById('ol-search')?.value||'').toLowerCase().trim();
@@ -2259,8 +2230,8 @@ function renderOrders(){
       +'<span class="ol-seg-lbl">'+lbl+'</span>'
       +'<span class="ol-seg-count">'+(counts[k]||0)+'</span></button>';
   };
-  const segHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('complete','Dispatched');
-  ['ol-status-pills','ol-status-pills-mobile'].forEach(id=>{const h=document.getElementById(id); if(h) h.innerHTML=segHTML;});
+  const segHost=document.getElementById('ol-status-pills');
+  if(segHost) segHost.innerHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('complete','Dispatched');
 
   // Page-header summary strip — bucket counts (order can appear in multiple), so the
   // numbers agree with the Status page and reflect real production state.
@@ -2273,27 +2244,11 @@ function renderOrders(){
   }
 
   const list=orders.filter(olPasses);
+  // Sort — same 3 dimensions as the Status page for uniformity.
   const mv=o=>o.updated_at||o.created_at||'';
-  if(olSortDue==='asc' || olSortDue==='desc'){
-    // Due-date sort. Undated orders always go last.
-    const dir = olSortDue==='asc' ? 1 : -1;
-    list.sort((a,b)=>{
-      const ad=a.disp||'', bd=b.disp||'';
-      if(!ad && !bd) return 0;
-      if(!ad) return 1;
-      if(!bd) return -1;
-      return dir * ad.localeCompare(bd);
-    });
-  } else {
-    // Recently moved first — preserves the app's default ordering.
-    list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
-  }
-  // Reflect the sort state on both the desktop header arrow and the mobile button.
-  const arrChar = olSortDue==='asc' ? '↑' : olSortDue==='desc' ? '↓' : '↕';
-  ['ol-sort-arr','ol-sort-arr-mobile'].forEach(id=>{
-    const arr=document.getElementById(id);
-    if(arr){ arr.textContent=arrChar; arr.classList.toggle('on', olSortDue!==''); }
-  });
+  if(olSort==='due')       list.sort((a,b)=>(a.disp||'9999').localeCompare(b.disp||'9999') || (b.id-a.id));
+  else if(olSort==='moved') list.sort((a,b)=>mv(b).localeCompare(mv(a)) || (b.id-a.id));
+  else if(olSort==='cust')  list.sort((a,b)=>(a.cust||'').localeCompare(b.cust||''));
 
   const tbody=document.getElementById('ol-tbody');
   const cards=document.getElementById('ol-cards');
