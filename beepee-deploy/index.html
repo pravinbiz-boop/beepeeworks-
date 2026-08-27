@@ -1827,16 +1827,16 @@ function tcPanelHTML(id, tabName){
   if(tabName==='ready'){
     // Pre-fill with what's pending — most common action is "mark everything remaining as ready"
     return '<span class="tc-panel-lbl">Mark ready</span>'
-      +'<input type="number" inputmode="numeric" min="1" max="'+pending+'" id="tc-inp-ready" value="'+pending+'" />'
+      +'<input type="number" inputmode="numeric" min="1" max="'+pending+'" class="tc-inp-ready" value="'+pending+'" />'
       +'<span class="tc-unit ready">nos</span>'
-      +'<button class="tc-save" onclick="tcCommitReady('+id+')">Save</button>';
+      +'<button class="tc-save" onclick="tcCommitReady(this,'+id+')">Save</button>';
   }
   if(tabName==='dispatch'){
     // Pre-fill with what's ready — most common action is "ship the entire ready buffer"
     return '<span class="tc-panel-lbl">Dispatch now</span>'
-      +'<input type="number" inputmode="numeric" min="1" max="'+rq+'" id="tc-inp-dispatch" class="tc-inp-dispatch" value="'+rq+'" />'
+      +'<input type="number" inputmode="numeric" min="1" max="'+rq+'" class="tc-inp-dispatch" value="'+rq+'" />'
       +'<span class="tc-unit dispatch">nos</span>'
-      +'<button class="tc-save" onclick="tcCommitDispatch('+id+')">Save</button>';
+      +'<button class="tc-save" onclick="tcCommitDispatch(this,'+id+')">Save</button>';
   }
   return '';
 }
@@ -1869,8 +1869,10 @@ async function tcPatchOrder(id, patch, successMsg){
 }
 
 // + Ready X: pulls X from Pending; adds X to Ready. Guardrail: X ≤ Pending.
-async function tcCommitReady(id){
-  const inp=document.getElementById('tc-inp-ready'); if(!inp) return;
+// Input is scoped to the button's own card so two open editors don't collide.
+async function tcCommitReady(btn, id){
+  const card=btn.closest('.ocard.scard'); if(!card) return;
+  const inp=card.querySelector('.tc-inp-ready'); if(!inp) return;
   const delta=parseInt(inp.value,10);
   if(isNaN(delta)||delta<=0){showToast('Enter a positive number','err');inp.focus();return;}
   const o=orders.find(x=>x.id===id); if(!o) return;
@@ -1889,8 +1891,9 @@ async function tcCommitReady(id){
 
 // + Dispatch X: pulls X from Ready; adds X to Dispatched. Pending unchanged.
 // Guardrail: X ≤ Ready.
-async function tcCommitDispatch(id){
-  const inp=document.getElementById('tc-inp-dispatch'); if(!inp) return;
+async function tcCommitDispatch(btn, id){
+  const card=btn.closest('.ocard.scard'); if(!card) return;
+  const inp=card.querySelector('.tc-inp-dispatch'); if(!inp) return;
   const delta=parseInt(inp.value,10);
   if(isNaN(delta)||delta<=0){showToast('Enter a positive number','err');inp.focus();return;}
   const o=orders.find(x=>x.id===id); if(!o) return;
@@ -1962,6 +1965,17 @@ function olBuckets(o){
   const r=Math.max(0,Number(o.ready_qty)||0);
   const d=Math.max(0,Number(o.dispatched_qty)||0);
   return {total,r,d,p:Math.max(0,total-r-d)};
+}
+// Bucket-match predicate — an order "is in" a bucket if that bucket's qty > 0.
+// One order can match multiple buckets (an in-progress order has pending + ready + dispatched).
+// Shared by both Orders and Status pages so tab counts, summary counts, and status-filter
+// results all use identical semantics — the numbers match wherever they appear.
+function bucketMatch(o, key){
+  const b=olBuckets(o);
+  if(key==='pending')    return b.p>0;
+  if(key==='ready')      return b.r>0;
+  if(key==='dispatched') return b.total>0 && b.d>0;
+  return true; // '' = All
 }
 // Headline status — pending outranks everything (matches the reference).
 function olStatus(o){
@@ -2198,7 +2212,10 @@ function olSyncFilterOptions(){
 }
 function olPasses(o){
   const q=(document.getElementById('ol-search')?.value||'').toLowerCase().trim();
-  if(olFStatus && olStatus(o).key!==olFStatus) return false;
+  // Bucket-match — same semantics as the Status page: an order clicked into a
+  // status tab must currently hold that bucket's qty (an in-progress order
+  // legitimately appears under Pending AND Ready AND Dispatched).
+  if(olFStatus && !bucketMatch(o, olFStatus)) return false;
   if(olFCust && (o.cust||'')!==olFCust) return false;
   if(olFProd && (o.prod||'')!==olFProd) return false;
   if(olFDue){
@@ -2218,14 +2235,18 @@ function renderOrders(){
   const clr=document.getElementById('ol-clear');
   if(clr){const on=olAnyFilter(); clr.disabled=!on; clr.style.opacity=on?'1':'.45';}
 
-  // Status filter — segmented control above the Status column (desktop),
-  // duplicated inside the mobile filter bar. Counts reflect the OTHER active
-  // filters + search (so a count always matches "what clicking will show").
+  // Status tab counts — bucket-matched so the numbers agree with the Status page
+  // and with the summary strip below. Counts reflect the OTHER active filters +
+  // search (so a count always matches "what clicking this tab will show").
   const savedStatus=olFStatus; olFStatus='';
   const basePool=orders.filter(olPasses);
   olFStatus=savedStatus;
-  const counts={'':basePool.length};
-  ['pending','ready','dispatched'].forEach(k=>counts[k]=basePool.filter(o=>olStatus(o).key===k).length);
+  const counts={
+    '':basePool.length,
+    pending:    basePool.filter(o=>bucketMatch(o,'pending')).length,
+    ready:      basePool.filter(o=>bucketMatch(o,'ready')).length,
+    dispatched: basePool.filter(o=>bucketMatch(o,'dispatched')).length
+  };
   const tab=(k,lbl)=>{
     const on=olFStatus===k;
     return '<button class="ol-seg-btn'+(on?' on':'')+'" data-key="'+k+'" role="tab" aria-pressed="'+on+'" onclick="olSetStatus(\''+k+'\')">'
@@ -2235,15 +2256,10 @@ function renderOrders(){
   const segHost=document.getElementById('ol-status-pills');
   if(segHost) segHost.innerHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('dispatched','Dispatched');
 
-  // Page-header summary strip — bucket counts (order can appear in multiple), so the
-  // numbers agree with the Status page and reflect real production state.
+  // Summary strip — uses the SAME bucket counts as the tabs and respects the
+  // active filters, so the header line always agrees with the tab numbers.
   const summaryEl=document.getElementById('ol-summary');
-  if(summaryEl){
-    const bp=orders.filter(o=>{const t=Number(o.qty)||0,r=Number(o.ready_qty)||0,d=Number(o.dispatched_qty)||0;return Math.max(0,t-r-d)>0;}).length;
-    const br=orders.filter(o=>(Number(o.ready_qty)||0)>0).length;
-    const bd=orders.filter(o=>(Number(o.dispatched_qty)||0)>0).length;
-    summaryEl.textContent=orders.length+' Orders · '+bp+' Pending · '+br+' Ready · '+bd+' Dispatched';
-  }
+  if(summaryEl) summaryEl.textContent=basePool.length+' Orders · '+counts.pending+' Pending · '+counts.ready+' Ready · '+counts.dispatched+' Dispatched';
 
   const list=orders.filter(olPasses);
   // Sort — same 3 dimensions as the Status page for uniformity.
@@ -2455,13 +2471,8 @@ function addProductToOrder(){
 // Bucket match — an order is "in" a bucket if that bucket's qty > 0. This lets an
 // in-progress order (some pending + some ready + some dispatched) show under whichever
 // tab you're looking at, which is what production planning actually needs.
-function woBucketMatch(o, key){
-  const t=Number(o.qty)||0, r=Number(o.ready_qty)||0, d=Number(o.dispatched_qty)||0;
-  if(key==='pending')    return Math.max(0,t-r-d)>0;
-  if(key==='ready')      return r>0;
-  if(key==='dispatched') return d>0;
-  return true; // '' = All
-}
+// Deprecated shim — reuse the shared bucketMatch so Orders + Status stay in lock-step.
+function woBucketMatch(o, key){ return bucketMatch(o, key); }
 // Per-order predicate — search + status + customer + product all applied.
 function woPasses(o){
   const q=(document.getElementById('wo-search')?.value||'').toLowerCase().trim();
