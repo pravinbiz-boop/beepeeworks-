@@ -514,12 +514,12 @@ tr.ol-row:hover{background:var(--s2)}
   .wo-filter-row .ol-seg{width:100%}
   /* Labels-only tabs — enough breathing room for "Dispatched" at 375px viewport.
      Font is 11.5px so all four labels fit inside their own tab with padding.
-     line-height:1 collapses the line box around the glyphs; the small
-     translateY nudges the letters up by 1px to compensate for DM Sans'
-     ascender space, which otherwise makes descender-containing words like
-     "Pending" and "Dispatched" read as bottom-heavy on iOS Safari. */
-  .wo-filter-row .ol-seg-btn{flex:1;padding:0 4px;font-size:11.5px;gap:0;justify-content:center;min-width:0;height:42px;font-weight:600;line-height:1}
-  .wo-filter-row .ol-seg-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1;transform:translateY(-1px)}
+     line-height:1 collapses the line box around the glyphs; adding 3px extra
+     bottom padding shifts flex-centre up by ~1.5px so the visible glyphs
+     centre against the button — compensates for DM Sans' ascender/descender
+     asymmetry on iOS Safari, which otherwise pushes the text visually low. */
+  .wo-filter-row .ol-seg-btn{flex:1;padding:0 4px 3px;font-size:11.5px;gap:0;justify-content:center;min-width:0;height:42px;font-weight:600;line-height:1}
+  .wo-filter-row .ol-seg-lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1}
   .wo-filter-selects{flex-basis:100%}
   .wo-filter-selects .ol-col-sel{flex:1 1 45%;min-width:130px;height:42px}
 }
@@ -1477,7 +1477,8 @@ let olPage=1, woPage=1;
 // Status page: multi-select filter (all statuses visible by default) + sort control
 // Single-select status filter (matches Orders page). '' = All. Bucket keys:
 // 'pending' (has pending qty), 'ready' (has ready qty), 'dispatched' (has any dispatched).
-let woFStatus='';
+// Default: "Pending" tab — matches Orders page.
+let woFStatus='pending';
 let woFCust='', woFProd='', woFDue='';
 let woSort='due';
 const PAGE_SIZE=50;
@@ -2162,7 +2163,8 @@ function olToggleEditor(el){
   }
 }
 // Filter + sort state (single set of controls now — same pattern as Status page).
-let olFStatus='', olFCust='', olFProd='', olFDue='';
+// Default: "Pending" tab selected on load so the shop floor sees what still needs work.
+let olFStatus='pending', olFCust='', olFProd='', olFDue='';
 // Sort options match Status: 'due' | 'moved' | 'cust'. Default: due-date ascending.
 let olSort='due';
 function olApplyFilters(){
@@ -2175,10 +2177,11 @@ function olSetStatus(v){olFStatus=v;olPage=1;renderOrders();}
 function olSortChange(v){olSort=v;olPage=1;renderOrders();}
 function olAnyFilter(){
   const sb=document.getElementById('ol-search');
-  return !!(olFStatus||olFCust||olFProd||olFDue||olSort!=='due'||(sb&&sb.value.trim()));
+  // 'pending' is the default status filter now — treat it as no-op for the Clear-all button
+  return !!((olFStatus && olFStatus!=='pending')||olFCust||olFProd||olFDue||olSort!=='due'||(sb&&sb.value.trim()));
 }
 function olClearFilters(){
-  olFStatus=olFCust=olFProd=olFDue='';
+  olFCust=olFProd=olFDue=''; olFStatus='pending';
   olSort='due';
   ['olf-cust','olf-prod','olf-due','ol-sort'].forEach(id=>{const s=document.getElementById(id); if(s) s.value=id==='ol-sort'?'due':'';});
   const sb=document.getElementById('ol-search'); if(sb) sb.value='';
@@ -2488,7 +2491,8 @@ function woSyncFilterOptions(){
 }
 function woAnyFilter(){
   const sb=document.getElementById('wo-search');
-  return !!(woFStatus||woFCust||woFProd||woFDue||(sb&&sb.value.trim()));
+  // 'pending' is the default — treat it as no-op for the Clear-all button
+  return !!((woFStatus && woFStatus!=='pending')||woFCust||woFProd||woFDue||(sb&&sb.value.trim()));
 }
 function renderWorkStatus(){
   woSyncFilterOptions();
@@ -2557,7 +2561,7 @@ function woApplyFilters(){
 }
 function woSortChange(v){woSort=v;woPage=1;renderWorkStatus();}
 function woClearFilters(){
-  woFStatus=woFCust=woFProd=woFDue='';
+  woFCust=woFProd=woFDue=''; woFStatus='pending';
   woSort='due';
   ['wof-cust','wof-prod','wof-due','wo-sort'].forEach(id=>{const s=document.getElementById(id); if(s) s.value=id==='wo-sort'?'due':'';});
   const sb=document.getElementById('wo-search'); if(sb) sb.value='';
@@ -3182,10 +3186,35 @@ async function init(){
     db.get('tasks')
   ]);
   parties=p||[]; orders=o||[]; tasks=t||[];
+  lastRefetchAt=Date.now();
   renderOrders(); renderTasks(); renderParties(); wPlyChange();
 }
+// Silent refetch — used when the tab regains focus. Refreshes orders + tasks
+// so edits made on other devices become visible without a page reload.
+// Throttled to at most once every 10s so a quick tab-switch is a no-op.
+let lastRefetchAt=0;
+const REFETCH_MIN_MS=10000;
+async function refetchIfStale(){
+  if(!appInited) return;
+  if(Date.now()-lastRefetchAt < REFETCH_MIN_MS) return;
+  lastRefetchAt=Date.now();
+  try{
+    const [o,t]=await Promise.all([db.get('orders'), db.get('tasks')]);
+    if(Array.isArray(o)) orders=o;
+    if(Array.isArray(t)) tasks=t;
+    // Repaint whichever view is currently active
+    const active=document.querySelector('.view.active')?.id||'';
+    if(active==='view-orders')     renderOrders();
+    if(active==='view-workstatus') renderWorkStatus();
+    if(active==='view-tasks')      renderTasks();
+    if(active==='view-productdata')renderProductData();
+  }catch(e){/* silent — user isn't blocked either way */}
+}
 checkAuth();
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkAuth();});
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden){ checkAuth(); refetchIfStale(); }
+});
+window.addEventListener('focus', refetchIfStale);
 document.addEventListener('keydown',(e)=>{
   if(e.key==='Escape' && editTaskId!==null) closeTaskDrawer();
 });
