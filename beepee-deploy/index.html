@@ -516,7 +516,8 @@ tr.ol-row:hover{background:var(--s2)}
 }
 
 /* ── SMART STATUS · agenda-list of orders grouped by due date ── */
-.sm-agenda{display:flex;flex-direction:column;gap:14px}
+/* Match Orders/Status card spacing (6px between day groups). */
+.sm-agenda{display:flex;flex-direction:column;gap:6px}
 .sm-day{background:var(--surface);border:var(--bw) solid var(--line);border-radius:var(--r2);overflow:hidden;box-shadow:var(--shadow-sm)}
 .sm-day-hd{display:flex;align-items:baseline;gap:12px;padding:11px 14px;background:var(--s2);border-bottom:var(--bw) solid var(--line)}
 .sm-day-date{font-family:'Outfit',sans-serif;font-size:14.5px;font-weight:700;color:var(--ink)}
