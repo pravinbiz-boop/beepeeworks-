@@ -505,6 +505,39 @@ table.t{width:100%;border-collapse:collapse}
 .ocard.scard{cursor:pointer}
 tr.ol-row{cursor:pointer}
 tr.ol-row:hover{background:var(--s2)}
+/* ── SMART STATUS · agenda-list of orders grouped by due date ── */
+.sm-agenda{display:flex;flex-direction:column;gap:14px}
+.sm-day{background:var(--surface);border:var(--bw) solid var(--line);border-radius:var(--r2);overflow:hidden;box-shadow:var(--shadow-sm)}
+.sm-day-hd{display:flex;align-items:baseline;gap:12px;padding:11px 14px;background:var(--s2);border-bottom:var(--bw) solid var(--line)}
+.sm-day-date{font-family:'Outfit',sans-serif;font-size:14.5px;font-weight:700;color:var(--ink)}
+.sm-day-rel{font-size:11.5px;color:var(--ink3);font-weight:600}
+.sm-day-rel.urgent{color:var(--red);text-transform:uppercase;letter-spacing:.04em}
+.sm-day-rel.overdue{color:var(--red);text-transform:uppercase;letter-spacing:.04em}
+.sm-day-count{margin-left:auto;font-size:11px;color:var(--ink3);font-weight:600;font-variant-numeric:tabular-nums}
+.sm-day-rows{display:flex;flex-direction:column}
+.sm-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:var(--bw) solid var(--line);cursor:pointer;transition:background .12s}
+.sm-row:last-child{border-bottom:0}
+.sm-row:hover{background:var(--s2)}
+.sm-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sm-dot.p{background:var(--stat-pend)}
+.sm-dot.r{background:var(--stat-ready)}
+.sm-dot.d{background:var(--stat-disp)}
+.sm-row-body{flex:1;min-width:0}
+.sm-row-hd{display:flex;align-items:baseline;gap:10px}
+.sm-cust{font-weight:700;font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sm-ono{font-size:11px;color:var(--ink3);font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
+.sm-row-detail{font-size:11.5px;color:var(--ink3);margin-top:2px;font-variant-numeric:tabular-nums}
+.sm-desc{font-size:11px;color:var(--muted);font-style:italic;margin-top:2px}
+.sm-row-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0}
+.sm-row-status.pn{background:var(--red-bg);color:var(--red)}
+.sm-row-status.rd{background:var(--amber-bg);color:var(--amber)}
+.sm-row-status.ds{background:var(--green-bg);color:var(--green)}
+@media(max-width:720px){
+  .sm-row{padding:10px 12px;gap:8px}
+  .sm-row-status{display:none}
+  .sm-day-hd{padding:10px 12px;gap:10px}
+}
+
 /* Status page filter row — mirrors Orders page: segmented status control + dropdowns */
 .wo-filter-row{display:flex;gap:10px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
 .wo-filter-row .ol-seg{flex:0 0 auto}
@@ -838,6 +871,10 @@ tr.ol-row:hover{background:var(--s2)}
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
     Status
   </button>
+  <button class="nl" data-v="smart" onclick="nav('smart')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Smart Status
+  </button>
   <button class="nl" data-v="productdata" onclick="nav('productdata')">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
     Data
@@ -972,6 +1009,35 @@ tr.ol-row:hover{background:var(--s2)}
 
     <div class="wo-list" id="wo-list"></div>
     <div class="pd-pagination" id="wo-pagination" style="display:none"></div>
+  </section>
+
+  <!-- SMART STATUS — chronological agenda-list of orders grouped by due date -->
+  <section id="view-smart" class="view">
+    <div class="ph">
+      <div><div class="ptitle">Smart Status</div><div class="ol-psub" id="sm-summary"></div></div>
+    </div>
+
+    <div class="ol-toolbar">
+      <input class="inp ol-search" id="sm-search" placeholder="Search customer, order no, size, product, PLY…" oninput="smPage=1;renderSmart()">
+      <button class="btn btn-g ol-clear-btn" id="sm-clear" onclick="smClearFilters()">Clear all</button>
+    </div>
+
+    <div class="wo-filter-row">
+      <div class="ol-seg" id="sm-status-pills" role="tablist" aria-label="Filter by status"></div>
+      <div class="wo-filter-selects">
+        <select class="sel ol-col-sel" id="smf-cust" onchange="smApplyFilters()" aria-label="Filter by customer"><option value="">All Customers</option></select>
+        <select class="sel ol-col-sel" id="smf-prod" onchange="smApplyFilters()" aria-label="Filter by product"><option value="">All Products</option></select>
+        <select class="sel ol-col-sel" id="smf-due" onchange="smApplyFilters()" aria-label="Filter by due date">
+          <option value="">Any Due</option><option value="urgent">&lt; 3 Days</option>
+          <option value="soon">&lt; 7 Days</option><option value="none">No Due</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="result-count" id="sm-result-count"></div>
+
+    <div class="sm-agenda" id="sm-list"></div>
+    <div class="pd-pagination" id="sm-pagination" style="display:none"></div>
   </section>
 
   <!-- TASKS -->
@@ -1247,6 +1313,10 @@ tr.ol-row:hover{background:var(--s2)}
   <button class="bn" data-v="workstatus" onclick="nav('workstatus')">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
     <span>Status</span>
+  </button>
+  <button class="bn" data-v="smart" onclick="nav('smart')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span>Smart</span>
   </button>
   <button class="bn" data-v="productdata" onclick="nav('productdata')">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
@@ -2571,6 +2641,179 @@ function woClearFilters(){
 // woStatusChange removed — status is derived from buckets under sequential-flow model.
 // Direct qty edits happen via the Toggle Card's + Ready / + Dispatch / ✎ Qty tabs.
 
+// ── SMART STATUS ─────────────────────────────────────────
+// Agenda-list view: orders grouped by their due date, in chronological order.
+// Filter model matches Orders/Status; no sort dropdown (list is always chronological).
+let smFStatus='pending', smFCust='', smFProd='', smFDue='', smPage=1;
+const SM_PAGE_SIZE=100;
+
+function smApplyFilters(){
+  smFCust=document.getElementById('smf-cust').value;
+  smFProd=document.getElementById('smf-prod').value;
+  smFDue=document.getElementById('smf-due').value;
+  smPage=1; renderSmart();
+}
+function smSetStatus(v){smFStatus=v; smPage=1; renderSmart();}
+function smGoPage(p){smPage=p; renderSmart(); window.scrollTo({top:0,behavior:'smooth'});}
+function smAnyFilter(){
+  const sb=document.getElementById('sm-search');
+  return !!((smFStatus && smFStatus!=='pending')||smFCust||smFProd||smFDue||(sb&&sb.value.trim()));
+}
+function smClearFilters(){
+  smFCust=smFProd=smFDue=''; smFStatus='pending';
+  ['smf-cust','smf-prod','smf-due'].forEach(id=>{const s=document.getElementById(id); if(s) s.value='';});
+  const sb=document.getElementById('sm-search'); if(sb) sb.value='';
+  smPage=1; renderSmart();
+}
+function smSyncFilterOptions(){
+  const custs=[...new Set(orders.map(o=>o.cust).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const prods=[...new Set(orders.map(o=>o.prod).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const fill=(id,vals,cur,allLbl)=>{const s=document.getElementById(id); if(!s) return;
+    s.innerHTML='<option value="">'+allLbl+'</option>'+vals.map(v=>'<option value="'+esc(v)+'"'+(v===cur?' selected':'')+'>'+esc(v)+'</option>').join('');};
+  fill('smf-cust',custs,smFCust,'All Customers');
+  fill('smf-prod',prods,smFProd,'All Products');
+  const dueSel=document.getElementById('smf-due'); if(dueSel) dueSel.value=smFDue;
+}
+// Same predicate shape as woPasses — uses bucketMatch for consistency.
+function smPasses(o){
+  const q=(document.getElementById('sm-search')?.value||'').toLowerCase().trim();
+  if(smFStatus && !bucketMatch(o, smFStatus)) return false;
+  if(smFCust && (o.cust||'') !== smFCust) return false;
+  if(smFProd && (o.prod||'') !== smFProd) return false;
+  if(smFDue){
+    const t=Number(o.qty)||0, d=Number(o.dispatched_qty)||0;
+    const inWork = !(t>0 && d>=t);
+    const dl=o.disp ? Math.round((new Date(o.disp+'T00:00:00')-new Date(today()+'T00:00:00'))/864e5) : null;
+    if(smFDue==='urgent' && !(inWork && dl!==null && dl<3)) return false;
+    if(smFDue==='soon'   && !(inWork && dl!==null && dl<7)) return false;
+    if(smFDue==='none'   && !(!inWork || dl===null))         return false;
+  }
+  if(q && !orderMatchesQuery(o,q)) return false;
+  return true;
+}
+
+// Human-readable day header: "Today · Fri 28 Aug", "Tomorrow · Sat 29 Aug", "3d overdue · Mon 24 Aug"
+function smDayHeaderText(dateStr){
+  if(!dateStr) return 'No due date';
+  const dt=new Date(dateStr+'T00:00:00');
+  const t=new Date(today()+'T00:00:00');
+  const dl=Math.round((dt-t)/864e5);
+  const dayName=dt.toLocaleDateString('en-IN',{weekday:'short'});
+  const dayFmt=dt.getDate()+' '+dt.toLocaleString('en-IN',{month:'short'});
+  let rel;
+  if(dl===0) rel='Today';
+  else if(dl===1) rel='Tomorrow';
+  else if(dl===-1) rel='Yesterday';
+  else if(dl<0) rel=(-dl)+'d overdue';
+  else rel='in '+dl+' days';
+  return {rel, day: dayName+' · '+dayFmt, urgent: dl<=1, overdue: dl<0};
+}
+
+function renderSmart(){
+  smSyncFilterOptions();
+  const clr=document.getElementById('sm-clear');
+  if(clr){const on=smAnyFilter(); clr.disabled=!on; clr.style.opacity=on?'1':'.45';}
+
+  // Status tabs — same bucket-match semantics as Orders + Status
+  const savedStatus=smFStatus; smFStatus='';
+  const basePool=orders.filter(smPasses);
+  smFStatus=savedStatus;
+  const counts={
+    '':basePool.length,
+    pending:    basePool.filter(o=>bucketMatch(o,'pending')).length,
+    ready:      basePool.filter(o=>bucketMatch(o,'ready')).length,
+    dispatched: basePool.filter(o=>bucketMatch(o,'dispatched')).length
+  };
+  const tab=(k,lbl)=>{
+    const on=smFStatus===k;
+    return '<button class="ol-seg-btn'+(on?' on':'')+'" data-key="'+k+'" role="tab" aria-pressed="'+on+'" onclick="smSetStatus(\''+k+'\')">'
+      +'<span class="ol-seg-lbl">'+lbl+'</span></button>';
+  };
+  const segHost=document.getElementById('sm-status-pills');
+  if(segHost) segHost.innerHTML=tab('','All')+tab('pending','Pending')+tab('ready','Ready')+tab('dispatched','Dispatched');
+  renderResultCount('sm-result-count', smFStatus, counts);
+
+  const summ=document.getElementById('sm-summary');
+  if(summ) summ.textContent=orders.length+' Orders · '+counts.pending+' Pending · '+counts.ready+' Ready · '+counts.dispatched+' Dispatched';
+
+  // Group filtered orders by due date (chronological). Undated orders → separate group at bottom.
+  const list=orders.filter(smPasses);
+  const groups=new Map(); // dateKey → orders[]
+  const undated=[];
+  list.forEach(o=>{
+    if(!o.disp){ undated.push(o); return; }
+    if(!groups.has(o.disp)) groups.set(o.disp,[]);
+    groups.get(o.disp).push(o);
+  });
+  // Sort keys ascending (earliest first)
+  const dateKeys=[...groups.keys()].sort();
+
+  const host=document.getElementById('sm-list');
+  if(!list.length){
+    const q=(document.getElementById('sm-search')?.value||'').trim();
+    const msg=q?'No orders match your search.':'No orders match the filters.';
+    host.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted);font-size:13px">'+esc(msg)+'</div>';
+    document.getElementById('sm-pagination').style.display='none';
+    return;
+  }
+
+  // Simple pagination on the DATE GROUPS (not individual orders) so days stay whole.
+  const totalGroups=dateKeys.length + (undated.length?1:0);
+  const totalPages=Math.max(1,Math.ceil(totalGroups/SM_PAGE_SIZE));
+  if(smPage>totalPages) smPage=totalPages;
+  const start=(smPage-1)*SM_PAGE_SIZE;
+  const pageKeys=dateKeys.slice(start, start+SM_PAGE_SIZE);
+
+  const dayCard=(o)=>{
+    const b=olBuckets(o);
+    const st=olStatus(o);
+    const dotCls=b.p>0?'p':b.r>0?'r':'d';
+    const total=Number(o.qty)||0;
+    const detail=esc(String(o.ply||'?'))+' PLY · '+esc(o.prod||'—')+' · '+olSize(o)+' · '+fmt(total)+' nos';
+    const ono=o.no?'<span class="sm-ono">'+esc(o.no)+'</span>':'';
+    const desc=o.description?'<div class="sm-desc">'+esc(o.description)+'</div>':'';
+    return '<div class="sm-row" data-oid="'+o.id+'" onclick="openDrawer('+o.id+')">'
+      +'<span class="sm-dot '+dotCls+'" title="'+esc(st.text)+'"></span>'
+      +'<div class="sm-row-body">'
+        +'<div class="sm-row-hd"><span class="sm-cust">'+esc(o.cust||'—')+'</span>'+ono+'</div>'
+        +'<div class="sm-row-detail">'+detail+'</div>'
+        +desc
+      +'</div>'
+      +'<span class="sm-row-status '+st.cls+'">'+st.text+'</span>'
+    +'</div>';
+  };
+
+  let html='';
+  pageKeys.forEach(dateStr=>{
+    const dayOrders=groups.get(dateStr);
+    const hdr=smDayHeaderText(dateStr);
+    const relCls=hdr.urgent?' urgent':(hdr.overdue?' overdue':'');
+    html+='<div class="sm-day">'
+      +'<div class="sm-day-hd">'
+        +'<span class="sm-day-date">'+esc(hdr.day)+'</span>'
+        +'<span class="sm-day-rel'+relCls+'">'+esc(hdr.rel)+'</span>'
+        +'<span class="sm-day-count">'+dayOrders.length+(dayOrders.length===1?' order':' orders')+'</span>'
+      +'</div>'
+      +'<div class="sm-day-rows">'+dayOrders.map(dayCard).join('')+'</div>'
+    +'</div>';
+  });
+  if(smPage===totalPages && undated.length){
+    html+='<div class="sm-day"><div class="sm-day-hd">'
+      +'<span class="sm-day-date">Unscheduled</span>'
+      +'<span class="sm-day-rel">no due date</span>'
+      +'<span class="sm-day-count">'+undated.length+(undated.length===1?' order':' orders')+'</span>'
+    +'</div><div class="sm-day-rows">'+undated.map(dayCard).join('')+'</div></div>';
+  }
+  host.innerHTML=html;
+
+  const pgEl=document.getElementById('sm-pagination');
+  if(totalPages>1){
+    pgEl.style.display='flex';
+    pgEl.innerHTML='<span style="font-size:11px;color:var(--ink3)">Page '+smPage+' of '+totalPages+'</span>'
+      +'<div class="pd-pg-btns">'+pdPagerHTML(smPage,totalPages,'smGoPage')+'</div>';
+  } else pgEl.style.display='none';
+}
+
 // ── TASKS ────────────────────────────────────────────────
 // SVG delete icon markup (reused)
 const TRASH_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
@@ -3173,6 +3416,7 @@ function nav(v){
   document.querySelectorAll('[data-v]').forEach(b=>b.classList.toggle('active',b.dataset.v===v));
   document.querySelectorAll('.view').forEach(s=>s.classList.toggle('active',s.id==='view-'+v));
   if(v==='workstatus') renderWorkStatus();
+  if(v==='smart')      renderSmart();
   if(v==='productdata') renderProductData();
 }
 
@@ -3207,6 +3451,7 @@ async function refetchIfStale(){
     const active=document.querySelector('.view.active')?.id||'';
     if(active==='view-orders')     renderOrders();
     if(active==='view-workstatus') renderWorkStatus();
+    if(active==='view-smart')      renderSmart();
     if(active==='view-tasks')      renderTasks();
     if(active==='view-productdata')renderProductData();
   }catch(e){/* silent — user isn't blocked either way */}
