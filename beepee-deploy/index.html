@@ -516,28 +516,25 @@ tr.ol-row:hover{background:var(--s2)}
 }
 
 /* ── SMART STATUS · agenda-list of orders grouped by due date ── */
-/* Match Orders/Status card spacing (6px between day groups). */
+/* Flat list — each row is its own card with 6px gap, matching Orders + Status.
+   Day headers slot inline as sticky-style dividers between the rows. */
 .sm-agenda{display:flex;flex-direction:column;gap:6px}
-.sm-day{background:var(--surface);border:var(--bw) solid var(--line);border-radius:var(--r2);overflow:hidden;box-shadow:var(--shadow-sm)}
-.sm-day-hd{display:flex;align-items:baseline;gap:12px;padding:11px 14px;background:var(--s2);border-bottom:var(--bw) solid var(--line)}
+.sm-day-hd{display:flex;align-items:baseline;gap:12px;padding:14px 4px 4px;font-family:'DM Sans',sans-serif}
+.sm-day-hd:first-child{padding-top:0}
 .sm-day-date{font-family:'Outfit',sans-serif;font-size:14.5px;font-weight:700;color:var(--ink)}
 .sm-day-rel{font-size:11.5px;color:var(--ink3);font-weight:600}
-.sm-day-rel.urgent{color:var(--red);text-transform:uppercase;letter-spacing:.04em}
-.sm-day-rel.overdue{color:var(--red);text-transform:uppercase;letter-spacing:.04em}
+.sm-day-rel.urgent,.sm-day-rel.overdue{color:var(--red);text-transform:uppercase;letter-spacing:.04em}
 .sm-day-count{margin-left:auto;font-size:11px;color:var(--ink3);font-weight:600;font-variant-numeric:tabular-nums}
-.sm-day-rows{display:flex;flex-direction:column}
-/* Row-level status tint + left stripe — matches Orders/Status card treatment. */
-.sm-row{position:relative;display:flex;align-items:center;gap:10px;padding:10px 14px 10px 18px;border-bottom:var(--bw) solid var(--line);cursor:pointer;transition:background .12s}
-.sm-row:last-child{border-bottom:0}
+/* Each row is a standalone card — same tint + left stripe as Orders/Status cards. */
+.sm-row{position:relative;display:flex;align-items:center;gap:10px;padding:11px 14px 11px 18px;border-radius:var(--r2);border:var(--bw) solid var(--line);cursor:pointer;transition:filter .12s;overflow:hidden}
 .sm-row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:transparent}
-.sm-row.pn{background:var(--red-bg)}
+.sm-row.pn{background:var(--red-bg);border-color:rgba(185,28,28,.08)}
 .sm-row.pn::before{background:var(--stat-pend)}
-.sm-row.rd{background:var(--amber-bg)}
+.sm-row.rd{background:var(--amber-bg);border-color:rgba(180,83,9,.08)}
 .sm-row.rd::before{background:var(--stat-ready)}
-.sm-row.ds{background:var(--green-bg)}
+.sm-row.ds{background:var(--green-bg);border-color:rgba(21,128,61,.08)}
 .sm-row.ds::before{background:var(--stat-disp)}
 .sm-row:hover{filter:brightness(.98)}
-/* Legacy dot — no longer needed with tinted rows, but keep the class for compat */
 .sm-dot{display:none}
 .sm-row-body{flex:1;min-width:0}
 .sm-row-hd{display:flex;align-items:baseline;gap:10px}
@@ -2799,26 +2796,28 @@ function renderSmart(){
     +'</div>';
   };
 
+  // Flat list — day header, then N row-cards, then next day header, etc.
+  // Uniform 6px gap between every child of .sm-agenda so row-to-row spacing
+  // matches Orders + Status card lists.
   let html='';
   pageKeys.forEach(dateStr=>{
     const dayOrders=groups.get(dateStr);
     const hdr=smDayHeaderText(dateStr);
     const relCls=hdr.urgent?' urgent':(hdr.overdue?' overdue':'');
-    html+='<div class="sm-day">'
-      +'<div class="sm-day-hd">'
-        +'<span class="sm-day-date">'+esc(hdr.day)+'</span>'
-        +'<span class="sm-day-rel'+relCls+'">'+esc(hdr.rel)+'</span>'
-        +'<span class="sm-day-count">'+dayOrders.length+(dayOrders.length===1?' order':' orders')+'</span>'
-      +'</div>'
-      +'<div class="sm-day-rows">'+dayOrders.map(dayCard).join('')+'</div>'
-    +'</div>';
+    html+='<div class="sm-day-hd">'
+      +'<span class="sm-day-date">'+esc(hdr.day)+'</span>'
+      +'<span class="sm-day-rel'+relCls+'">'+esc(hdr.rel)+'</span>'
+      +'<span class="sm-day-count">'+dayOrders.length+(dayOrders.length===1?' order':' orders')+'</span>'
+    +'</div>'
+    +dayOrders.map(dayCard).join('');
   });
   if(smPage===totalPages && undated.length){
-    html+='<div class="sm-day"><div class="sm-day-hd">'
+    html+='<div class="sm-day-hd">'
       +'<span class="sm-day-date">Unscheduled</span>'
       +'<span class="sm-day-rel">no due date</span>'
       +'<span class="sm-day-count">'+undated.length+(undated.length===1?' order':' orders')+'</span>'
-    +'</div><div class="sm-day-rows">'+undated.map(dayCard).join('')+'</div></div>';
+    +'</div>'
+    +undated.map(dayCard).join('');
   }
   host.innerHTML=html;
 
