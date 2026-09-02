@@ -539,10 +539,12 @@ tr.ol-row:hover{background:var(--s2)}
 .sm-dot{display:none}
 .sm-row-body{flex:1;min-width:0}
 .sm-row-hd{display:flex;align-items:baseline;gap:10px}
+/* Customer stays the boldest/darkest — everything else darkened one step so it
+   reads clearly on the tinted card backgrounds. */
 .sm-cust{font-weight:700;font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sm-ono{font-size:11px;color:var(--ink3);font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
-.sm-row-detail{font-size:11.5px;color:var(--ink3);margin-top:2px;font-variant-numeric:tabular-nums}
-.sm-desc{font-size:11px;color:var(--muted);font-style:italic;margin-top:2px}
+.sm-ono{font-size:11px;color:var(--ink2);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
+.sm-row-detail{font-size:11.5px;color:var(--ink2);font-weight:500;margin-top:2px;font-variant-numeric:tabular-nums}
+.sm-desc{font-size:11px;color:var(--ink3);font-style:italic;margin-top:2px}
 @media(max-width:720px){
   .sm-row{padding:10px 12px 10px 16px;gap:8px}
   .sm-day-hd{padding:12px 4px 4px;gap:10px}
