@@ -155,7 +155,7 @@ body{background:var(--bg);color:var(--ink);font-family:'DM Sans',system-ui,-appl
   .o-detail{white-space:normal;word-break:break-word;flex:1 1 100%}
   .o-right{flex:1 1 100%;justify-content:space-between}
   /* Status card header wraps on mobile */
-  .sc-head{gap:4px}
+  .sc-head{gap:4px;row-gap:2px}
   .sc-head .o-cust{white-space:normal;word-break:break-word}
   .sc-head .o-detail{flex:1 1 100%}
   /* Pills: slightly taller on mobile for tap targets */
@@ -294,7 +294,7 @@ table.t{width:100%;border-collapse:collapse}
 .obody-c{flex:1;padding:8px 12px;min-width:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .o-left{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
 .o-cust{font-size:13.5px;font-weight:700;white-space:nowrap;flex-shrink:0}
-.o-desc{font-size:11.5px;color:var(--ink3);font-style:italic;white-space:pre-line;word-break:break-word;flex:1 1 100%;margin-top:-2px}
+.o-desc{font-size:11.5px;color:var(--ink3);font-style:italic;white-space:pre-line;word-break:break-word;flex:1 1 100%;margin-top:-3px;line-height:1.25}
 .o-ono{font-size:12px;color:var(--ink3);white-space:nowrap}
 .o-detail{font-size:12.5px;font-weight:700;color:var(--ink2);white-space:nowrap}
 .o-right{display:flex;align-items:center;gap:5px;flex-shrink:0;margin-left:auto}
@@ -515,9 +515,10 @@ tr.ol-row:hover{background:var(--s2)}
   .view-switch{padding:0;width:38px;justify-content:center}
 }
 
-/* ── SMART STATUS · agenda-list of orders grouped by due date ── */
-/* Flat list — each row is its own card with 6px gap, matching Orders + Status.
-   Day headers slot inline as sticky-style dividers between the rows. */
+/* ── SMART STATUS · agenda-list of Bucket-view cards grouped by due date ── */
+/* Each row is a full Status (bucket) card via statusCardHTML(), so the tint,
+   progress bar, +Ready / +Dispatch actions and drawer link are identical to
+   the Status page. Day headers slot inline as dividers between the cards. */
 .sm-agenda{display:flex;flex-direction:column;gap:6px}
 .sm-day-hd{display:flex;align-items:baseline;gap:12px;padding:14px 4px 4px;font-family:'DM Sans',sans-serif}
 .sm-day-hd:first-child{padding-top:0}
@@ -526,27 +527,7 @@ tr.ol-row:hover{background:var(--s2)}
 .sm-day-rel.urgent,.sm-day-rel.overdue{color:var(--red);text-transform:uppercase;letter-spacing:.04em}
 .sm-day-rel.done{color:var(--muted);font-weight:500}
 .sm-day-count{margin-left:auto;font-size:11px;color:var(--ink3);font-weight:600;font-variant-numeric:tabular-nums}
-/* Each row is a standalone card — same tint + left stripe as Orders/Status cards. */
-.sm-row{position:relative;display:flex;align-items:center;gap:10px;padding:11px 14px 11px 18px;border-radius:var(--r2);border:var(--bw) solid var(--line);cursor:pointer;transition:filter .12s;overflow:hidden}
-.sm-row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:transparent}
-.sm-row.pn{background:var(--red-bg);border-color:rgba(185,28,28,.08)}
-.sm-row.pn::before{background:var(--stat-pend)}
-.sm-row.rd{background:var(--amber-bg);border-color:rgba(180,83,9,.08)}
-.sm-row.rd::before{background:var(--stat-ready)}
-.sm-row.ds{background:var(--green-bg);border-color:rgba(21,128,61,.08)}
-.sm-row.ds::before{background:var(--stat-disp)}
-.sm-row:hover{filter:brightness(.98)}
-.sm-dot{display:none}
-.sm-row-body{flex:1;min-width:0}
-.sm-row-hd{display:flex;align-items:baseline;gap:10px}
-/* Customer stays the boldest/darkest — everything else darkened one step so it
-   reads clearly on the tinted card backgrounds. */
-.sm-cust{font-weight:700;font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sm-ono{font-size:11px;color:var(--ink2);font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
-.sm-row-detail{font-size:11.5px;color:var(--ink2);font-weight:500;margin-top:2px;font-variant-numeric:tabular-nums}
-.sm-desc{font-size:11px;color:var(--ink3);font-style:italic;margin-top:2px}
 @media(max-width:720px){
-  .sm-row{padding:10px 12px 10px 16px;gap:8px}
   .sm-day-hd{padding:12px 4px 4px;gap:10px}
 }
 
@@ -585,9 +566,13 @@ tr.ol-row:hover{background:var(--s2)}
    (matches every other list card in the app); Outfit is reserved for page titles. */
 /* ── STATUS CARD (scard) — uses .ocard shell, adds bar/nums/tabs below ── */
 .ocard.scard{cursor:pointer}
-.ocard.scard .obody-c{padding-bottom:0}
 .sc-body{flex-direction:column;align-items:stretch}
-.sc-head{flex-wrap:wrap}
+/* .sc-head inherits gap:10px from .o-left as the column-gap between items on
+   the same row. When items wrap to a new row (description, due chip), that
+   10px becomes vertical space too — visible dead space above the description
+   when the order has one. Override row-gap only, so wrapped rows sit tight
+   without touching the horizontal spacing of the header row. */
+.sc-head{flex-wrap:wrap;row-gap:2px}
 .tc-bar{
   display:flex;height:6px;margin:6px 0 6px;border-radius:3px;overflow:hidden;gap:1px;
 }
@@ -1817,12 +1802,9 @@ function statusCardHTML(ord){
         +descHtml
         +dueChipHTML
       +'</div>'
-      // Bar is always visible.
-      +'<div class="tc-bar" aria-label="Progress: '+fmt(pending)+' pending, '+fmt(rq)+' ready, '+fmt(dq)+' dispatched">'
-        +seg('p',pending,pFlex)
-        +seg('r',rq,rFlex)
-        +seg('d',dq,dFlex)
-      +'</div>'
+      // Progress bar removed — the tinted card background + left stripe already
+      // signal the derived status, and the numeric P/R/D readout is one tap
+      // away via the expand panel below.
       // Collapsed by default (Option A) — tap the card to reveal.
       +'<div class="sc-expand" onclick="event.stopPropagation()">'
         +'<div class="tc-nums">'
@@ -2776,23 +2758,11 @@ function renderSmart(){
   const start=(smPage-1)*SM_PAGE_SIZE;
   const pageKeys=dateKeys.slice(start, start+SM_PAGE_SIZE);
 
-  const dayCard=(o)=>{
-    const st=olStatus(o);
-    const total=Number(o.qty)||0;
-    const detail=esc(String(o.ply||'?'))+' PLY · '+esc(o.prod||'—')+' · '+olSize(o)+' · '+fmt(total)+' nos';
-    const ono=o.no?'<span class="sm-ono">'+esc(o.no)+'</span>':'';
-    const desc=o.description?'<div class="sm-desc">'+esc(o.description)+'</div>':'';
-    // Row mirrors the Status card layout: tinted bg + left stripe carry the
-    // status, customer + order no inline, then the spec detail line (qty is
-    // the last chunk of that line — same position as the bucket view).
-    return '<div class="sm-row '+st.cls+'" data-oid="'+o.id+'" onclick="openDrawer('+o.id+')">'
-      +'<div class="sm-row-body">'
-        +'<div class="sm-row-hd"><span class="sm-cust">'+esc(o.cust||'—')+'</span>'+ono+'</div>'
-        +'<div class="sm-row-detail">'+detail+'</div>'
-        +desc
-      +'</div>'
-    +'</div>';
-  };
+  // Each Smart row IS a Bucket-view card — same statusCardHTML() as the Status
+  // page, so click-to-expand, +Ready / +Dispatch, progress bar, due chip and
+  // drawer link all behave identically. commitReady / commitDispatch already
+  // repaint every .ocard.scard[data-oid=X], so live status changes stay in sync.
+  const dayCard=(o)=>statusCardHTML(o);
 
   // Flat list — day header, then N row-cards, then next day header, etc.
   // Uniform 6px gap between every child of .sm-agenda so row-to-row spacing
