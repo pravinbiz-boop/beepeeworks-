@@ -1347,9 +1347,15 @@ tr.ol-row:hover{background:var(--s2)}
       <label class="flbl">Customer *</label>
       <input class="inp" id="ed-cust" list="custList">
     </div>
-    <div class="frow">
-      <label class="flbl">Order No</label>
-      <input class="inp" id="ed-no">
+    <div class="fg2">
+      <div class="frow">
+        <label class="flbl">Order Date</label>
+        <div class="inp" id="ed-date-display" aria-readonly="true" style="display:flex;align-items:center;background:var(--s2);color:var(--ink2);cursor:default"></div>
+      </div>
+      <div class="frow">
+        <label class="flbl">Order No</label>
+        <input class="inp" id="ed-no">
+      </div>
     </div>
     <div class="fg2">
       <div class="frow"><label class="flbl">Product *</label>
@@ -2372,6 +2378,15 @@ function openDrawer(id){
   editId=id;
   document.getElementById('ed-title').textContent='Edit · '+(ord.no||ord.cust||'Order');
   setVal('ed-date',ord.date); setVal('ed-no',ord.no); setVal('ed-cust',ord.cust);
+  const _edDisp=document.getElementById('ed-date-display');
+  if(_edDisp){
+    if(ord.date){
+      const _dt=new Date(ord.date+'T00:00:00');
+      _edDisp.textContent=_dt.getDate()+' '+_dt.toLocaleString('en-IN',{month:'short'})+' '+_dt.getFullYear();
+    } else {
+      _edDisp.textContent='—';
+    }
+  }
   setVal('ed-prod',ord.prod); setVal('ed-ply',ord.ply);
   setVal('ed-L',ord.l); setVal('ed-W',ord.w); setVal('ed-H',ord.h||0);
   toggleH('ed');
