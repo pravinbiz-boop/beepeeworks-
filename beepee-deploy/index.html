@@ -897,10 +897,14 @@ tr.ol-row:hover{background:var(--s2)}
       <input type="hidden" id="no-date">
       <div class="ch"><span class="ctitle">New Order</span><button class="btn-del" onclick="hideNewOrderForm()">✕</button></div>
       <div class="cb" style="padding:12px 14px;display:flex;flex-direction:column;gap:9px">
+        <div class="frow">
+          <label class="flbl">Customer *</label>
+          <input class="inp" id="no-cust" list="custList" placeholder="Type customer name">
+        </div>
         <div class="fg2">
           <div class="frow">
-            <label class="flbl">Customer *</label>
-            <input class="inp" id="no-cust" list="custList" placeholder="Type customer name">
+            <label class="flbl">Order Date</label>
+            <div class="inp" id="no-date-display" aria-readonly="true" style="display:flex;align-items:center;background:var(--s2);color:var(--ink2);cursor:default"></div>
           </div>
           <div class="frow">
             <label class="flbl">Order No</label>
@@ -1711,7 +1715,11 @@ function noGetRows(){
 
 function showNewOrderForm(){
   document.getElementById('new-order-form').style.display='block';
-  document.getElementById('no-date').value=today();
+  const t=today();
+  document.getElementById('no-date').value=t;
+  const dt=new Date(t+'T00:00:00');
+  document.getElementById('no-date-display').textContent=
+    dt.getDate()+' '+dt.toLocaleString('en-IN',{month:'short'})+' '+dt.getFullYear();
   noRowId=0;
   document.getElementById('no-prod-rows').innerHTML='';
   noAddRow();
