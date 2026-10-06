@@ -756,6 +756,15 @@ tr.ol-row:hover{background:var(--s2)}
 .w-sec-icon{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .w-sec-badge{font-size:10px;color:var(--ink3);background:var(--s2);padding:2px 8px;border-radius:10px;font-weight:500}
 .w-divider{height:1px;background:var(--line);margin:2px 0}
+/* Box / Board mode toggle (shared Weight page) */
+.w-mode-toggle{display:inline-flex;background:var(--s2);border-radius:var(--r2);padding:4px;gap:2px;margin-bottom:14px}
+.w-mode-btn{height:40px;padding:0 20px;border:0;border-radius:9px;background:transparent;color:var(--ink3);font-family:inherit;font-weight:600;font-size:13.5px;cursor:pointer;display:inline-flex;align-items:center;gap:9px;transition:all .15s ease}
+.w-mode-btn.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.w-mode-btn svg{width:18px;height:18px;flex-shrink:0}
+.w-mode-btn.on svg{color:var(--accent)}
+#view-weight.board .box-only{display:none !important}
+#view-weight.board .w-geom-fg3,
+#view-weight.board .w-cfg-fg3{grid-template-columns:1fr 1fr}
 
 /* ── FORM GRID ── */
 .fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -1068,13 +1077,25 @@ tr.ol-row:hover{background:var(--s2)}
   </section>
 
   <!-- WEIGHT -->
-  <section id="view-weight" class="view">
+  <section id="view-weight" class="view box">
     <div class="ph"><div><div class="ptitle">Weight Calculator</div></div></div>
+
+    <!-- Box / Board mode toggle -->
+    <div class="w-mode-toggle" role="tablist">
+      <button class="w-mode-btn on" id="w-mb-box" type="button" onclick="wSetMode('box')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        Box
+      </button>
+      <button class="w-mode-btn" id="w-mb-board" type="button" onclick="wSetMode('board')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="6" rx="1"/><line x1="3" y1="12" x2="21" y2="12"/></svg>
+        Board
+      </button>
+    </div>
 
     <!-- Result strip -->
     <div class="card w-result-card" style="margin-bottom:14px;overflow:hidden">
       <div class="w-result-strip">
-        <div><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.5)">Weight per Box</span></div>
+        <div><span id="w-result-lbl" style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.5)">Weight per Box</span></div>
         <div style="display:flex;align-items:baseline;gap:6px">
           <span class="w-result-val" id="w-result">—</span>
           <span class="w-result-unit">kg</span>
@@ -1093,24 +1114,24 @@ tr.ol-row:hover{background:var(--s2)}
               <div class="w-sec-icon" style="background:var(--accent-bg);color:var(--accent)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></div>
               <span class="wlbl" style="margin:0">Configuration</span>
             </div>
-            <div class="fg3">
+            <div class="fg3 w-cfg-fg3">
               <div class="frow"><label class="wlbl">Ply</label><select class="sel" id="w-ply" onchange="wPlyChange()"><option>3</option><option>5</option><option>7</option></select></div>
-              <div class="frow"><label class="wlbl">Unit</label><select class="sel" id="w-unit" onchange="wCalc()"><option value="in">Inches</option><option value="cm">CM</option></select></div>
-              <div class="frow"><label class="wlbl">Joint</label><select class="sel" id="w-joint" onchange="wCalc()"><option value="double">Double</option><option value="single">Single</option></select></div>
+              <div class="frow"><label class="wlbl">Unit</label><select class="sel" id="w-unit" onchange="wReelEdited=false;wCutEdited=false;wCalc()"><option value="in">Inches</option><option value="cm">CM</option></select></div>
+              <div class="frow box-only"><label class="wlbl">Joint</label><select class="sel" id="w-joint" onchange="wCalc()"><option value="double">Double</option><option value="single">Single</option></select></div>
             </div>
           </div>
           <div class="w-divider"></div>
-          <!-- Box Size -->
+          <!-- Box / Sheet Size -->
           <div>
             <div class="w-sec-title">
               <div class="w-sec-icon" style="background:var(--blue-bg);color:var(--blue)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
-              <span class="wlbl" style="margin:0">Box Size</span>
+              <span class="wlbl" id="w-geom-title" style="margin:0">Box Size</span>
               <span class="w-sec-badge" id="w-unit-lbl">inches</span>
             </div>
-            <div class="fg3">
+            <div class="fg3 w-geom-fg3">
               <div class="frow"><label class="wlbl">L</label><input class="inp num" type="number" inputmode="decimal" id="w-L" value="15" min="0" oninput="wCalc()"></div>
               <div class="frow"><label class="wlbl">W</label><input class="inp num" type="number" inputmode="decimal" id="w-W" value="15" min="0" oninput="wCalc()"></div>
-              <div class="frow"><label class="wlbl">H</label><input class="inp num" type="number" inputmode="decimal" id="w-H" value="15" min="0" oninput="wCalc()"></div>
+              <div class="frow box-only"><label class="wlbl">H</label><input class="inp num" type="number" inputmode="decimal" id="w-H" value="15" min="0" oninput="wCalc()"></div>
             </div>
           </div>
           <div class="w-divider"></div>
@@ -1133,13 +1154,13 @@ tr.ol-row:hover{background:var(--s2)}
           <div>
             <div class="w-sec-title">
               <div class="w-sec-icon" style="background:var(--green-bg);color:var(--green)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M21 3H3v18h18V3z"/><path d="M21 9H3M21 15H3M9 3v18"/></svg></div>
-              <span class="wlbl" style="margin:0">Board Sizes</span>
+              <span class="wlbl" id="w-board-title" style="margin:0">Board Sizes</span>
               <span class="w-sec-badge">editable · in</span>
               <button class="btn btn-g btn-sm" id="w-board-reset" style="display:none;height:22px;padding:0 8px;font-size:10px;margin-left:auto" onclick="wBoardReset()">↺ Auto</button>
             </div>
             <div class="w-board-row" style="display:flex;gap:12px;align-items:flex-start">
               <div class="frow" style="flex:1">
-                <label class="wlbl">Reel (W+H+1)</label>
+                <label class="wlbl" id="w-reel-lbl">Reel (W+H+1)</label>
                 <div style="display:flex;align-items:center;gap:6px">
                   <input class="inp num" type="number" inputmode="decimal" id="w-reel" step="0.01" oninput="wReelEdited=true;wCalc()">
                   <span style="font-size:11px;color:var(--ink3)">in</span>
@@ -1565,6 +1586,7 @@ let editId=null;
 let editTaskId=null;
 let appInited=false;
 let wReelEdited=false, wCutEdited=false, wTotalGsmEdited=false;
+let wMode='box', wCurPly='3';
 let tSort='newest', tPage=1;
 const T_PAGE_SIZE=50;
 const T_LS_KEY='beepee.tasks.filters.v1';
@@ -3095,10 +3117,37 @@ function deleteFromTaskDrawer(){
 }
 
 // ── WEIGHT ───────────────────────────────────────────────
+// Box / Board mode toggle. Box uses the original overlap/joint math;
+// Board treats reel = W and cut = L (flat sheet, sheets × 1).
+function wSetMode(m){
+  wMode=m;
+  const view=document.getElementById('view-weight');
+  if(view){view.classList.toggle('board',m==='board');view.classList.toggle('box',m==='box');}
+  document.getElementById('w-mb-box').classList.toggle('on',m==='box');
+  document.getElementById('w-mb-board').classList.toggle('on',m==='board');
+  document.getElementById('w-geom-title').textContent  = m==='box' ? 'Box Size' : 'Sheet Size';
+  document.getElementById('w-board-title').textContent = m==='box' ? 'Board Sizes' : 'Sheet dimensions';
+  document.getElementById('w-result-lbl').textContent  = m==='box' ? 'Weight per Box' : 'Weight per Sheet';
+  // Fresh mode: drop any manual Reel/Cut overrides so geometry drives again.
+  wReelEdited=false; wCutEdited=false;
+  wCalc();
+}
 function wPlyChange(){
+  const newPly=document.getElementById('w-ply').value;
+  // F2 — warn before silently discarding manual per-layer GSM edits.
+  const oldLayers=PLY_LAYERS[wCurPly]||[];
+  const hasEdits=oldLayers.some((l,i)=>{
+    const el=document.getElementById('wg'+i);
+    const def=DEF_GSM[l.l]||120;
+    return el && Math.abs((parseFloat(el.value)||0)-def) > 0.5;
+  });
+  if(hasEdits && !confirm('Changing Ply will reset the per-layer GSM values you edited. Continue?')){
+    document.getElementById('w-ply').value=wCurPly;
+    return;
+  }
+  wCurPly=newPly;
   wTotalGsmEdited=false;
-  const ply=document.getElementById('w-ply').value;
-  document.getElementById('w-gsm-fields').innerHTML=PLY_LAYERS[ply].map((l,i)=>
+  document.getElementById('w-gsm-fields').innerHTML=PLY_LAYERS[newPly].map((l,i)=>
     '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">'
     +'<div style="display:flex;align-items:center;gap:8px">'
       +'<div style="width:7px;height:7px;border-radius:50%;background:'+(l.t==='flute'?'var(--amber)':'var(--ink)')+'"></div>'
@@ -3114,16 +3163,30 @@ function wCalc(){
   const unit=document.getElementById('w-unit').value;
   const joint=document.getElementById('w-joint').value;
   const f=unit==='cm'?1/2.54:1;
-  const L=(parseFloat(document.getElementById('w-L').value)||0)*f;
-  const W=(parseFloat(document.getElementById('w-W').value)||0)*f;
-  const H=(parseFloat(document.getElementById('w-H').value)||0)*f;
-  const reel=W+H+1, cut=joint==='double'?(L+W+2):(L*2+W*2+2);
+  // F4 — clamp negative input to zero inside the math so nothing produces negative weight.
+  const L=Math.max(0,parseFloat(document.getElementById('w-L').value)||0)*f;
+  const W=Math.max(0,parseFloat(document.getElementById('w-W').value)||0)*f;
+  const H=Math.max(0,parseFloat(document.getElementById('w-H').value)||0)*f;
+  let reel, cut;
+  if(wMode==='box'){
+    reel = W+H+1;
+    cut  = joint==='double' ? (L+W+2) : (L*2+W*2+2);
+  } else {
+    reel = W; cut = L;
+  }
   if(!wReelEdited){const el=document.getElementById('w-reel');if(el)el.value=reel.toFixed(2);}
   if(!wCutEdited){const el=document.getElementById('w-cut');if(el)el.value=cut.toFixed(2);}
   document.getElementById('w-unit-lbl').textContent=unit==='in'?'inches':'cm → inches';
   document.getElementById('w-reel-hint').textContent=wReelEdited?'Formula: '+reel.toFixed(2)+' in':'';
   document.getElementById('w-cut-hint').textContent=wCutEdited?'Formula: '+cut.toFixed(2)+' in':'';
-  document.getElementById('w-cut-lbl').textContent=joint==='double'?'Cut Size (L+W+2)':'Cut Size (L×2+W×2+2)';
+  // Mode-dependent field labels.
+  if(wMode==='board'){
+    document.getElementById('w-reel-lbl').textContent='Width (= W)';
+    document.getElementById('w-cut-lbl').textContent ='Length (= L)';
+  } else {
+    document.getElementById('w-reel-lbl').textContent='Reel (W+H+1)';
+    document.getElementById('w-cut-lbl').textContent =joint==='double'?'Cut Size (L+W+2)':'Cut Size (L×2+W×2+2)';
+  }
   document.getElementById('w-board-reset').style.display=(wReelEdited||wCutEdited)?'inline-flex':'none';
   wCalcFromBoard();
 }
@@ -3131,19 +3194,25 @@ function wBoardReset(){wReelEdited=false;wCutEdited=false;document.getElementByI
 function wCalcFromBoard(){
   const ply=document.getElementById('w-ply').value;
   const joint=document.getElementById('w-joint').value;
-  const reel=parseFloat(document.getElementById('w-reel')?.value)||0;
-  const cut=parseFloat(document.getElementById('w-cut')?.value)||0;
+  const reel=Math.max(0,parseFloat(document.getElementById('w-reel')?.value)||0);
+  const cut =Math.max(0,parseFloat(document.getElementById('w-cut')?.value)||0);
   let gsm=0;
   PLY_LAYERS[ply].forEach((l,i)=>{const v=parseFloat(document.getElementById('wg'+i)?.value)||0;gsm+=l.t==='flute'?v*1.45:v;});
   const gsmEl=document.getElementById('w-total-gsm');
   if(gsmEl&&!wTotalGsmEdited) gsmEl.value=Math.round(gsm);
   const g=gsmEl?parseFloat(gsmEl.value)||0:gsm;
-  const sheets=joint==='double'?2:1;
+  const sheets = wMode==='box' ? (joint==='double'?2:1) : 1;
   const wt=(reel*cut/1550)*g*sheets/1000;
+  // F3 — require real geometry before showing a weight; the +1/+2 Box overlaps
+  // would otherwise produce a non-zero "ghost" weight for an empty-dimension box.
+  const Lv=parseFloat(document.getElementById('w-L').value)||0;
+  const Wv=parseFloat(document.getElementById('w-W').value)||0;
+  const Hv=parseFloat(document.getElementById('w-H').value)||0;
+  const hasGeom = wMode==='box' ? (Lv>0 && Wv>0 && Hv>0) : (Lv>0 && Wv>0);
   const res=document.getElementById('w-result');
-  if(res) res.textContent=wt>0?wt.toFixed(3):'—';
+  if(res) res.textContent=(hasGeom && wt>0)?wt.toFixed(3):'—';
   const fm=document.getElementById('w-formula');
-  if(fm) fm.textContent=reel.toFixed(2)+'″ × '+cut.toFixed(2)+'″ = '+(reel*cut/1550).toFixed(4)+' m² × '+Math.round(g)+' GSM × '+sheets+' = '+wt.toFixed(3)+' kg';
+  if(fm) fm.textContent=reel.toFixed(2)+'″ × '+cut.toFixed(2)+'″ = '+(reel*cut/1550).toFixed(4)+' m² × '+Math.round(g)+' GSM × '+sheets+' sheet'+(sheets>1?'s':'')+' = '+wt.toFixed(3)+' kg';
 }
 
 // ── PRODUCT DATA ─────────────────────────────────────────
