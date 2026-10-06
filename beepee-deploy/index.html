@@ -765,6 +765,9 @@ tr.ol-row:hover{background:var(--s2)}
 #view-weight.board .box-only{display:none !important}
 #view-weight.board .w-geom-fg3,
 #view-weight.board .w-cfg-fg3{grid-template-columns:1fr 1fr}
+/* Board mode drops to a single column — the right card only holds Total GSM
+   once Board Sizes is hidden, so the two-column grid leaves awkward empty space. */
+#view-weight.board .w2{grid-template-columns:1fr}
 
 /* ── FORM GRID ── */
 .fg2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -1150,8 +1153,8 @@ tr.ol-row:hover{background:var(--s2)}
       <!-- Right column: Board Sizes + Total GSM -->
       <div class="card">
         <div class="cb" style="display:flex;flex-direction:column;gap:14px">
-          <!-- Board Sizes -->
-          <div>
+          <!-- Board Sizes (Box mode only — Board mode uses L/W directly, no overlap math) -->
+          <div class="box-only">
             <div class="w-sec-title">
               <div class="w-sec-icon" style="background:var(--green-bg);color:var(--green)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="14" height="14"><path d="M21 3H3v18h18V3z"/><path d="M21 9H3M21 15H3M9 3v18"/></svg></div>
               <span class="wlbl" id="w-board-title" style="margin:0">Board Sizes</span>
@@ -1177,7 +1180,7 @@ tr.ol-row:hover{background:var(--s2)}
               </div>
             </div>
           </div>
-          <div class="w-divider"></div>
+          <div class="w-divider box-only"></div>
           <!-- Total GSM -->
           <div>
             <div class="w-sec-title">
@@ -3205,10 +3208,15 @@ function wCalcFromBoard(){
   const wt=(reel*cut/1550)*g*sheets/1000;
   // F3 — require real geometry before showing a weight; the +1/+2 Box overlaps
   // would otherwise produce a non-zero "ghost" weight for an empty-dimension box.
+  // A manual Reel/Cut override also counts as valid geometry (Box mode only;
+  // Board mode hides Reel/Cut, so L/W are the sole source there).
   const Lv=parseFloat(document.getElementById('w-L').value)||0;
   const Wv=parseFloat(document.getElementById('w-W').value)||0;
   const Hv=parseFloat(document.getElementById('w-H').value)||0;
-  const hasGeom = wMode==='box' ? (Lv>0 && Wv>0 && Hv>0) : (Lv>0 && Wv>0);
+  const manualBoard = (wReelEdited||wCutEdited) && reel>0 && cut>0;
+  const hasGeom = wMode==='box'
+    ? (manualBoard || (Lv>0 && Wv>0 && Hv>0))
+    : (Lv>0 && Wv>0);
   const res=document.getElementById('w-result');
   if(res) res.textContent=(hasGeom && wt>0)?wt.toFixed(3):'—';
   const fm=document.getElementById('w-formula');
